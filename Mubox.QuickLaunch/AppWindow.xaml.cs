@@ -10,7 +10,8 @@ namespace Mubox.QuickLaunch
     /// <summary>
     /// Interaction logic for Window1.xaml
     /// </summary>
-    public partial class AppWindow : Window
+    public partial class AppWindow 
+        : Window, IDisposable
     {
         private DispatcherTimer TitleTimer { get; set; }
 
@@ -63,7 +64,7 @@ namespace Mubox.QuickLaunch
         {
             NotifyPropertyChangedExtensions.UIDispatcher = this.Dispatcher;
             IconHandles = new Dictionary<string, System.Drawing.Icon>();
-            IconHandles.Add("QuickLaunch", new System.Drawing.Icon(System.IO.Path.Combine(Environment.CurrentDirectory, @"Notification\Icons\network_center.ico")));
+            IconHandles.Add("QuickLaunch", new System.Drawing.Icon(System.IO.Path.Combine(Environment.CurrentDirectory, @"Notification\Icons\Mubox2013.ico")));
             notifyIcon = new System.Windows.Forms.NotifyIcon();
             notifyIcon.Click += notifyIcon_Click;
             notifyIcon.DoubleClick += notifyIcon_DoubleClick;
@@ -243,6 +244,16 @@ namespace Mubox.QuickLaunch
 
         private void frameContentPage_NavigationFailed(object sender, NavigationFailedEventArgs e)
         {
+        }
+
+        public void Dispose()
+        {
+            var notifyIcon = this.notifyIcon;
+            this.notifyIcon = null;
+            if (notifyIcon != null)
+            {
+                notifyIcon.Dispose();
+            }
         }
     }
 }

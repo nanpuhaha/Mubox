@@ -26,8 +26,7 @@
     </AssemblyOriginatorKeyFile>
     <TargetZone>LocalIntranet</TargetZone>
     <GenerateManifests>true</GenerateManifests>
-    <ApplicationIcon>
-    </ApplicationIcon>
+    <ApplicationIcon>Mubox2013.ico</ApplicationIcon>
     <IsWebBootstrapper>true</IsWebBootstrapper>
     <ExcludedPermissions>
     </ExcludedPermissions>
@@ -185,9 +184,9 @@
     <Resource Include="Content\Images\Help.png">
     </Resource>
     <Resource Include="Content\Images\GotoShortcutsHS.png" />
-    <Resource Include="network_center.ico" />
-    <Content Include="Notification\Icons\network_center.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Resource Include="Mubox2013.ico" />
+    <Content Include="Notification\Icons\Mubox2013.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>

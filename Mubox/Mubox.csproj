@@ -63,6 +63,9 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Content\Icons\Mubox2013.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
@@ -145,6 +148,7 @@
     </Compile>
     <Compile Include="View\SysTrayMenu.cs" />
     <Resource Include="Content\Images\ExtraLifeBanner.png" />
+    <Content Include="Content\Icons\Mubox2013.ico" />
     <Content Include="Images\ExtraLifeBanner.png" />
     <Content Include="View\Themes\BrushedGlass.xaml">
       <SubType>Designer</SubType>
@@ -248,7 +252,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\Icons\Mubox.ico" />
     <Content Include="View\Server\PayPalDonateButton.png" />
   </ItemGroup>
   <ItemGroup>
