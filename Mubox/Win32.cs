@@ -15,19 +15,19 @@ namespace Mubox
         public static class Cursor
         {
             [DllImport("user32.dll")]
-            public static extern bool GetCursorPos(out System.Drawing.Point lpPoint);
+            internal static extern bool GetCursorPos(out System.Drawing.Point lpPoint);
 
             [DllImport("user32.dll")]
-            public static extern bool SetCursorPos(int X, int Y);
+            internal static extern bool SetCursorPos(int X, int Y);
 
             [DllImport("user32.dll")]
-            public static extern IntPtr GetCapture();
+            internal static extern IntPtr GetCapture();
 
             [DllImport("user32.dll")]
-            public static extern IntPtr SetCapture(IntPtr hWnd);
+            internal static extern IntPtr SetCapture(IntPtr hWnd);
 
             [DllImport("user32.dll")]
-            public static extern bool ReleaseCapture();
+            internal static extern bool ReleaseCapture();
         }
 
         #endregion
@@ -37,7 +37,7 @@ namespace Mubox
         public static class SystemMetrics
         {
             [DllImport("user32.dll")]
-            public static extern int GetSystemMetrics(SM smIndex);
+            internal static extern int GetSystemMetrics(SM smIndex);
 
             public enum SM : int
             {
@@ -427,19 +427,19 @@ namespace Mubox
         public static class WindowHook
         {
             [DllImport("user32.dll", SetLastError = true)]
-            public static extern IntPtr SetWindowsHookEx(HookType hookType, IntPtr callbackPtr, IntPtr hModule, IntPtr dwThreadId);
+            internal static extern IntPtr SetWindowsHookEx(HookType hookType, IntPtr callbackPtr, IntPtr hModule, IntPtr dwThreadId);
 
             [DllImport("user32.dll")]
-            public static extern int CallNextHookEx(IntPtr hHook, int nCode, IntPtr wParam, IntPtr lParam);
+            internal static extern int CallNextHookEx(IntPtr hHook, int nCode, IntPtr wParam, IntPtr lParam);
 
             [DllImport("user32.dll")]
-            public static extern bool UnhookWindowsHookEx(IntPtr hhk);
+            internal static extern bool UnhookWindowsHookEx(IntPtr hhk);
 
-            public delegate int HookProc(int code, IntPtr wParam, IntPtr lParam);
+            internal delegate int HookProc(int code, IntPtr wParam, IntPtr lParam);
 
-            public delegate int LowLevelKeyboardProc(int nCode, WM windowMessage, IntPtr keyboardHookStruct);
+            internal delegate int LowLevelKeyboardProc(int nCode, WM windowMessage, IntPtr keyboardHookStruct);
 
-            public delegate IntPtr LowLevelMouseProc(int code, WM windowMessage, IntPtr mouseHookStruct);
+            internal delegate IntPtr LowLevelMouseProc(int code, WM windowMessage, IntPtr mouseHookStruct);
 
             public enum HookType : int
             {
@@ -463,11 +463,11 @@ namespace Mubox
             [StructLayout(LayoutKind.Sequential)]
             public struct KBDLLHOOKSTRUCT
             {
-                public uint vkCode;
-                public uint scanCode;
-                public LLKHF flags;
-                public uint time;
-                public IntPtr dwExtraInfo;
+                internal uint vkCode;
+                internal uint scanCode;
+                internal LLKHF flags;
+                internal uint time;
+                internal IntPtr dwExtraInfo;
             }
 
             [Flags]
@@ -493,11 +493,11 @@ namespace Mubox
             [StructLayout(LayoutKind.Sequential)]
             public struct MSLLHOOKSTRUCT
             {
-                public System.Drawing.Point pt;
-                public uint mouseData;
-                public LLMHF flags;
-                public uint time;
-                public IntPtr dwExtraInfo;
+                internal System.Drawing.Point pt;
+                internal uint mouseData;
+                internal LLMHF flags;
+                internal uint time;
+                internal IntPtr dwExtraInfo;
             }
 
             [Flags]
@@ -933,7 +933,7 @@ namespace Mubox
         public static class Windows
         {
             [DllImport("user32.dll")]
-            public static extern bool ShowWindowAsync(IntPtr hWnd, ShowState nCmdShow);
+            internal static extern bool ShowWindowAsync(IntPtr hWnd, ShowState nCmdShow);
 
             public enum ShowState : int
             {
@@ -984,16 +984,16 @@ namespace Mubox
             }
 
             [DllImport("user32.dll")]
-            public static extern bool SetWindowPos(IntPtr hwnd, Position position, int X, int Y, int cx, int cy, Options options);
+            internal static extern bool SetWindowPos(IntPtr hwnd, Position position, int X, int Y, int cx, int cy, Options options);
 
             [DllImport("user32.dll")]
-            public static extern bool SetWindowPos(IntPtr hwnd, IntPtr insertAt, int X, int Y, int cx, int cy, uint uFlags);
+            internal static extern bool SetWindowPos(IntPtr hwnd, IntPtr insertAt, int X, int Y, int cx, int cy, uint uFlags);
 
             [DllImport("user32.dll")]
-            public static extern uint SetWindowLong(IntPtr hwnd, GWL nIndex, uint dwNewLong);
+            internal static extern uint SetWindowLong(IntPtr hwnd, GWL nIndex, uint dwNewLong);
 
             [DllImport("user32.dll", SetLastError = true)]
-            public static extern uint GetWindowLong(IntPtr hWnd, GWL nIndex);
+            internal static extern uint GetWindowLong(IntPtr hWnd, GWL nIndex);
 
             public enum GWL : int
             {
@@ -1094,79 +1094,87 @@ namespace Mubox
             }
 
             [DllImport("user32.dll", SetLastError = true)]
-            public static extern bool BringWindowToTop(IntPtr hWnd);
+            internal static extern bool BringWindowToTop(IntPtr hWnd);
 
             [DllImport("user32.dll")]
-            public static extern IntPtr SetActiveWindow(IntPtr hWnd);
+            internal static extern IntPtr SetActiveWindow(IntPtr hWnd);
 
             // For Windows Mobile, replace user32.dll with coredll.dll
             [DllImport("user32.dll")]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool SetForegroundWindow(IntPtr hWnd);
+            internal static extern bool SetForegroundWindow(IntPtr hWnd);
 
             [DllImport("user32.dll", SetLastError = true)]
-            public static extern IntPtr GetWindowThreadProcessId(IntPtr hWnd, out IntPtr lpdwProcessId);
+            internal static extern IntPtr GetWindowThreadProcessId(IntPtr hWnd, out IntPtr lpdwProcessId);
 
             [DllImport("user32.dll")]
-            public static extern bool AttachThreadInput(IntPtr idAttach, IntPtr idAttachTo, bool fAttach);
+            internal static extern bool AttachThreadInput(IntPtr idAttach, IntPtr idAttachTo, bool fAttach);
 
             [DllImport("user32.dll")]
-            public static extern IntPtr GetForegroundWindow();
+            internal static extern IntPtr GetForegroundWindow();
+
+            public static IntPtr CurrentForegroundWindow
+            {
+                get
+                {
+                    return GetForegroundWindow();
+                }
+            }
 
             [return: MarshalAs(UnmanagedType.Bool)]
             [DllImport("user32.dll", SetLastError = true)]
-            public static extern bool PostMessage(IntPtr hWnd, WM Msg, int wParam, uint lParam);
+            internal static extern bool PostMessage(IntPtr hWnd, WM Msg, int wParam, uint lParam);
 
             [return: MarshalAs(UnmanagedType.Bool)]
             [DllImport("user32.dll", SetLastError = true)]
-            public static extern bool PostMessage(IntPtr hWnd, WM Msg, uint wParam, uint lParam);
+            internal static extern bool PostMessage(IntPtr hWnd, WM Msg, uint wParam, uint lParam);
 
             [DllImport("user32.dll")]
-            public static extern IntPtr SendMessage(IntPtr hWnd, WM Msg, int wParam, uint lParam);
+            internal static extern IntPtr SendMessage(IntPtr hWnd, WM Msg, int wParam, uint lParam);
 
             [DllImport("user32.dll")]
-            public static extern bool TranslateMessage(ref MSG lpMsg);
+            internal static extern bool TranslateMessage(ref MSG lpMsg);
 
             [DllImport("user32.dll")]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool EnumWindows(EnumWindowsProc enumWindowsProc, IntPtr lParam);
+            internal static extern bool EnumWindows(EnumWindowsProc enumWindowsProc, IntPtr lParam);
 
-            public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
-
-            [DllImport("user32.dll")]
-            public static extern bool EnumDesktopWindows(IntPtr hDesktop, Func<IntPtr, IntPtr, bool> enumWindowsProc, IntPtr lParam);
+            internal delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 
             [DllImport("user32.dll")]
-            public static extern bool EnumDesktopWindows(IntPtr hDesktop, IntPtr enumWindowsCallbackPtr, IntPtr lParam);
+            internal static extern bool EnumDesktopWindows(IntPtr hDesktop, Func<IntPtr, IntPtr, bool> enumWindowsProc, IntPtr lParam);
 
             [DllImport("user32.dll")]
-            public static extern bool EnumDesktopWindows(IntPtr hDesktop, EnumWindowsProc enumWindowsCallbackPtr, IntPtr lParam);
+            internal static extern bool EnumDesktopWindows(IntPtr hDesktop, IntPtr enumWindowsCallbackPtr, IntPtr lParam);
+
+            [DllImport("user32.dll")]
+            internal static extern bool EnumDesktopWindows(IntPtr hDesktop, EnumWindowsProc enumWindowsCallbackPtr, IntPtr lParam);
 
             [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-            public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+            internal static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
             [DllImport("user32.dll")]
-            public static extern IntPtr SetFocus(IntPtr hWnd);
+            internal static extern IntPtr SetFocus(IntPtr hWnd);
 
             [DllImport("user32.dll")]
-            public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+            internal static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
 
             [DllImport("user32.dll")]
-            public static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
+            internal static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
 
             [DllImport("user32.dll")]
-            public static extern bool ScreenToClient(IntPtr hWnd, ref POINT lpPoint);
+            internal static extern bool ScreenToClient(IntPtr hWnd, ref POINT lpPoint);
 
             [Serializable, StructLayout(LayoutKind.Sequential)]
             public struct RECT
             {
-                public int Left;
-                public int Top;
-                public int Right;
-                public int Bottom;
-                public int Width { get { return Right - Left; } }
+                internal int Left;
+                internal int Top;
+                internal int Right;
+                internal int Bottom;
+                internal int Width { get { return Right - Left; } }
 
-                public int Height { get { return Bottom - Top; } }
+                internal int Height { get { return Bottom - Top; } }
             }
 
             [Flags]
@@ -1185,23 +1193,23 @@ namespace Mubox
             [Serializable, StructLayout(LayoutKind.Sequential)]
             public struct MSG
             {
-                public IntPtr hwnd;
-                public WM message;
-                public int wParam;
-                public uint lParam;
-                public uint time;
-                public POINT pt;
+                internal IntPtr hwnd;
+                internal WM message;
+                internal int wParam;
+                internal uint lParam;
+                internal uint time;
+                internal POINT pt;
             }
 
             [StructLayout(LayoutKind.Sequential)]
             public struct POINT
             {
-                public int x;
-                public int y;
+                internal int x;
+                internal int y;
             }
 
             [DllImport("user32.dll", CharSet = CharSet.Auto)]
-            public static extern IntPtr DefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+            internal static extern IntPtr DefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
         }
 
         public enum HitTestValues : short
@@ -2157,10 +2165,10 @@ namespace Mubox
         public static class Threads
         {
             [DllImport("kernel32.dll")]
-            public static extern IntPtr GetCurrentThreadId();
+            internal static extern IntPtr GetCurrentThreadId();
 
             [DllImport("user32.dll", SetLastError = true)]
-            public static extern uint GetWindowThreadProcessId(IntPtr hwnd, out IntPtr processId);
+            internal static extern uint GetWindowThreadProcessId(IntPtr hwnd, out IntPtr processId);
         }
 
         #endregion
@@ -2169,22 +2177,22 @@ namespace Mubox
         public static class SendInputApi
         {
             [DllImport("user32.dll", SetLastError = true)]
-            public static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+            internal static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
 
             [DllImport("user32.dll", SetLastError = true)]
-            public static extern uint SendInput(uint nInputs, INPUT64[] pInputs, int cbSize);
+            internal static extern uint SendInput(uint nInputs, INPUT64[] pInputs, int cbSize);
 
             [DllImport("user32.dll", SetLastError = false)]
-            public static extern IntPtr GetMessageExtraInfo();
+            internal static extern IntPtr GetMessageExtraInfo();
 
             [DllImport("kernel32.dll")]
-            public static extern uint GetTickCount();
+            internal static extern uint GetTickCount();
 
             [DllImport("user32.dll")]
-            public static extern ushort VkKeyScan(char ch);
+            internal static extern ushort VkKeyScan(char ch);
 
             [DllImport("user32.dll")]
-            public static extern uint MapVirtualKey(VK uCode, MAPVK uMapType);
+            internal static extern uint MapVirtualKey(VK uCode, MAPVK uMapType);
 
             public enum MAPVK : uint
             {
@@ -2195,7 +2203,7 @@ namespace Mubox
                 MAPVK_VK_TO_VSC_EX = 0x04
             }
 
-            public static void SendInputViaKBParams(Win32.WindowHook.LLKHF flags, uint time, uint scan, uint vk, Win32.CAS cas)
+            internal static void SendInputViaKBParams(Win32.WindowHook.LLKHF flags, uint time, uint scan, uint vk, Win32.CAS cas)
             {
                 if ((flags & WindowHook.LLKHF.UP) != WindowHook.LLKHF.UP)
                 {
@@ -2260,7 +2268,7 @@ namespace Mubox
                 }
             }
 
-            public static KeyEventFlags ConvertFlags(WindowHook.LLKHF flags)
+            internal static KeyEventFlags ConvertFlags(WindowHook.LLKHF flags)
             {
                 KeyEventFlags newFlags = KeyEventFlags.None;
                 if (Win32.WindowHook.LLKHF.UP == (Win32.WindowHook.LLKHF.UP & flags))
@@ -2274,12 +2282,12 @@ namespace Mubox
                 return newFlags;
             }
 
-            public static void SendInputViaHookStruct(Win32.WindowHook.MSLLHOOKSTRUCT hookStruct, int X, int Y)
+            internal static void SendInputViaHookStruct(Win32.WindowHook.MSLLHOOKSTRUCT hookStruct, int X, int Y)
             {
                 SendInputViaMSParams((MouseEventFlags)hookStruct.flags, hookStruct.time, X, Y, hookStruct.mouseData);
             }
 
-            public static void SendInputViaMSParams(MouseEventFlags flags, uint time, int relX, int relY, uint mouseData)
+            internal static void SendInputViaMSParams(MouseEventFlags flags, uint time, int relX, int relY, uint mouseData)
             {
                 uint result = 0;
                 if (IntPtr.Size == 8)
@@ -2330,8 +2338,8 @@ namespace Mubox
                 KEYEVENTF_SCANCODE = 0x0008
             }
 
-            public const uint XBUTTON1 = 0x0001;
-            public const uint XBUTTON2 = 0x0002;
+            internal const uint XBUTTON1 = 0x0001;
+            internal const uint XBUTTON2 = 0x0002;
 
             [Flags]
             public enum MouseEventFlags : uint
@@ -2355,55 +2363,55 @@ namespace Mubox
             public struct INPUT
             {
                 [FieldOffset(0)]
-                public InputType InputType;
+                internal InputType InputType;
                 [FieldOffset(4)]
-                public KEYBDINPUT ki;
+                internal KEYBDINPUT ki;
                 [FieldOffset(4)]
-                public MOUSEINPUT mi;
+                internal MOUSEINPUT mi;
                 [FieldOffset(4)]
-                public HARDWAREINPUT hi;
+                internal HARDWAREINPUT hi;
             }
 
             [StructLayout(LayoutKind.Explicit)]
             public struct INPUT64
             {
                 [FieldOffset(0)]
-                public InputType InputType;
+                internal InputType InputType;
                 [FieldOffset(8)]
-                public KEYBDINPUT ki;
+                internal KEYBDINPUT ki;
                 [FieldOffset(8)]
-                public MOUSEINPUT mi;
+                internal MOUSEINPUT mi;
                 [FieldOffset(8)]
-                public HARDWAREINPUT hi;
+                internal HARDWAREINPUT hi;
             }
 
             [StructLayout(LayoutKind.Sequential)]
             public struct MOUSEINPUT
             {
-                public int dx;
-                public int dy;
-                public uint mouseData;
-                public MouseEventFlags Flags;
-                public uint time;
-                public IntPtr dwExtraInfo;
+                internal int dx;
+                internal int dy;
+                internal uint mouseData;
+                internal MouseEventFlags Flags;
+                internal uint time;
+                internal IntPtr dwExtraInfo;
             }
 
             [StructLayout(LayoutKind.Sequential)]
             public struct KEYBDINPUT
             {
-                public VK VirtualKey;
-                public ushort wScan;
-                public KeyEventFlags Flags;
-                public uint time;
-                public IntPtr dwExtraInfo;
+                internal VK VirtualKey;
+                internal ushort wScan;
+                internal KeyEventFlags Flags;
+                internal uint time;
+                internal IntPtr dwExtraInfo;
             }
 
             [StructLayout(LayoutKind.Sequential)]
             public struct HARDWAREINPUT
             {
-                public int uMsg;
-                public short wParamL;
-                public short wParamH;
+                internal int uMsg;
+                internal short wParamL;
+                internal short wParamH;
             }
         }
 
@@ -2414,15 +2422,15 @@ namespace Mubox
         {
             [DllImport("user32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool SystemParametersInfo(SPI uiAction, uint uiParam, IntPtr pvParam, SPIF fWinIni);
+            internal static extern bool SystemParametersInfo(SPI uiAction, uint uiParam, IntPtr pvParam, SPIF fWinIni);
 
             [DllImport("user32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool SystemParametersInfo(SPI uiAction, uint uiParam, String pvParam, SPIF fWinIni);
+            internal static extern bool SystemParametersInfo(SPI uiAction, uint uiParam, String pvParam, SPIF fWinIni);
 
             [DllImport("user32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool SystemParametersInfo(SPI uiAction, uint uiParam, ref ANIMATIONINFO pvParam, SPIF fWinIni);
+            internal static extern bool SystemParametersInfo(SPI uiAction, uint uiParam, ref ANIMATIONINFO pvParam, SPIF fWinIni);
 
             /// <summary>
             /// SPI_ System-wide parameter - Used in SystemParametersInfo function
@@ -3653,7 +3661,7 @@ namespace Mubox
                 /// Creates an AMINMATIONINFO structure.
                 /// </summary>
                 /// <param name="iMinAnimate">If non-zero and SPI_SETANIMATION is specified, enables minimize/restore animation.</param>
-                public ANIMATIONINFO(System.Int32 iMinAnimate)
+                internal ANIMATIONINFO(System.Int32 iMinAnimate)
                 {
                     this.cbSize = (System.UInt32)Marshal.SizeOf(typeof(ANIMATIONINFO));
                     this.iMinAnimate = iMinAnimate;
@@ -3662,12 +3670,12 @@ namespace Mubox
                 /// <summary>
                 /// Always must be set to (System.UInt32)Marshal.SizeOf(typeof(ANIMATIONINFO)).
                 /// </summary>
-                public System.UInt32 cbSize;
+                internal System.UInt32 cbSize;
 
                 /// <summary>
                 /// If non-zero, minimize/restore animation is enabled, otherwise disabled.
                 /// </summary>
-                public System.Int32 iMinAnimate;
+                internal System.Int32 iMinAnimate;
             }
         }
 
@@ -3685,12 +3693,12 @@ namespace Mubox
             Is = 0x8000
         }
 
-        public static bool IsPressed(VK vk)
+        internal static bool IsPressed(VK vk)
         {
             return (KeyState.Is == (KeyState.Is & GetAsyncKeyState(vk)));
         }
 
-        public static bool IsToggled(VK vk)
+        internal static bool IsToggled(VK vk)
         {
             return (KeyState.Toggled == (KeyState.Toggled & GetKeyState(vk)));
         }
@@ -3699,10 +3707,10 @@ namespace Mubox
         private static extern KeyState GetKeyState(VK vk);
 
         [DllImport("user32.dll")]
-        public static extern bool SetKeyboardState(byte[] lpKeyState);
+        internal static extern bool SetKeyboardState(byte[] lpKeyState);
 
         [DllImport("user32.dll")]
-        public static extern bool GetKeyboardState(byte[] lpKeyState);
+        internal static extern bool GetKeyboardState(byte[] lpKeyState);
 
         #endregion
 
@@ -3720,15 +3728,15 @@ namespace Mubox
             [StructLayout(LayoutKind.Sequential, Pack = 1)]
             private struct MountPointReparseData
             {
-                public ReparseTagType ReparseTag;
-                public ushort ReparseDataLength;
-                public ushort Reserved;
-                public ushort SubstituteNameOffset;
-                public ushort SubstituteNameLength;
-                public ushort PrintNameOffset;
-                public ushort PrintNameLength;
+                internal ReparseTagType ReparseTag;
+                internal ushort ReparseDataLength;
+                internal ushort Reserved;
+                internal ushort SubstituteNameOffset;
+                internal ushort SubstituteNameLength;
+                internal ushort PrintNameOffset;
+                internal ushort PrintNameLength;
                 [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x3FF0)]
-                public byte[] PathBuffer;
+                internal byte[] PathBuffer;
             }
 
             [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = true, CharSet = CharSet.Unicode)]
@@ -3879,7 +3887,7 @@ namespace Mubox
 
             #endregion
 
-            public static void CreateFile(string junctionPath, string sourcePath)
+            internal static void CreateFile(string junctionPath, string sourcePath)
             {
                 string junctionFolder = System.IO.Path.GetFullPath(junctionPath).Replace(System.IO.Path.GetFileName(junctionPath), "");
                 if (!System.IO.Directory.Exists(junctionFolder))
@@ -3897,7 +3905,7 @@ namespace Mubox
                 }
             }
 
-            public static void CreateFolder(string junctionPath, string sourcePath)
+            internal static void CreateFolder(string junctionPath, string sourcePath)
             {
                 string sourcePathInternal = "\\??\\" + sourcePath;
                 if (!sourcePathInternal.EndsWith("\\"))
@@ -3981,7 +3989,7 @@ namespace Mubox
 
         public static class CodePage
         {
-            public static byte[] ConvertToCodePage(string text, uint codePageId)
+            internal static byte[] ConvertToCodePage(string text, uint codePageId)
             {
                 int lenA = WideCharToMultiByte(
                     codePageId,
@@ -4059,60 +4067,60 @@ namespace Mubox
         [StructLayout(LayoutKind.Sequential)]
         public struct DEVMODE
         {
-            public const int CCHDEVICENAME = 32;
-            public const int CCHFORMNAME = 32;
+            internal const int CCHDEVICENAME = 32;
+            internal const int CCHFORMNAME = 32;
 
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHDEVICENAME)]
-            public string dmDeviceName;
-            public short dmSpecVersion;
-            public short dmDriverVersion;
-            public short dmSize;
-            public short dmDriverExtra;
-            public DM dmFields;
+            internal string dmDeviceName;
+            internal short dmSpecVersion;
+            internal short dmDriverVersion;
+            internal short dmSize;
+            internal short dmDriverExtra;
+            internal DM dmFields;
 
-            public short dmOrientation;
-            public short dmPaperSize;
-            public short dmPaperLength;
-            public short dmPaperWidth;
+            internal short dmOrientation;
+            internal short dmPaperSize;
+            internal short dmPaperLength;
+            internal short dmPaperWidth;
 
-            public short dmScale;
-            public short dmCopies;
-            public short dmDefaultSource;
-            public short dmPrintQuality;
-            public short dmColor;
-            public short dmDuplex;
-            public short dmYResolution;
-            public short dmTTOption;
-            public short dmCollate;
+            internal short dmScale;
+            internal short dmCopies;
+            internal short dmDefaultSource;
+            internal short dmPrintQuality;
+            internal short dmColor;
+            internal short dmDuplex;
+            internal short dmYResolution;
+            internal short dmTTOption;
+            internal short dmCollate;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHFORMNAME)]
-            public string dmFormName;
-            public short dmLogPixels;
-            public int dmBitsPerPel;    // Declared wrong in the full framework
-            public int dmPelsWidth;
-            public int dmPelsHeight;
-            public int dmDisplayFlags;
-            public int dmDisplayFrequency;
+            internal string dmFormName;
+            internal short dmLogPixels;
+            internal int dmBitsPerPel;    // Declared wrong in the full framework
+            internal int dmPelsWidth;
+            internal int dmPelsHeight;
+            internal int dmDisplayFlags;
+            internal int dmDisplayFrequency;
 
-            public int dmICMMethod;
-            public int dmICMIntent;
-            public int dmMediaType;
-            public int dmDitherType;
-            public int dmReserved1;
-            public int dmReserved2;
-            public int dmPanningWidth;
-            public int dmPanningHeight;
+            internal int dmICMMethod;
+            internal int dmICMIntent;
+            internal int dmMediaType;
+            internal int dmDitherType;
+            internal int dmReserved1;
+            internal int dmReserved2;
+            internal int dmPanningWidth;
+            internal int dmPanningHeight;
 
-            public int dmPositionX; // Using a PointL Struct does not work
-            public int dmPositionY;
+            internal int dmPositionX; // Using a PointL Struct does not work
+            internal int dmPositionY;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public struct SECURITY_ATTRIBUTES
         {
-            public int nLength;
-            public IntPtr lpSecurityDescriptor;
+            internal int nLength;
+            internal IntPtr lpSecurityDescriptor;
             [MarshalAs(UnmanagedType.Bool)]
-            public bool bInheritHandle;
+            internal bool bInheritHandle;
         }
 
         [System.Security.SuppressUnmanagedCodeSecurity]
@@ -4120,7 +4128,7 @@ namespace Mubox
         {
             // @ms-help://MS.VSCC.v80/MS.MSDN.v80/MS.WIN32COM.v10.en/dllproc/base/createdesktop.htm
             [DllImport("user32.dll", EntryPoint = "CreateDesktop", CharSet = CharSet.Unicode, SetLastError = true)]
-            public static extern IntPtr CreateDesktop(
+            internal static extern IntPtr CreateDesktop(
                 string desktopName,
                 string deviceName, // must be null
                 IntPtr deviceMode, // must be IntPtr.Zero
@@ -4131,7 +4139,7 @@ namespace Mubox
             // @ms-help://MS.VSCC.v80/MS.MSDN.v80/MS.WIN32COM.v10.en/dllproc/base/closedesktop.htm
             [DllImport("user32.dll", EntryPoint = "CloseDesktop", CharSet = CharSet.Unicode, SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool CloseDesktop(
+            internal static extern bool CloseDesktop(
                 IntPtr handle);
 
             // @pinvoke.net
@@ -4164,12 +4172,12 @@ namespace Mubox
 
         public static class MACROS
         {
-            public static ushort GET_KEYSTATE_WPARAM(uint wParam)
+            internal static ushort GET_KEYSTATE_WPARAM(uint wParam)
             {
                 return LOWORD(wParam);
             }
 
-            public static ushort GET_NCHITTEST_WPARAM(uint wParam)
+            internal static ushort GET_NCHITTEST_WPARAM(uint wParam)
             {
                 return LOWORD(wParam);
             }
@@ -4180,62 +4188,62 @@ namespace Mubox
                 XBUTTON2 = 2
             }
 
-            public static XBUTTONS GET_XBUTTON_WPARAM(uint wParam)
+            internal static XBUTTONS GET_XBUTTON_WPARAM(uint wParam)
             {
                 return (XBUTTONS)HIWORD(wParam);
             }
 
-            public static short GET_X_LPARAM(uint lp)
+            internal static short GET_X_LPARAM(uint lp)
             {
                 return (short)LOWORD(lp);
             }
 
-            public static short GET_Y_LPARAM(uint lp)
+            internal static short GET_Y_LPARAM(uint lp)
             {
                 return (short)HIWORD(lp);
             }
 
-            public static uint MAKEWPARAM(ushort l, ushort h)
+            internal static uint MAKEWPARAM(ushort l, ushort h)
             {
                 return MAKELONG(l, h);
             }
 
-            public static uint MAKELPARAM(ushort l, ushort h)
+            internal static uint MAKELPARAM(ushort l, ushort h)
             {
                 return MAKELONG(l, h);
             }
 
-            public static uint MAKELRESULT(ushort l, ushort h)
+            internal static uint MAKELRESULT(ushort l, ushort h)
             {
                 return MAKELONG(l, h);
             }
 
-            public static ushort MAKEWORD(byte a, byte b)
+            internal static ushort MAKEWORD(byte a, byte b)
             {
                 return (ushort)((ushort)a | ((ushort)b << 8));
             }
 
-            public static uint MAKELONG(ushort a, ushort b)
+            internal static uint MAKELONG(ushort a, ushort b)
             {
                 return (uint)((uint)a | ((uint)b << 16));
             }
 
-            public static ushort LOWORD(uint l)
+            internal static ushort LOWORD(uint l)
             {
                 return (ushort)(l & 0xffff);
             }
 
-            public static ushort HIWORD(uint l)
+            internal static ushort HIWORD(uint l)
             {
                 return (ushort)((l >> 16) & 0xffff);
             }
 
-            public static byte LOBYTE(ushort w)
+            internal static byte LOBYTE(ushort w)
             {
                 return (byte)(w & 0xff);
             }
 
-            public static byte HIBYTE(ushort w)
+            internal static byte HIBYTE(ushort w)
             {
                 return (byte)((w >> 8) & 0xff);
             }

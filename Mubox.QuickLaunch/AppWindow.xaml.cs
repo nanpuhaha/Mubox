@@ -30,7 +30,7 @@ namespace Mubox.QuickLaunch
         private void timerDetectActivationChange_Tick(object sender, EventArgs e)
         {
             IntPtr lastActiveWindow = Mubox.Control.Network.Client.LastActivatedClientWindowHandle;
-            IntPtr foregroundWindow = Win32.Windows.GetForegroundWindow();
+            IntPtr foregroundWindow = Win32.Windows.CurrentForegroundWindow;
             if ((foregroundWindow == IntPtr.Zero) || (foregroundWindow == lastActiveWindow))
             {
                 return;

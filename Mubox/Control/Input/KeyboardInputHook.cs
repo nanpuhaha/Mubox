@@ -140,6 +140,7 @@ namespace Mubox.Control.Input
         public static event EventHandler<KeyboardInput> KeyboardInputReceived;
 
         private static byte[] pressedKeys = new byte[256];
+        private static object pressedKeysLock = new object();
 
         private static Performance KeyboardInputPerformance = Performance.CreatePerformance("_KeyboardInput");
         private static Performance KeyboardHandlerPerformance = Performance.CreatePerformance("_KeyboardHandler");
@@ -201,7 +202,7 @@ namespace Mubox.Control.Input
         private static bool IsRepeatKey(Win32.WindowHook.KBDLLHOOKSTRUCT hookStruct)
         {
             int vk = (int)(hookStruct.vkCode & 0xFF);
-            lock (pressedKeys)
+            lock (pressedKeysLock)
             {
                 bool keyIsPressed = pressedKeys[vk] == 0x80;
                 if (Win32.WindowHook.LLKHF.UP != (hookStruct.flags & Win32.WindowHook.LLKHF.UP))
