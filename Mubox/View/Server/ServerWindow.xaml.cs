@@ -73,7 +73,7 @@ namespace Mubox.View.Server
             return buttons;
         }
 
-        private void MouseInputHook_MouseInputReceived(MouseInput e)
+        private void MouseInputHook_MouseInputReceived(object sender, MouseInput e)
         {
             if (!Mubox.Configuration.MuboxConfigSection.Default.EnableMouseCapture)
             {
@@ -545,7 +545,7 @@ namespace Mubox.View.Server
             }
         }
 
-        private void KeyboardInputHook_KeyboardInputReceived(KeyboardInput e)
+        private void KeyboardInputHook_KeyboardInputReceived(object sender, KeyboardInput e)
         {
             if (this.Keyboard_DefaultAction != null)
             {

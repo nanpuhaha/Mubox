@@ -16,6 +16,7 @@ namespace Mubox.Model.Input
 {
     [DataContract]
     public abstract class InputBase
+        : EventArgs
     {
         private readonly DateTime _createdTime = DateTime.Now;
 

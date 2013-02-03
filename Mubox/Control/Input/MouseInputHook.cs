@@ -89,7 +89,7 @@ namespace Mubox.Control.Input
             }
         }
 
-        public static event Action<MouseInput> MouseInputReceived;
+        public static event EventHandler<MouseInput> MouseInputReceived;
 
         private static bool OnMouseInputReceived(Win32.WM wParam, Win32.WindowHook.MSLLHOOKSTRUCT hookStruct)
         {
@@ -108,7 +108,7 @@ namespace Mubox.Control.Input
             {
                 if (MouseInputReceived != null)
                 {
-                    MouseInputReceived(mouseInputEventArgs);
+                    MouseInputReceived(null, mouseInputEventArgs);
                     return mouseInputEventArgs.Handled;
                 }
             }

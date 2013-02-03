@@ -137,7 +137,7 @@ namespace Mubox.Control.Input
             }
         }
 
-        public static event Action<KeyboardInput> KeyboardInputReceived;
+        public static event EventHandler<KeyboardInput> KeyboardInputReceived;
 
         private static byte[] pressedKeys = new byte[256];
 
@@ -236,7 +236,7 @@ namespace Mubox.Control.Input
             {
                 if (e != null)
                 {
-                    KeyboardInputReceived(e);
+                    KeyboardInputReceived(null, e);
                     if (Performance.IsPerformanceEnabled)
                     {
                         KeyboardHandlerPerformance.Count((long)(e.CreatedTime - DateTime.Now).TotalMilliseconds);
