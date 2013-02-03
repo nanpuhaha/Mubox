@@ -18,7 +18,7 @@ namespace Mubox.Control.Input
         private static Win32.WindowHook.HookProc hookProc = null;
         private static IntPtr hookProcPtr = IntPtr.Zero;
 
-        public static int MouseHook(int nCode, IntPtr wParam, IntPtr lParam)
+        public static UIntPtr MouseHook(int nCode, IntPtr wParam, IntPtr lParam)
         {
             try
             {
@@ -27,7 +27,7 @@ namespace Mubox.Control.Input
                     Mubox.Win32.WindowHook.MSLLHOOKSTRUCT mouseHookStruct = (Mubox.Win32.WindowHook.MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(Mubox.Win32.WindowHook.MSLLHOOKSTRUCT));
                     if (OnMouseInputReceived((Win32.WM)wParam, mouseHookStruct))
                     {
-                        return 1;
+                        return new UIntPtr(1);
                     }
                 }
             }
@@ -45,7 +45,7 @@ namespace Mubox.Control.Input
                 Debug.WriteLine(ex.Message);
                 Debug.WriteLine(ex.StackTrace);
             }
-            return 0;
+            return UIntPtr.Zero;
         }
 
         private static bool isStarted;
@@ -66,7 +66,7 @@ namespace Mubox.Control.Input
             //            IntPtr nextHook = IntPtr.Zero // COMMENTED BY CODEIT.RIGHT;
             //IntPtr dwThreadId = Win32.Threads.GetCurrentThreadId();
             IntPtr hModule = Marshal.GetHINSTANCE(System.Reflection.Assembly.GetEntryAssembly().GetModules()[0]);
-            hHook = Win32.WindowHook.SetWindowsHookEx(Win32.WindowHook.HookType.WH_MOUSE_LL, hookProcPtr, hModule, IntPtr.Zero);
+            hHook = Win32.WindowHook.SetWindowsHookEx(Win32.WindowHook.HookType.WH_MOUSE_LL, hookProcPtr, hModule, 0);
             if (hHook == IntPtr.Zero)
             {
                 // failed

@@ -17,7 +17,7 @@ namespace Mubox.Control.Input
         private static Win32.WindowHook.HookProc hookProc = null;
         private static IntPtr hookProcPtr = IntPtr.Zero;
 
-        public static int KeyboardHook(int nCode, IntPtr wParam, IntPtr lParam)
+        public static UIntPtr KeyboardHook(int nCode, IntPtr wParam, IntPtr lParam)
         {
             try
             {
@@ -26,7 +26,7 @@ namespace Mubox.Control.Input
                     Mubox.Win32.WindowHook.KBDLLHOOKSTRUCT keyboardHookStruct = (Mubox.Win32.WindowHook.KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(Mubox.Win32.WindowHook.KBDLLHOOKSTRUCT));
                     if (OnKeyboardInputReceived((Win32.WM)wParam, keyboardHookStruct))
                     {
-                        return 1;
+                        return new UIntPtr(1);
                     }
                 }
             }
@@ -44,7 +44,7 @@ namespace Mubox.Control.Input
                 Debug.WriteLine(ex.Message);
                 Debug.WriteLine(ex.StackTrace);
             }
-            return 1;
+            return new UIntPtr(1);
         }
 
         private static bool isStarted;
@@ -75,7 +75,7 @@ namespace Mubox.Control.Input
                 IntPtr hModule = Marshal.GetHINSTANCE(modules[0]);
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate()
                 {
-                    hHook = Win32.WindowHook.SetWindowsHookEx(Win32.WindowHook.HookType.WH_KEYBOARD_LL, hookProcPtr, hModule, IntPtr.Zero);
+                    hHook = Win32.WindowHook.SetWindowsHookEx(Win32.WindowHook.HookType.WH_KEYBOARD_LL, hookProcPtr, hModule, 0);
                     if (hHook == IntPtr.Zero)
                     {
                         // failed

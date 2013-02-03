@@ -427,15 +427,15 @@ namespace Mubox
         public static class WindowHook
         {
             [DllImport("user32.dll", SetLastError = true)]
-            internal static extern IntPtr SetWindowsHookEx(HookType hookType, IntPtr callbackPtr, IntPtr hModule, IntPtr dwThreadId);
+            internal static extern IntPtr SetWindowsHookEx(HookType hookType, IntPtr callbackPtr, IntPtr hModule, uint dwThreadId);
 
             [DllImport("user32.dll")]
-            internal static extern int CallNextHookEx(IntPtr hHook, int nCode, IntPtr wParam, IntPtr lParam);
+            internal static extern UIntPtr CallNextHookEx(IntPtr hHook, int nCode, IntPtr wParam, IntPtr lParam);
 
             [DllImport("user32.dll")]
             internal static extern bool UnhookWindowsHookEx(IntPtr hhk);
 
-            internal delegate int HookProc(int code, IntPtr wParam, IntPtr lParam);
+            internal delegate UIntPtr HookProc(int code, IntPtr wParam, IntPtr lParam);
 
             internal delegate int LowLevelKeyboardProc(int nCode, WM windowMessage, IntPtr keyboardHookStruct);
 
@@ -494,7 +494,7 @@ namespace Mubox
             public struct MSLLHOOKSTRUCT
             {
                 internal System.Drawing.Point pt;
-                internal uint mouseData;
+                internal UIntPtr mouseData;
                 internal LLMHF flags;
                 internal uint time;
                 internal IntPtr dwExtraInfo;
@@ -513,7 +513,7 @@ namespace Mubox
         /// <summary>
         /// Enumeration for virtual keys.
         /// </summary>
-        public enum VK : ushort
+        public enum VK : uint
         {
             /// <summary></summary>
             LeftButton = 0x01,
@@ -1105,7 +1105,7 @@ namespace Mubox
             internal static extern bool SetForegroundWindow(IntPtr hWnd);
 
             [DllImport("user32.dll", SetLastError = true)]
-            internal static extern IntPtr GetWindowThreadProcessId(IntPtr hWnd, out IntPtr lpdwProcessId);
+            internal static extern uint GetWindowThreadProcessId(IntPtr hWnd, out IntPtr lpdwProcessId);
 
             [DllImport("user32.dll")]
             internal static extern bool AttachThreadInput(IntPtr idAttach, IntPtr idAttachTo, bool fAttach);
@@ -1123,14 +1123,14 @@ namespace Mubox
 
             [return: MarshalAs(UnmanagedType.Bool)]
             [DllImport("user32.dll", SetLastError = true)]
-            internal static extern bool PostMessage(IntPtr hWnd, WM Msg, int wParam, uint lParam);
+            internal static extern bool PostMessage(IntPtr hWnd, WM Msg, IntPtr wParam, UIntPtr lParam);
 
             [return: MarshalAs(UnmanagedType.Bool)]
             [DllImport("user32.dll", SetLastError = true)]
-            internal static extern bool PostMessage(IntPtr hWnd, WM Msg, uint wParam, uint lParam);
+            internal static extern bool PostMessage(IntPtr hWnd, WM Msg, UIntPtr wParam, UIntPtr lParam);
 
             [DllImport("user32.dll")]
-            internal static extern IntPtr SendMessage(IntPtr hWnd, WM Msg, int wParam, uint lParam);
+            internal static extern IntPtr SendMessage(IntPtr hWnd, WM Msg, IntPtr wParam, UIntPtr lParam);
 
             [DllImport("user32.dll")]
             internal static extern bool TranslateMessage(ref MSG lpMsg);
@@ -2165,7 +2165,7 @@ namespace Mubox
         public static class Threads
         {
             [DllImport("kernel32.dll")]
-            internal static extern IntPtr GetCurrentThreadId();
+            internal static extern uint GetCurrentThreadId();
 
             [DllImport("user32.dll", SetLastError = true)]
             internal static extern uint GetWindowThreadProcessId(IntPtr hwnd, out IntPtr processId);
@@ -2287,7 +2287,7 @@ namespace Mubox
                 SendInputViaMSParams((MouseEventFlags)hookStruct.flags, hookStruct.time, X, Y, hookStruct.mouseData);
             }
 
-            internal static void SendInputViaMSParams(MouseEventFlags flags, uint time, int relX, int relY, uint mouseData)
+            internal static void SendInputViaMSParams(MouseEventFlags flags, uint time, int relX, int relY, UIntPtr mouseData)
             {
                 uint result = 0;
                 if (IntPtr.Size == 8)
@@ -2390,7 +2390,7 @@ namespace Mubox
             {
                 internal int dx;
                 internal int dy;
-                internal uint mouseData;
+                internal UIntPtr mouseData; // TODO: does this really translate to 64bit value on 64bit platform?
                 internal MouseEventFlags Flags;
                 internal uint time;
                 internal IntPtr dwExtraInfo;
@@ -4172,12 +4172,12 @@ namespace Mubox
 
         public static class MACROS
         {
-            internal static ushort GET_KEYSTATE_WPARAM(uint wParam)
+            internal static ushort GET_KEYSTATE_WPARAM(UIntPtr wParam)
             {
                 return LOWORD(wParam);
             }
 
-            internal static ushort GET_NCHITTEST_WPARAM(uint wParam)
+            internal static ushort GET_NCHITTEST_WPARAM(UIntPtr wParam)
             {
                 return LOWORD(wParam);
             }
@@ -4188,32 +4188,32 @@ namespace Mubox
                 XBUTTON2 = 2
             }
 
-            internal static XBUTTONS GET_XBUTTON_WPARAM(uint wParam)
+            internal static XBUTTONS GET_XBUTTON_WPARAM(UIntPtr wParam)
             {
                 return (XBUTTONS)HIWORD(wParam);
             }
 
-            internal static short GET_X_LPARAM(uint lp)
+            internal static short GET_X_LPARAM(UIntPtr lp)
             {
                 return (short)LOWORD(lp);
             }
 
-            internal static short GET_Y_LPARAM(uint lp)
+            internal static short GET_Y_LPARAM(UIntPtr lp)
             {
                 return (short)HIWORD(lp);
             }
 
-            internal static uint MAKEWPARAM(ushort l, ushort h)
+            internal static UIntPtr MAKEWPARAM(ushort l, ushort h)
             {
                 return MAKELONG(l, h);
             }
 
-            internal static uint MAKELPARAM(ushort l, ushort h)
+            internal static UIntPtr MAKELPARAM(ushort l, ushort h)
             {
                 return MAKELONG(l, h);
             }
 
-            internal static uint MAKELRESULT(ushort l, ushort h)
+            internal static UIntPtr MAKELRESULT(ushort l, ushort h)
             {
                 return MAKELONG(l, h);
             }
@@ -4223,19 +4223,29 @@ namespace Mubox
                 return (ushort)((ushort)a | ((ushort)b << 8));
             }
 
-            internal static uint MAKELONG(ushort a, ushort b)
+            internal static UIntPtr MAKELONG(ushort a, ushort b)
             {
-                return (uint)((uint)a | ((uint)b << 16));
+                return (UIntPtr)((uint)a | ((uint)b << 16));
             }
 
-            internal static ushort LOWORD(uint l)
+            internal static uint HIDWORD(UIntPtr l)
             {
-                return (ushort)(l & 0xffff);
+                return (uint)(l.ToUInt64() & 0xffffffff);
             }
 
-            internal static ushort HIWORD(uint l)
+            internal static uint LODWORD(UIntPtr l)
             {
-                return (ushort)((l >> 16) & 0xffff);
+                return (uint)((l.ToUInt64() >> 32) & 0xffffffff);
+            }
+
+            internal static ushort LOWORD(UIntPtr l)
+            {
+                return (ushort)(l.ToUInt32() & 0xffff);
+            }
+
+            internal static ushort HIWORD(UIntPtr l)
+            {
+                return (ushort)((l.ToUInt32() >> 16) & 0xffff);
             }
 
             internal static byte LOBYTE(ushort w)

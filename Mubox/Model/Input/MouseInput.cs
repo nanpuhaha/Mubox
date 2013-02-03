@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 
 namespace Mubox.Model.Input
 {
@@ -26,7 +27,7 @@ namespace Mubox.Model.Input
         public System.Windows.Point Point { get; set; }
 
         [DataMember]
-        public uint MouseData { get; set; }
+        public UIntPtr MouseData { get; set; }
 
         public Win32.SendInputApi.MouseEventFlags Flags
         {

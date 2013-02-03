@@ -41,7 +41,7 @@ namespace Mubox.Control.Network
                         {
                             if (windowHandle != IntPtr.Zero)
                             {
-                                if (IntPtr.Zero == Win32.Windows.GetWindowThreadProcessId(windowHandle, out windowInputQueue))
+                                if (Win32.Windows.GetWindowThreadProcessId(windowHandle, out windowInputQueue) == 0)
                                 {
                                     Debug.WriteLine("GWTPID Failed for set_WindowHandle(" + windowHandle + ") ");
                                 }
@@ -668,20 +668,20 @@ namespace Mubox.Control.Network
 
         private void OnKeyboardEventViaViq(uint vk, Win32.WindowHook.LLKHF flags, uint scan, uint time, Win32.CAS cas)
         {
-            int wParam = (int)vk;
+            var wParam = new IntPtr(vk);
 
             Win32.WM wm = (((flags & Win32.WindowHook.LLKHF.UP) == Win32.WindowHook.LLKHF.UP) ? Win32.WM.KEYUP : Win32.WM.KEYDOWN); // TODO SYSKEYDOWN via Win32.WindowHook.LLKHF.AltKey ?
             uint lParam = 0x01;
 
             if (wm == Win32.WM.KEYUP)
             {
-                lParam |= 0xC0000000;
+                lParam |= 0xC0000000; // TODO: this may need to change on 64bit platforms, not clear
             }
 
             uint scanCode = scan;
             if (scanCode > 0)
             {
-                lParam |= ((scanCode & 0xFF) << 16);
+                lParam |= ((scanCode & 0xFF) << 16); // TODO: this may need to change on 64bit platforms, not clear
             }
 
             if ((flags & Win32.WindowHook.LLKHF.UP) != Win32.WindowHook.LLKHF.UP)
@@ -702,7 +702,7 @@ namespace Mubox.Control.Network
             }
 
             Win32.SetKeyboardState(this.pressedKeys);
-            Win32.Windows.SendMessage(WindowHandle, wm, wParam, lParam);
+            Win32.Windows.SendMessage(WindowHandle, wm, wParam, new UIntPtr(lParam));
 
             // if keydown, translate message
             if (wm == Win32.WM.KEYDOWN)
@@ -738,20 +738,19 @@ namespace Mubox.Control.Network
 
         private static object OnMouseEventLock = new object();
 
-        private void OnMouseEvent_Action(int pointX, int pointY, int lPointX, int lPointY, Win32.WM wm, uint mouseData, bool isButtonUpEvent)
+        private void OnMouseEvent_Action(int pointX, int pointY, int lPointX, int lPointY, Win32.WM wm, UIntPtr mouseData, bool isButtonUpEvent)
         {
-            uint clientRelativeCoordinates = Win32.MACROS.MAKELPARAM(
+            var clientRelativeCoordinates = Win32.MACROS.MAKELPARAM(
                 (ushort)lPointX,
                 (ushort)lPointY);
 
             //            IntPtr previousWindowCapture = Win32.Cursor.GetCapture() // COMMENTED BY CODEIT.RIGHT;
-            int hwnd = windowHandle.ToInt32();
             lock (OnMouseEventLock)
             {
                 //Win32.Cursor.SetCapture(windowHandle);
-                Win32.Windows.PostMessage(windowHandle, Win32.WM.MOUSEMOVE, (int)CurrentMK, clientRelativeCoordinates);
-                Win32.Windows.PostMessage(windowHandle, Win32.WM.SETCURSOR, hwnd, Win32.MACROS.MAKELPARAM((ushort)Win32.WM.MOUSEMOVE, (ushort)Win32.HitTestValues.HTCLIENT));
-                Win32.Windows.PostMessage(windowHandle, Win32.WM.MOUSEACTIVATE, hwnd, Win32.MACROS.MAKELPARAM((ushort)wm, (ushort)Win32.HitTestValues.HTCLIENT));
+                Win32.Windows.PostMessage(windowHandle, Win32.WM.MOUSEMOVE, new IntPtr((int)CurrentMK), clientRelativeCoordinates);
+                Win32.Windows.PostMessage(windowHandle, Win32.WM.SETCURSOR, windowHandle, Win32.MACROS.MAKELPARAM((ushort)Win32.WM.MOUSEMOVE, (ushort)Win32.HitTestValues.HTCLIENT));
+                Win32.Windows.PostMessage(windowHandle, Win32.WM.MOUSEACTIVATE, windowHandle, Win32.MACROS.MAKELPARAM((ushort)wm, (ushort)Win32.HitTestValues.HTCLIENT));
                 Win32.Windows.PostMessage(windowHandle, wm, mouseData, clientRelativeCoordinates);
                 Debug.WriteLine("OnMouseEvent SendMessage(" + windowHandle.ToString() + ", " + wm + ", " + mouseData + ", " + clientRelativeCoordinates + ", " + pointX + ", " + pointY + ", " + lPointX + ", " + lPointY + ", (" + CurrentMK + "), " + isButtonUpEvent);
                 //Win32.Cursor.ReleaseCapture();
