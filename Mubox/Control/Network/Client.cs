@@ -176,46 +176,44 @@ namespace Mubox.Control.Network
 
                 Debug.WriteLine("MCNC: receiveBuffer=" + System.Text.Encoding.ASCII.GetString(receiveBuffer));
 
-                using (var stream = new System.IO.MemoryStream(receiveBuffer))
+                var stream = new System.IO.MemoryStream(receiveBuffer);
+                using (var reader = new System.IO.BinaryReader(stream))
                 {
-                    using (var reader = new System.IO.BinaryReader(stream))
+                    while (stream.Position < stream.Length && stream.ReadByte() == 0x1b)
                     {
-                        while (stream.Position < stream.Length && stream.ReadByte() == 0x1b)
+                        var lastReadPosition = stream.Position - 1;
+                        object o = null;
+                        try
                         {
-                            var lastReadPosition = stream.Position - 1;
-                            object o = null;
-                            try
+                            var len = reader.ReadUInt16();
+                            byte[] payload = new byte[len];
+                            stream.Read(payload, 0, payload.Length);
+                            using (var payloadStream = new System.IO.MemoryStream(payload))
                             {
-                                var len = reader.ReadUInt16();
-                                byte[] payload = new byte[len];
-                                stream.Read(payload, 0, payload.Length);
-                                using (var payloadStream = new System.IO.MemoryStream(payload))
-                                {
-                                    o = Serializer.ReadObject(payloadStream);
-                                }
+                                o = Serializer.ReadObject(payloadStream);
                             }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine("MCNC: lastReadPosition=" + lastReadPosition + " currentPosition=" + stream.Position);
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine("MCNC: lastReadPosition=" + lastReadPosition + " currentPosition=" + stream.Position);
 
-                                Debug.WriteLine(ex.Message);
-                                Debug.WriteLine(ex.StackTrace);
-                                // TODO: log/debug exception types thrown here, not documented on MSDN and it's not clear how to handle a buffer underrun in ReadObject
-                                // TODO: if the exception is due to an unknown type, the fragmentBuffer logic will result in a deadlock on the network (always retrying a bad object)
-                                o = null;
-                            }
+                            Debug.WriteLine(ex.Message);
+                            Debug.WriteLine(ex.StackTrace);
+                            // TODO: log/debug exception types thrown here, not documented on MSDN and it's not clear how to handle a buffer underrun in ReadObject
+                            // TODO: if the exception is due to an unknown type, the fragmentBuffer logic will result in a deadlock on the network (always retrying a bad object)
+                            o = null;
+                        }
 
-                            if (o == null)
-                            {
-                                stream.Seek(lastReadPosition, System.IO.SeekOrigin.Begin);
-                                fragmentBuffer = new byte[stream.Length - lastReadPosition];
-                                stream.Read(fragmentBuffer, 0, fragmentBuffer.Length);
-                                break;
-                            }
-                            else
-                            {
-                                EnqueueAction(actionQueue, o);
-                            }
+                        if (o == null)
+                        {
+                            stream.Seek(lastReadPosition, System.IO.SeekOrigin.Begin);
+                            fragmentBuffer = new byte[stream.Length - lastReadPosition];
+                            stream.Read(fragmentBuffer, 0, fragmentBuffer.Length);
+                            break;
+                        }
+                        else
+                        {
+                            EnqueueAction(actionQueue, o);
                         }
                     }
                 }
