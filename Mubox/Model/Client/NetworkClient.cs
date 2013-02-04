@@ -294,7 +294,7 @@ namespace Mubox.Model.Client
 
                 byte[] buf = null;
 
-                using (var stream = new System.IO.MemoryStream())
+                var stream = new System.IO.MemoryStream();
                 using (var writer = new System.IO.BinaryWriter(stream))
                 {
                     stream.Seek(3, System.IO.SeekOrigin.Begin);
