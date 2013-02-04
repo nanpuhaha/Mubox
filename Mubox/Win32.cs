@@ -513,7 +513,7 @@ namespace Mubox
         /// <summary>
         /// Enumeration for virtual keys.
         /// </summary>
-        public enum VK : uint
+        public enum VK : ushort
         {
             /// <summary></summary>
             LeftButton = 0x01,
