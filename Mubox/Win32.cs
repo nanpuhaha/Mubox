@@ -3881,7 +3881,7 @@ namespace Mubox
                 IO_REPARSE_TAG_DFSR = (0x80000012),
             }
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             private static extern bool CreateHardLink(string lpFileName, string lpExistingFileName,
                IntPtr lpSecurityAttributes);
 
