@@ -246,13 +246,27 @@ namespace Mubox.QuickLaunch
         {
         }
 
+        ~AppWindow()
+        {
+            Dispose(false);
+        }
+
         public void Dispose()
         {
-            var notifyIcon = this.notifyIcon;
-            this.notifyIcon = null;
-            if (notifyIcon != null)
+            Dispose(true);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                notifyIcon.Dispose();
+                var notifyIcon = this.notifyIcon;
+                this.notifyIcon = null;
+                if (notifyIcon != null)
+                {
+                    notifyIcon.Dispose();
+                }
+                GC.SuppressFinalize(this);
             }
         }
     }
