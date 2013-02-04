@@ -295,16 +295,16 @@ namespace Mubox.Model.Client
                 byte[] buf = null;
 
                 using (var stream = new System.IO.MemoryStream())
-                    using (var writer = new System.IO.BinaryWriter(stream))
-                    {
-                        stream.Seek(3, System.IO.SeekOrigin.Begin);
-                        Serializer.WriteObject(stream, input);
-                        var len = (ushort)(stream.Position - 3);
-                        stream.Seek(0, System.IO.SeekOrigin.Begin);
-                        stream.WriteByte(0x1b);
-                        writer.Write(len);
-                        buf = stream.ToArray();
-                    }
+                using (var writer = new System.IO.BinaryWriter(stream))
+                {
+                    stream.Seek(3, System.IO.SeekOrigin.Begin);
+                    Serializer.WriteObject(stream, input);
+                    var len = (ushort)(stream.Position - 3);
+                    stream.Seek(0, System.IO.SeekOrigin.Begin);
+                    stream.WriteByte(0x1b);
+                    writer.Write(len);
+                    buf = stream.ToArray();
+                }
 
                 SocketError socketError;
                 ClientSocket.BeginSend(buf, 0, buf.Length, SocketFlags.None, out socketError, BeginSendCallback, ClientSocket);

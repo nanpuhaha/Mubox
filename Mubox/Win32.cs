@@ -1150,7 +1150,7 @@ namespace Mubox
             [DllImport("user32.dll")]
             internal static extern bool EnumDesktopWindows(IntPtr hDesktop, EnumWindowsProc enumWindowsCallbackPtr, IntPtr lParam);
 
-            [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
             internal static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
             [DllImport("user32.dll")]
