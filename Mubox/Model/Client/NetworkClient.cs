@@ -295,7 +295,6 @@ namespace Mubox.Model.Client
                 byte[] buf = null;
 
                 using (var stream = new System.IO.MemoryStream())
-                {
                     using (var writer = new System.IO.BinaryWriter(stream))
                     {
                         stream.Seek(3, System.IO.SeekOrigin.Begin);
@@ -306,7 +305,6 @@ namespace Mubox.Model.Client
                         writer.Write(len);
                         buf = stream.ToArray();
                     }
-                }
 
                 SocketError socketError;
                 ClientSocket.BeginSend(buf, 0, buf.Length, SocketFlags.None, out socketError, BeginSendCallback, ClientSocket);
