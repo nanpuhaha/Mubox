@@ -1201,7 +1201,7 @@ namespace Mubox
                 internal POINT pt;
             }
 
-            [StructLayout(LayoutKind.Sequential)]
+            [Serializable, StructLayout(LayoutKind.Sequential)]
             public struct POINT
             {
                 internal int x;
