@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -40,6 +41,7 @@ namespace Mubox.View.Client
         public int AutoReconnectDelay = 9;
         public string ApplicationLaunchPath { get; set; }
 
+        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors", Justification="expected call to OnPropertyChanged via set_ClientState, it is dispatched and occurs after construction (not during)")]
         public ClientWindow(Mubox.Model.ClientState clientState)
         {
             Mubox.View.Client.ClientWindowCollection.Instance.Add(this);

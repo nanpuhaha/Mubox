@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
@@ -2385,6 +2386,7 @@ namespace Mubox
                 internal HARDWAREINPUT hi;
             }
 
+            [SuppressMessage("Microsoft.Design", "CA1049:TypesThatOwnNativeResourcesShouldBeDisposable", Justification = "struct is not responsible for deallocation")]
             [StructLayout(LayoutKind.Sequential)]
             public struct MOUSEINPUT
             {
@@ -2396,6 +2398,7 @@ namespace Mubox
                 internal IntPtr dwExtraInfo;
             }
 
+            [SuppressMessage("Microsoft.Design", "CA1049:TypesThatOwnNativeResourcesShouldBeDisposable", Justification = "struct is not responsible for deallocation")]
             [StructLayout(LayoutKind.Sequential)]
             public struct KEYBDINPUT
             {
@@ -2424,7 +2427,7 @@ namespace Mubox
             [return: MarshalAs(UnmanagedType.Bool)]
             internal static extern bool SystemParametersInfo(SPI uiAction, uint uiParam, IntPtr pvParam, SPIF fWinIni);
 
-            [DllImport("user32.dll", SetLastError = true)]
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             [return: MarshalAs(UnmanagedType.Bool)]
             internal static extern bool SystemParametersInfo(SPI uiAction, uint uiParam, String pvParam, SPIF fWinIni);
 
