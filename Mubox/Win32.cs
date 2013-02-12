@@ -2193,7 +2193,7 @@ namespace Mubox
             internal static extern ushort VkKeyScan(char ch);
 
             [DllImport("user32.dll")]
-            internal static extern uint MapVirtualKey(VK uCode, MAPVK uMapType);
+            internal static extern uint MapVirtualKey(uint uCode, MAPVK uMapType);
 
             public enum MAPVK : uint
             {
@@ -3686,7 +3686,7 @@ namespace Mubox
         #region KeyState
 
         [DllImport("user32.dll")]
-        private static extern KeyState GetAsyncKeyState(VK vk);
+        private static extern KeyState GetAsyncKeyState(uint vk);
 
         public enum KeyState : ushort
         {
@@ -3698,16 +3698,16 @@ namespace Mubox
 
         internal static bool IsPressed(VK vk)
         {
-            return (KeyState.Is == (KeyState.Is & GetAsyncKeyState(vk)));
+            return (KeyState.Is == (KeyState.Is & GetAsyncKeyState((uint)vk)));
         }
 
         internal static bool IsToggled(VK vk)
         {
-            return (KeyState.Toggled == (KeyState.Toggled & GetKeyState(vk)));
+            return (KeyState.Toggled == (KeyState.Toggled & GetKeyState((uint)vk)));
         }
 
         [DllImport("user32.dll")]
-        private static extern KeyState GetKeyState(VK vk);
+        private static extern KeyState GetKeyState(uint vk);
 
         [DllImport("user32.dll")]
         internal static extern bool SetKeyboardState(byte[] lpKeyState);
