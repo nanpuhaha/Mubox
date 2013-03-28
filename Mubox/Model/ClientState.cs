@@ -8,6 +8,8 @@ namespace Mubox.Model
 {
     public class ClientState : IDisposable
     {
+        public Win32.SandboxApi.Sandbox Sandbox { get; set; }
+        
         private ClientState()
         {
             Timer = new System.Timers.Timer();
@@ -488,6 +490,11 @@ namespace Mubox.Model
             if (this.SettingsWindow != null)
             {
                 this.SettingsWindow = null;
+            }
+            if (this.Sandbox != null)
+            {
+                var sandbox = this.Sandbox;
+                this.Sandbox = null;
             }
         }
 

@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Security;
+using System.Security.Principal;
 using System.Text;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace Mubox
 {
@@ -3721,6 +3725,8 @@ namespace Mubox
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool Beep(uint dwFreq, uint dwDuration);
 
+        #region Isolation
+
         [System.Security.SuppressUnmanagedCodeSecurity]
         public static class IsolationApi
         {
@@ -3766,7 +3772,7 @@ namespace Mubox
 
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            private static extern bool CloseHandle(IntPtr hObject);
+            static extern bool CloseHandle(IntPtr hObject);
 
             [Flags]
             private enum EFileAccess : uint
@@ -3988,6 +3994,7 @@ namespace Mubox
             }
         }
 
+        #endregion
         #region Code Page
 
         public static class CodePage
@@ -4028,6 +4035,1007 @@ namespace Mubox
                 int cbMultiByte,
                 IntPtr lpDefaultChar,
                 IntPtr usedDefault);
+        }
+
+        #endregion
+        #region Sandbox
+
+        public static class SandboxApi
+        {
+            // TODO: sand-boxing should be a "per-game" option
+
+            [StructLayout(LayoutKind.Sequential, Pack = 1)]
+            public struct SYSTEM_HANDLE_INFORMATION
+            {
+                public int Count;
+                public SYSTEM_HANDLE[] Handles;
+            }
+
+            [StructLayout(LayoutKind.Sequential, Pack = 1)]
+            public struct SYSTEM_HANDLE
+            {
+                public int ProcessID;
+                public byte ObjectType;
+                public byte HandleFlags;
+                public ushort HandleValue;
+                public IntPtr ObjectPointer;
+                public uint AccessMask;
+            }
+
+            [DllImport("ntdll.dll")]
+            static extern NTSTATUS NtQuerySystemInformation(
+                SYSTEM_INFORMATION_CLASS SystemInformationClass,
+                IntPtr SystemInformation,
+                int SystemInformationLength,
+                out int ReturnLength
+            );
+
+            [DllImport("ntdll.dll")]
+            static extern NTSTATUS NtQueryObject(
+                IntPtr Handle,
+                OBJECT_INFORMATION_CLASS ObjectInformationClass,
+                IntPtr ObjectInformation,
+                int ObjectInformationLength,
+                out int ReturnLength
+            );
+
+            public enum SYSTEM_INFORMATION_CLASS
+            {
+                Handles = 16,
+            }
+
+            public enum OBJECT_INFORMATION_CLASS
+            {
+                ObjectBasicInformation = 0,
+                ObjectName = 1, // Undocumented??
+                ObjectTypeInformation = 2,
+            }
+
+            //[StructLayout(LayoutKind.Sequential)]
+            //public struct OBJECT_TYPE_INFORMATION
+            //{
+            //    [MarshalAs(UnmanagedType.LPWStr)]
+            //    public string TypeName;
+            //    public int TotalNumberOfObjects;
+            //    public int TotalNumberOfHandles;
+            //    public int TotalPagedPoolUsage;
+            //    public int TotalNonPagedPoolUsage;
+            //    public int TotalNamePoolUsage;
+            //    public int TotalHandleTableUsage;
+            //    public int HighWaterNumberOfObjects;
+            //    public int HighWaterNumberOfHandles;
+            //    public int HighWaterPagedPoolUsage;
+            //    public int HighWaterNonPagedPoolUsage;
+            //    public int HighWaterNamePoolUsage;
+            //    public int HighWaterHandleTableUsage;
+            //    public int InvalidAttributes;
+            //    public GENERIC_MAPPING GenericMapping;
+            //    public int ValidAccessMask;
+            //    [MarshalAs(UnmanagedType.Bool)]
+            //    public bool SecurityRequired;
+            //    [MarshalAs(UnmanagedType.Bool)]
+            //    public bool MaintainHandleCount;
+            //    public int PoolType;
+            //    public int DefaultPagedPoolCharge;
+            //    public int DefaultNonPagedPoolCharge;
+            //}
+
+            //[StructLayout(LayoutKind.Sequential)]
+            //public struct GENERIC_MAPPING
+            //{
+            //    uint GenericRead;
+            //    uint GenericWrite;
+            //    uint GenericExecute;
+            //    uint GenericAll;
+            //}
+            /// <summary>
+            /// A NT status value.
+            /// </summary>
+            public enum NTSTATUS : uint
+            {
+                // Success
+                Success = 0x00000000,
+                Wait0 = 0x00000000,
+                Wait1 = 0x00000001,
+                Wait2 = 0x00000002,
+                Wait3 = 0x00000003,
+                Wait63 = 0x0000003f,
+                Abandoned = 0x00000080,
+                AbandonedWait0 = 0x00000080,
+                AbandonedWait1 = 0x00000081,
+                AbandonedWait2 = 0x00000082,
+                AbandonedWait3 = 0x00000083,
+                AbandonedWait63 = 0x000000bf,
+                UserApc = 0x000000c0,
+                KernelApc = 0x00000100,
+                Alerted = 0x00000101,
+                Timeout = 0x00000102,
+                Pending = 0x00000103,
+                Reparse = 0x00000104,
+                MoreEntries = 0x00000105,
+                NotAllAssigned = 0x00000106,
+                SomeNotMapped = 0x00000107,
+                OpLockBreakInProgress = 0x00000108,
+                VolumeMounted = 0x00000109,
+                RxActCommitted = 0x0000010a,
+                NotifyCleanup = 0x0000010b,
+                NotifyEnumDir = 0x0000010c,
+                NoQuotasForAccount = 0x0000010d,
+                PrimaryTransportConnectFailed = 0x0000010e,
+                PageFaultTransition = 0x00000110,
+                PageFaultDemandZero = 0x00000111,
+                PageFaultCopyOnWrite = 0x00000112,
+                PageFaultGuardPage = 0x00000113,
+                PageFaultPagingFile = 0x00000114,
+                CrashDump = 0x00000116,
+                ReparseObject = 0x00000118,
+                NothingToTerminate = 0x00000122,
+                ProcessNotInJob = 0x00000123,
+                ProcessInJob = 0x00000124,
+                ProcessCloned = 0x00000129,
+                FileLockedWithOnlyReaders = 0x0000012a,
+                FileLockedWithWriters = 0x0000012b,
+
+                // Informational
+                Informational = 0x40000000,
+                ObjectNameExists = 0x40000000,
+                ThreadWasSuspended = 0x40000001,
+                WorkingSetLimitRange = 0x40000002,
+                ImageNotAtBase = 0x40000003,
+                RegistryRecovered = 0x40000009,
+
+                // Warning
+                Warning = 0x80000000,
+                GuardPageViolation = 0x80000001,
+                DatatypeMisalignment = 0x80000002,
+                Breakpoint = 0x80000003,
+                SingleStep = 0x80000004,
+                BufferOverflow = 0x80000005,
+                NoMoreFiles = 0x80000006,
+                HandlesClosed = 0x8000000a,
+                PartialCopy = 0x8000000d,
+                DeviceBusy = 0x80000011,
+                InvalidEaName = 0x80000013,
+                EaListInconsistent = 0x80000014,
+                NoMoreEntries = 0x8000001a,
+                LongJump = 0x80000026,
+                DllMightBeInsecure = 0x8000002b,
+
+                // Error
+                Error = 0xc0000000,
+                Unsuccessful = 0xc0000001,
+                NotImplemented = 0xc0000002,
+                InvalidInfoClass = 0xc0000003,
+                InfoLengthMismatch = 0xc0000004,
+                AccessViolation = 0xc0000005,
+                InPageError = 0xc0000006,
+                PagefileQuota = 0xc0000007,
+                InvalidHandle = 0xc0000008,
+                BadInitialStack = 0xc0000009,
+                BadInitialPc = 0xc000000a,
+                InvalidCid = 0xc000000b,
+                TimerNotCanceled = 0xc000000c,
+                InvalidParameter = 0xc000000d,
+                NoSuchDevice = 0xc000000e,
+                NoSuchFile = 0xc000000f,
+                InvalidDeviceRequest = 0xc0000010,
+                EndOfFile = 0xc0000011,
+                WrongVolume = 0xc0000012,
+                NoMediaInDevice = 0xc0000013,
+                NoMemory = 0xc0000017,
+                NotMappedView = 0xc0000019,
+                UnableToFreeVm = 0xc000001a,
+                UnableToDeleteSection = 0xc000001b,
+                IllegalInstruction = 0xc000001d,
+                AlreadyCommitted = 0xc0000021,
+                AccessDenied = 0xc0000022,
+                BufferTooSmall = 0xc0000023,
+                ObjectTypeMismatch = 0xc0000024,
+                NonContinuableException = 0xc0000025,
+                BadStack = 0xc0000028,
+                NotLocked = 0xc000002a,
+                NotCommitted = 0xc000002d,
+                InvalidParameterMix = 0xc0000030,
+                ObjectNameInvalid = 0xc0000033,
+                ObjectNameNotFound = 0xc0000034,
+                ObjectNameCollision = 0xc0000035,
+                ObjectPathInvalid = 0xc0000039,
+                ObjectPathNotFound = 0xc000003a,
+                ObjectPathSyntaxBad = 0xc000003b,
+                DataOverrun = 0xc000003c,
+                DataLate = 0xc000003d,
+                DataError = 0xc000003e,
+                CrcError = 0xc000003f,
+                SectionTooBig = 0xc0000040,
+                PortConnectionRefused = 0xc0000041,
+                InvalidPortHandle = 0xc0000042,
+                SharingViolation = 0xc0000043,
+                QuotaExceeded = 0xc0000044,
+                InvalidPageProtection = 0xc0000045,
+                MutantNotOwned = 0xc0000046,
+                SemaphoreLimitExceeded = 0xc0000047,
+                PortAlreadySet = 0xc0000048,
+                SectionNotImage = 0xc0000049,
+                SuspendCountExceeded = 0xc000004a,
+                ThreadIsTerminating = 0xc000004b,
+                BadWorkingSetLimit = 0xc000004c,
+                IncompatibleFileMap = 0xc000004d,
+                SectionProtection = 0xc000004e,
+                EasNotSupported = 0xc000004f,
+                EaTooLarge = 0xc0000050,
+                NonExistentEaEntry = 0xc0000051,
+                NoEasOnFile = 0xc0000052,
+                EaCorruptError = 0xc0000053,
+                FileLockConflict = 0xc0000054,
+                LockNotGranted = 0xc0000055,
+                DeletePending = 0xc0000056,
+                CtlFileNotSupported = 0xc0000057,
+                UnknownRevision = 0xc0000058,
+                RevisionMismatch = 0xc0000059,
+                InvalidOwner = 0xc000005a,
+                InvalidPrimaryGroup = 0xc000005b,
+                NoImpersonationToken = 0xc000005c,
+                CantDisableMandatory = 0xc000005d,
+                NoLogonServers = 0xc000005e,
+                NoSuchLogonSession = 0xc000005f,
+                NoSuchPrivilege = 0xc0000060,
+                PrivilegeNotHeld = 0xc0000061,
+                InvalidAccountName = 0xc0000062,
+                UserExists = 0xc0000063,
+                NoSuchUser = 0xc0000064,
+                GroupExists = 0xc0000065,
+                NoSuchGroup = 0xc0000066,
+                MemberInGroup = 0xc0000067,
+                MemberNotInGroup = 0xc0000068,
+                LastAdmin = 0xc0000069,
+                WrongPassword = 0xc000006a,
+                IllFormedPassword = 0xc000006b,
+                PasswordRestriction = 0xc000006c,
+                LogonFailure = 0xc000006d,
+                AccountRestriction = 0xc000006e,
+                InvalidLogonHours = 0xc000006f,
+                InvalidWorkstation = 0xc0000070,
+                PasswordExpired = 0xc0000071,
+                AccountDisabled = 0xc0000072,
+                NoneMapped = 0xc0000073,
+                TooManyLuidsRequested = 0xc0000074,
+                LuidsExhausted = 0xc0000075,
+                InvalidSubAuthority = 0xc0000076,
+                InvalidAcl = 0xc0000077,
+                InvalidSid = 0xc0000078,
+                InvalidSecurityDescr = 0xc0000079,
+                ProcedureNotFound = 0xc000007a,
+                InvalidImageFormat = 0xc000007b,
+                NoToken = 0xc000007c,
+                BadInheritanceAcl = 0xc000007d,
+                RangeNotLocked = 0xc000007e,
+                DiskFull = 0xc000007f,
+                ServerDisabled = 0xc0000080,
+                ServerNotDisabled = 0xc0000081,
+                TooManyGuidsRequested = 0xc0000082,
+                GuidsExhausted = 0xc0000083,
+                InvalidIdAuthority = 0xc0000084,
+                AgentsExhausted = 0xc0000085,
+                InvalidVolumeLabel = 0xc0000086,
+                SectionNotExtended = 0xc0000087,
+                NotMappedData = 0xc0000088,
+                ResourceDataNotFound = 0xc0000089,
+                ResourceTypeNotFound = 0xc000008a,
+                ResourceNameNotFound = 0xc000008b,
+                ArrayBoundsExceeded = 0xc000008c,
+                FloatDenormalOperand = 0xc000008d,
+                FloatDivideByZero = 0xc000008e,
+                FloatInexactResult = 0xc000008f,
+                FloatInvalidOperation = 0xc0000090,
+                FloatOverflow = 0xc0000091,
+                FloatStackCheck = 0xc0000092,
+                FloatUnderflow = 0xc0000093,
+                IntegerDivideByZero = 0xc0000094,
+                IntegerOverflow = 0xc0000095,
+                PrivilegedInstruction = 0xc0000096,
+                TooManyPagingFiles = 0xc0000097,
+                FileInvalid = 0xc0000098,
+                InstanceNotAvailable = 0xc00000ab,
+                PipeNotAvailable = 0xc00000ac,
+                InvalidPipeState = 0xc00000ad,
+                PipeBusy = 0xc00000ae,
+                IllegalFunction = 0xc00000af,
+                PipeDisconnected = 0xc00000b0,
+                PipeClosing = 0xc00000b1,
+                PipeConnected = 0xc00000b2,
+                PipeListening = 0xc00000b3,
+                InvalidReadMode = 0xc00000b4,
+                IoTimeout = 0xc00000b5,
+                FileForcedClosed = 0xc00000b6,
+                ProfilingNotStarted = 0xc00000b7,
+                ProfilingNotStopped = 0xc00000b8,
+                NotSameDevice = 0xc00000d4,
+                FileRenamed = 0xc00000d5,
+                CantWait = 0xc00000d8,
+                PipeEmpty = 0xc00000d9,
+                CantTerminateSelf = 0xc00000db,
+                InternalError = 0xc00000e5,
+                InvalidParameter1 = 0xc00000ef,
+                InvalidParameter2 = 0xc00000f0,
+                InvalidParameter3 = 0xc00000f1,
+                InvalidParameter4 = 0xc00000f2,
+                InvalidParameter5 = 0xc00000f3,
+                InvalidParameter6 = 0xc00000f4,
+                InvalidParameter7 = 0xc00000f5,
+                InvalidParameter8 = 0xc00000f6,
+                InvalidParameter9 = 0xc00000f7,
+                InvalidParameter10 = 0xc00000f8,
+                InvalidParameter11 = 0xc00000f9,
+                InvalidParameter12 = 0xc00000fa,
+                MappedFileSizeZero = 0xc000011e,
+                TooManyOpenedFiles = 0xc000011f,
+                Cancelled = 0xc0000120,
+                CannotDelete = 0xc0000121,
+                InvalidComputerName = 0xc0000122,
+                FileDeleted = 0xc0000123,
+                SpecialAccount = 0xc0000124,
+                SpecialGroup = 0xc0000125,
+                SpecialUser = 0xc0000126,
+                MembersPrimaryGroup = 0xc0000127,
+                FileClosed = 0xc0000128,
+                TooManyThreads = 0xc0000129,
+                ThreadNotInProcess = 0xc000012a,
+                TokenAlreadyInUse = 0xc000012b,
+                PagefileQuotaExceeded = 0xc000012c,
+                CommitmentLimit = 0xc000012d,
+                InvalidImageLeFormat = 0xc000012e,
+                InvalidImageNotMz = 0xc000012f,
+                InvalidImageProtect = 0xc0000130,
+                InvalidImageWin16 = 0xc0000131,
+                LogonServer = 0xc0000132,
+                DifferenceAtDc = 0xc0000133,
+                SynchronizationRequired = 0xc0000134,
+                DllNotFound = 0xc0000135,
+                IoPrivilegeFailed = 0xc0000137,
+                OrdinalNotFound = 0xc0000138,
+                EntryPointNotFound = 0xc0000139,
+                ControlCExit = 0xc000013a,
+                PortNotSet = 0xc0000353,
+                DebuggerInactive = 0xc0000354,
+                CallbackBypass = 0xc0000503,
+                PortClosed = 0xc0000700,
+                MessageLost = 0xc0000701,
+                InvalidMessage = 0xc0000702,
+                RequestCanceled = 0xc0000703,
+                RecursiveDispatch = 0xc0000704,
+                LpcReceiveBufferExpected = 0xc0000705,
+                LpcInvalidConnectionUsage = 0xc0000706,
+                LpcRequestsNotAllowed = 0xc0000707,
+                ResourceInUse = 0xc0000708,
+                ProcessIsProtected = 0xc0000712,
+                VolumeDirty = 0xc0000806,
+                FileCheckedOut = 0xc0000901,
+                CheckOutRequired = 0xc0000902,
+                BadFileType = 0xc0000903,
+                FileTooLarge = 0xc0000904,
+                FormsAuthRequired = 0xc0000905,
+                VirusInfected = 0xc0000906,
+                VirusDeleted = 0xc0000907,
+                TransactionalConflict = 0xc0190001,
+                InvalidTransaction = 0xc0190002,
+                TransactionNotActive = 0xc0190003,
+                TmInitializationFailed = 0xc0190004,
+                RmNotActive = 0xc0190005,
+                RmMetadataCorrupt = 0xc0190006,
+                TransactionNotJoined = 0xc0190007,
+                DirectoryNotRm = 0xc0190008,
+                CouldNotResizeLog = 0xc0190009,
+                TransactionsUnsupportedRemote = 0xc019000a,
+                LogResizeInvalidSize = 0xc019000b,
+                RemoteFileVersionMismatch = 0xc019000c,
+                CrmProtocolAlreadyExists = 0xc019000f,
+                TransactionPropagationFailed = 0xc0190010,
+                CrmProtocolNotFound = 0xc0190011,
+                TransactionSuperiorExists = 0xc0190012,
+                TransactionRequestNotValid = 0xc0190013,
+                TransactionNotRequested = 0xc0190014,
+                TransactionAlreadyAborted = 0xc0190015,
+                TransactionAlreadyCommitted = 0xc0190016,
+                TransactionInvalidMarshallBuffer = 0xc0190017,
+                CurrentTransactionNotValid = 0xc0190018,
+                LogGrowthFailed = 0xc0190019,
+                ObjectNoLongerExists = 0xc0190021,
+                StreamMiniversionNotFound = 0xc0190022,
+                StreamMiniversionNotValid = 0xc0190023,
+                MiniversionInaccessibleFromSpecifiedTransaction = 0xc0190024,
+                CantOpenMiniversionWithModifyIntent = 0xc0190025,
+                CantCreateMoreStreamMiniversions = 0xc0190026,
+                HandleNoLongerValid = 0xc0190028,
+                NoTxfMetadata = 0xc0190029,
+                LogCorruptionDetected = 0xc0190030,
+                CantRecoverWithHandleOpen = 0xc0190031,
+                RmDisconnected = 0xc0190032,
+                EnlistmentNotSuperior = 0xc0190033,
+                RecoveryNotNeeded = 0xc0190034,
+                RmAlreadyStarted = 0xc0190035,
+                FileIdentityNotPersistent = 0xc0190036,
+                CantBreakTransactionalDependency = 0xc0190037,
+                CantCrossRmBoundary = 0xc0190038,
+                TxfDirNotEmpty = 0xc0190039,
+                IndoubtTransactionsExist = 0xc019003a,
+                TmVolatile = 0xc019003b,
+                RollbackTimerExpired = 0xc019003c,
+                TxfAttributeCorrupt = 0xc019003d,
+                EfsNotAllowedInTransaction = 0xc019003e,
+                TransactionalOpenNotAllowed = 0xc019003f,
+                TransactedMappingUnsupportedRemote = 0xc0190040,
+                TxfMetadataAlreadyPresent = 0xc0190041,
+                TransactionScopeCallbacksNotSet = 0xc0190042,
+                TransactionRequiredPromotion = 0xc0190043,
+                CannotExecuteFileInTransaction = 0xc0190044,
+                TransactionsNotFrozen = 0xc0190045,
+
+                MaximumNtStatus = 0xffffffff
+            }
+
+            [DllImport("kernel32.dll", SetLastError = true)]
+            static extern bool GetProcessHandleCount(
+                IntPtr hProcess,
+                ref int dwHandleCount);
+
+            /// <summary>
+            /// <para>Gets system handle information.</para>
+            /// <para>This is not a cheap call.</para>
+            /// </summary>
+            /// <returns>Managed Copy of a Windows SYSTEM_HANDLE_INFORMATION struct</returns>
+            public static SYSTEM_HANDLE_INFORMATION GetSystemHandleInformation()
+            {
+                var ntstatus = NTSTATUS.InfoLengthMismatch;
+                var cbbuf = 0x100;
+                var buf = Marshal.AllocHGlobal(cbbuf);
+                try
+                {
+                    var returnLength = 0;
+                    while (ntstatus == NTSTATUS.InfoLengthMismatch)
+                    {
+                        cbbuf *= 2;
+                        buf = Marshal.ReAllocHGlobal(buf, new IntPtr(cbbuf));
+                        ntstatus = NtQuerySystemInformation(
+                            SYSTEM_INFORMATION_CLASS.Handles,
+                            buf,
+                            cbbuf,
+                            out returnLength);
+                    }
+                    if (ntstatus != NTSTATUS.Success)
+                    {
+                        Trace.WriteLine("ntstatus err code: " + ntstatus);
+                        return new SYSTEM_HANDLE_INFORMATION
+                            {
+                                Count = 0,
+                                Handles = new SYSTEM_HANDLE[0],
+                            };
+                    }
+                    var systemHandleInformation = new SYSTEM_HANDLE_INFORMATION();
+                    systemHandleInformation.Count = Marshal.ReadInt32(buf);
+                    systemHandleInformation.Handles = new SYSTEM_HANDLE[systemHandleInformation.Count];
+                    var sizeOfSystemHandleEntry = Marshal.SizeOf(typeof(SYSTEM_HANDLE));
+                    for (int i = 0; i < systemHandleInformation.Count; i++)
+                    {
+                        IntPtr ptr = (buf + (4 + (i * sizeOfSystemHandleEntry)));
+                        SYSTEM_HANDLE entry = (SYSTEM_HANDLE)Marshal.PtrToStructure(ptr, typeof(SYSTEM_HANDLE));
+                        systemHandleInformation.Handles[i] = entry;
+                    }
+                    return systemHandleInformation;
+                }
+                finally
+                {
+                    Marshal.FreeHGlobal(buf);
+                }
+            }
+
+            [DllImport("kernel32.dll")]
+            static extern IntPtr OpenMutex(
+                uint dwDesiredAccess,
+                bool bInheritHandle,
+               string lpName);
+
+            [DllImport("kernel32.dll")]
+            static extern bool ReleaseMutex(
+                IntPtr hMutex);
+
+            [DllImport("kernel32.dll", SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            static extern bool DuplicateHandle(
+                IntPtr hSourceProcessHandle,
+                IntPtr hSourceHandle,
+                IntPtr hTargetProcessHandle,
+                out IntPtr lpTargetHandle,
+                uint dwDesiredAccess,
+                [MarshalAs(UnmanagedType.Bool)] 
+                bool bInheritHandle,
+                uint dwOptions);
+
+            const UInt32 DUPLICATE_CLOSE_SOURCE = 1;
+            const UInt32 DUPLICATE_SAME_ACCESS = 2;
+
+            [DllImport("kernel32.dll", SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            static extern bool CloseHandle(IntPtr hObject);
+
+            const UInt32 DELETE = 0x00010000;
+            const UInt32 READ_CONTROL = 0x00020000;
+            const UInt32 SYNCHRONIZE = 0x00100000;
+            const UInt32 WRITE_DAC = 0x00040000;
+            const UInt32 WRITE_OWNER = 0x00080000;
+            const UInt32 MUTEX_ALL_ACCESS = 0x1F0001;
+            const UInt32 MUTEX_MODIFY_STATE = 0x0001;
+
+            /// <summary>
+            /// Method which attempts to 'fix' anything which prevents us from multi-launching and sandboxing a process.
+            /// </summary>
+            public static void TryFixMultilaunch(Win32.SandboxApi.Sandbox sandbox, string applicationName)
+            {
+                // most windows programes rely on a named mutex to limit application runs to a single instance, here are a list of mutexes to release/close
+                CloseNamedMutexes(sandbox, new string[] 
+                {
+                    "AN-Mutex-Window-Guild Wars",
+                    "AN-Mutex-Window-Guild Wars 2",
+                    // TODO: move list to config
+                });
+            }
+
+            private static void CloseNamedMutexes(Win32.SandboxApi.Sandbox sandbox, string[] mutexNames)
+            {
+                var processId = sandbox.Process.Id;
+                var entries = GetSystemHandleInformation()
+                    .Handles
+                    .Where(entry =>
+                        entry.ProcessID == processId // guest process
+                        && entry.ObjectType == 14 // TODO: are mutants always object type 14?
+                        && entry.AccessMask != 0x0012019f // known issue with hanging file handles (pipes?), which we're not interested in
+                        );
+
+                var currentProcessHandle = Process.GetCurrentProcess().Handle;
+                foreach (var entry in entries)
+                {
+                    var handle = new IntPtr(entry.HandleValue);
+                    IntPtr hDupe;
+                    var duped = DuplicateHandle(
+                        sandbox.Process.Handle,
+                        handle,
+                        currentProcessHandle,
+                        out hDupe,
+                        0,
+                        false,
+                        DUPLICATE_SAME_ACCESS);
+                    int err = Marshal.GetLastWin32Error();
+                    if (err != 0)
+                    {
+                        Console.WriteLine("spid=" + sandbox.Process.Id + " epid=" + entry.ProcessID + " handle=" + handle.ToInt64().ToString("X") + " type=" + entry.ObjectType + " err=" + err);
+                    }
+                    else
+                    {
+                        if (duped && hDupe != IntPtr.Zero)
+                        {
+                            var ntstatus = NTSTATUS.InfoLengthMismatch;
+                            var cbbuf = 1024;
+                            var buf = Marshal.AllocHGlobal(cbbuf);
+                            try
+                            {
+                                var returnLength = 0;
+                                while (ntstatus == NTSTATUS.InfoLengthMismatch)
+                                {
+                                    cbbuf *= 2;
+                                    buf = Marshal.ReAllocHGlobal(buf, new IntPtr(cbbuf));
+                                    ntstatus = NtQueryObject(
+                                        hDupe,
+                                        OBJECT_INFORMATION_CLASS.ObjectName,
+                                        buf,
+                                        cbbuf,
+                                        out returnLength);
+                                }
+                                if (ntstatus == NTSTATUS.Success)
+                                {
+                                    var typeName = Marshal.PtrToStringUni(buf + 4);
+                                    // if in list of mutexes, close it
+                                    if (mutexNames.Count(s => typeName.Contains(s)) > 0)
+                                    {
+                                        IntPtr hClose;
+                                        var closed = DuplicateHandle(
+                                            sandbox.Process.Handle,
+                                            handle,
+                                            currentProcessHandle,
+                                            out hClose,
+                                            0,
+                                            false,
+                                            DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE);
+                                        if (closed)
+                                        {
+                                            CloseHandle(hClose);
+                                            Console.WriteLine("Closed Remote Handle: pid=" + sandbox.Process.Id + " handle=" + handle.ToInt64().ToString("X") + " status=" + ntstatus + " type=" + entry.ObjectType + " name=" + typeName);
+                                        }
+                                    }
+                                }
+                            }
+                            finally
+                            {
+                                Marshal.FreeHGlobal(buf);
+                            }
+
+                            CloseHandle(hDupe);
+                        }
+                    }
+                }
+            }
+
+            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            static extern bool CreateProcessWithLogonW(
+               String userName,
+               String domain,
+               String password,
+               LogonFlags logonFlags,
+               String applicationName,
+               String commandLine,
+               CreationFlags creationFlags,
+               UInt32 environment,
+               String currentDirectory,
+               ref STARTUPINFO startupInfo,
+               out PROCESS_INFORMATION processInformation);
+
+            [Flags]
+            enum CreationFlags
+            {
+                CREATE_SUSPENDED = 0x00000004,
+                DETACHED_PROCESS = 0x00000008,
+                CREATE_NEW_CONSOLE = 0x00000010,
+                CREATE_NEW_PROCESS_GROUP = 0x00000200,
+                CREATE_UNICODE_ENVIRONMENT = 0x00000400,
+                CREATE_SEPARATE_WOW_VDM = 0x00000800,
+                CREATE_DEFAULT_ERROR_MODE = 0x04000000,
+            }
+
+            [Flags]
+            enum LogonFlags
+            {
+                LOGON_WITH_PROFILE = 0x00000001,
+                LOGON_NETCREDENTIALS_ONLY = 0x00000002
+            }
+
+            [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+            struct STARTUPINFO
+            {
+                public Int32 cb;
+                public string lpReserved;
+                public string lpDesktop;
+                public string lpTitle;
+                public Int32 dwX;
+                public Int32 dwY;
+                public Int32 dwXSize;
+                public Int32 dwYSize;
+                public Int32 dwXCountChars;
+                public Int32 dwYCountChars;
+                public Int32 dwFillAttribute;
+                public Int32 dwFlags;
+                public Int16 wShowWindow;
+                public Int16 cbReserved2;
+                public IntPtr lpReserved2;
+                public IntPtr hStdInput;
+                public IntPtr hStdOutput;
+                public IntPtr hStdError;
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            struct PROCESS_INFORMATION
+            {
+                public IntPtr hProcess;
+                public IntPtr hThread;
+                public int dwProcessId;
+                public int dwThreadId;
+            }
+
+            enum NET_API_STATUS : uint
+            {
+                NERR_Success = 0,
+                /// <summary>
+                /// This computer name is invalid.
+                /// </summary>
+                NERR_InvalidComputer = 2351,
+                /// <summary>
+                /// This operation is only allowed on the primary domain controller of the domain.
+                /// </summary>
+                NERR_NotPrimary = 2226,
+                /// <summary>
+                /// This operation is not allowed on this special group.
+                /// </summary>
+                NERR_SpeGroupOp = 2234,
+                /// <summary>
+                /// This operation is not allowed on the last administrative account.
+                /// </summary>
+                NERR_LastAdmin = 2452,
+                /// <summary>
+                /// The password parameter is invalid.
+                /// </summary>
+                NERR_BadPassword = 2203,
+                /// <summary>
+                /// The password does not meet the password policy requirements. Check the minimum password length, password complexity and password history requirements.
+                /// </summary>
+                NERR_PasswordTooShort = 2245,
+                /// <summary>
+                /// The user name could not be found.
+                /// </summary>
+                NERR_UserNotFound = 2221,
+
+                ERROR_ACCESS_DENIED = 5,
+                ERROR_NOT_ENOUGH_MEMORY = 8,
+                ERROR_INVALID_PARAMETER = 87,
+                ERROR_INVALID_NAME = 123,
+                ERROR_INVALID_LEVEL = 124,
+                ERROR_MORE_DATA = 234,
+                ERROR_SESSION_CREDENTIAL_CONFLICT = 1219
+            }
+            [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true, PreserveSig = true)]
+            private static extern uint LookupAccountName(
+                string lpSystemName,
+                string lpAccountName,
+                byte[] psid,
+                ref int cbsid,
+                StringBuilder domainName,
+                ref int cbdomainLength,
+                out int use);
+
+            [DllImport("advapi32.dll")]
+            private static extern bool LogonUser(
+                String lpszUsername,
+                String lpszDomain,
+                String lpszPassword,
+                int dwLogonType,
+                int dwLogonProvider,
+                ref IntPtr phToken);
+
+            [DllImport("advapi32.dll")]
+            private static extern bool DuplicateToken(
+                IntPtr ExistingTokenHandle,
+                int ImpersonationLevel,
+                ref IntPtr DuplicateTokenHandle);
+
+            [DllImport("userenv.dll", CharSet = CharSet.Auto)]
+            private static extern int CreateProfile(
+                [MarshalAs(UnmanagedType.LPWStr)] 
+                string pszUserSid,
+                [MarshalAs(UnmanagedType.LPWStr)] 
+                string pszUserName,
+                [Out][MarshalAs(UnmanagedType.LPWStr)] 
+                StringBuilder pszProfilePath,
+                uint cchProfilePath);
+
+            [DllImport("netapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+            private static extern NET_API_STATUS NetUserAdd(
+                //[MarshalAs(UnmanagedType.LPWStr)] 
+                //string servername,
+                IntPtr specifyNull,
+                int level,
+                ref USER_INFO_1 userInfo,
+                out UInt32 parm_err);
+
+            //uiPriv
+            const uint USER_PRIV_GUEST = 0;
+            const uint USER_PRIV_USER = 1;
+            const uint USER_PRIV_ADMIN = 2;
+
+            //uiFlags (flags)
+            const uint UF_DONT_EXPIRE_PASSWD = 0x10000;
+            const uint UF_MNS_LOGON_ACCOUNT = 0x20000;
+            const uint UF_SMARTCARD_REQUIRED = 0x40000;
+            const uint UF_TRUSTED_FOR_DELEGATION = 0x80000;
+            const uint UF_NOT_DELEGATED = 0x100000;
+            const uint UF_USE_DES_KEY_ONLY = 0x200000;
+            const uint UF_DONT_REQUIRE_PREAUTH = 0x400000;
+            const uint UF_PASSWORD_EXPIRED = 0x800000;
+            const uint UF_TRUSTED_TO_AUTHENTICATE_FOR_DELEGATION = 0x1000000;
+            const uint UF_NO_AUTH_DATA_REQUIRED = 0x2000000;
+            const uint UF_PARTIAL_SECRETS_ACCOUNT = 0x4000000;
+            const uint UF_USE_AES_KEYS = 0x8000000;
+
+            //uiFlags (choice)
+            const uint UF_TEMP_DUPLICATE_ACCOUNT = 0x0100;
+            const uint UF_NORMAL_ACCOUNT = 0x0200;
+            const uint UF_INTERDOMAIN_TRUST_ACCOUNT = 0x0800;
+            const uint UF_WORKSTATION_TRUST_ACCOUNT = 0x1000;
+            const uint UF_SERVER_TRUST_ACCOUNT = 0x2000;
+
+            [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+            struct USER_INFO_1
+            {
+                [MarshalAs(UnmanagedType.LPWStr)]
+                public string sUsername;
+                [MarshalAs(UnmanagedType.LPWStr)]
+                public string sPassword;
+                public uint uiPasswordAge;
+                public uint uiPriv;
+                [MarshalAs(UnmanagedType.LPWStr)]
+                public string sHome_Dir;
+                [MarshalAs(UnmanagedType.LPWStr)]
+                public string sComment;
+                public uint uiFlags;
+                [MarshalAs(UnmanagedType.LPWStr)]
+                public string sScript_Path;
+            }
+
+            public class Sandbox
+            {
+                public string UserName { get; internal set; }
+                public string Password { get; internal set; }
+                public string SID { get; internal set; }
+                public Process Process { get; set; }
+            }
+
+            // NOTE: may have a problem with cleaning these up
+            public static Win32.SandboxApi.Sandbox SafeCreateSandbox(string clientName)
+            {
+                var sandbox = new Sandbox
+                {
+                    UserName = "Mbx" + (clientName.Length > 20
+                        ? clientName.Substring(0, 20)
+                        : clientName),
+                    Password = "J*rf@#$sl3x",
+                };
+
+                var exists = DoesSandboxExist(sandbox);
+
+                // if user account not exists, create it
+                if (!exists)
+                {
+                    // create user account: NetUserAdd
+                    var userInfoLevel1 = new USER_INFO_1
+                    {
+                        sPassword = sandbox.Password,
+                        sUsername = sandbox.UserName,
+                        uiPriv = USER_PRIV_USER,
+                        uiFlags = UF_NORMAL_ACCOUNT,
+                    };
+                    uint parm_err;
+                    var netApiStatus = NetUserAdd(IntPtr.Zero, 1, ref userInfoLevel1, out parm_err);
+                    if (netApiStatus != NET_API_STATUS.NERR_Success)
+                    {
+                        var reason = "NetUserAdd failed for '???' reason " + netApiStatus;
+                        Console.Error.WriteLine(reason);
+                        throw new Exception(reason);
+                    }
+
+                    // create profile
+                    SafeLoadSID(sandbox);
+                    int MAX_PATH = 260;
+                    StringBuilder pathBuf = new StringBuilder(MAX_PATH);
+                    uint pathLen = (uint)pathBuf.Capacity;
+                    int result = CreateProfile(sandbox.SID, sandbox.UserName, pathBuf, pathLen);
+                }
+
+                return sandbox;
+            }
+
+            private static bool DoesSandboxExist(Sandbox sandbox)
+            {
+                // check if account already exists
+                /* does not work as-is:
+                
+                int use = 0;
+                byte[] sid = new byte[28];
+                int cbsid = sid.Length;
+                var domain = new StringBuilder(260);
+                int dnl = domain.Length;
+                var lookupResult = LookupAccountName(
+                    null,
+                    sandbox.UserName,
+                    sid,
+                    ref cbsid,
+                    null,
+                    ref dnl,
+                    out use);
+
+                Debug.WriteLine("err=" + Marshal.GetLastWin32Error());
+                ^ always 0
+                
+                 *
+                 */
+
+                // TODO: do a better job
+                var exists = SafeLoadSID(sandbox);
+                return exists;
+            }
+
+            private static bool SafeLoadSID(Sandbox sandbox)
+            {
+                /* see also:
+                 * ConvertSidToStringSid
+                 * ConvertStringSidToSid
+                 * */
+                try
+                {
+                    if (string.IsNullOrEmpty(sandbox.SID))
+                    {
+                        // get sid: .NET
+                        var acct = new NTAccount(sandbox.UserName);
+                        var si = (SecurityIdentifier)acct.Translate(typeof(SecurityIdentifier));
+                        if (si == null)
+                        {
+                            return false;
+                        }
+                        sandbox.SID = si.ToString();
+                    }
+                }
+                catch
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            public static Process LaunchProcess(
+                Win32.SandboxApi.Sandbox sandbox,
+                string applicationPath,
+                string commandLine,
+                string workingDirectory)
+            {
+                if (sandbox.Process != null)
+                {
+                    return sandbox.Process;
+                }
+
+                var startupInfo = new STARTUPINFO
+                {
+                    cb = Marshal.SizeOf(typeof(STARTUPINFO)),
+                };
+
+                var processInformation = new PROCESS_INFORMATION
+                {
+                };
+
+                var result = CreateProcessWithLogonW(
+                    sandbox.UserName,
+                    string.IsNullOrEmpty(Environment.UserDomainName)
+                        ? Environment.MachineName
+                        : Environment.UserDomainName,
+                    sandbox.Password,
+                    LogonFlags.LOGON_WITH_PROFILE,
+                    applicationPath,
+                    commandLine,
+                    CreationFlags.CREATE_NEW_CONSOLE,
+                    (uint)0,
+                    workingDirectory,
+                    ref startupInfo,
+                    out processInformation);
+
+                if (!result)
+                {
+                    Debug.WriteLine("CreateProcessWithLogonW failed with err 0x" + Marshal.GetLastWin32Error().ToString("X"));
+                }
+
+                sandbox.Process = result
+                    ? Process.GetProcessById(processInformation.dwProcessId)
+                    : null;
+                return sandbox.Process;
+            }
+
+            [DllImport("userenv", SetLastError = true)]
+            private static extern int DeleteProfile(
+                string lpSidString,
+                string lpProfilePath,
+                string lpComputerName);
+
+            [DllImport("netapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+            private static extern NET_API_STATUS NetUserDel(
+                string servername,
+                string username);
+
+            // TODO: nothing is calling this
+            // TODO: sandboxing should be a per-game option
+            // TODO: dynamic create+destroy of sandbox accounts should be a configurable behavior (two behaviors: no-destroy, destroy-on-game-exit)
+            public static void SafeDestroySandbox(Win32.SandboxApi.Sandbox sandbox)
+            {
+                SafeLoadSID(sandbox);
+
+                // delete profile
+                DeleteProfile(sandbox.SID, null, null);
+
+                // delete user account
+                NetUserDel(null, sandbox.UserName);
+            }
         }
 
         #endregion

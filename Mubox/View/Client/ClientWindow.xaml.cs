@@ -660,6 +660,9 @@ namespace Mubox.View.Client
             }
         }
 
+        // we only allow one process to launch every 250 ms (arbitrary) and we lock to ensure we have that window to clean up post-launch artifacts, such as game-created mutexes
+        private static object _global_process_launch_lock = new object();
+
         private void PerformApplicationLaunch()
         {
             string applicationExeName = System.IO.Path.GetFileName(ClientState.Settings.ApplicationPath);
@@ -707,18 +710,45 @@ namespace Mubox.View.Client
 
                     Control.FileReplicationManager.PerformReplication(this.ClientState.Settings.Files);
 
+                    #region pre-sandbox launch code
+
+                    ToggleApplicationLaunchButton();
+                    this.Hide();
+
+                    /*
                     ProcessStartInfo startInfo = new ProcessStartInfo(ApplicationLaunchPath);
                     startInfo.Arguments = ClientState.Settings.ApplicationArguments;
                     startInfo.WorkingDirectory = ApplicationLaunchPath.Replace(applicationExeName, "");
                     startInfo.UseShellExecute = false;
 
-                    ToggleApplicationLaunchButton();
-                    this.Hide();
-
                     Process process = new Process();
                     process.StartInfo = startInfo;
                     process.Start();
                     this.ClientState.GameProcess = process;
+                    */
+
+                    #endregion
+
+                    // new 'sandboxed' process launches
+                    if (ClientState.Sandbox == null)
+                    {
+                        ClientState.Sandbox = Win32.SandboxApi.SafeCreateSandbox(ClientState.NetworkClient.DisplayName);
+                    }
+
+                    lock (_global_process_launch_lock)
+                    {
+                        this.ClientState.GameProcess = Win32.SandboxApi.LaunchProcess(
+                            ClientState.Sandbox,
+                            ApplicationLaunchPath,
+                            ClientState.Settings.ApplicationArguments,
+                            ApplicationLaunchPath.Replace(applicationExeName, ""));
+                        
+                        System.Threading.Thread.Sleep(250);
+
+                        Win32.SandboxApi.TryFixMultilaunch(
+                            ClientState.Sandbox, 
+                            ApplicationLaunchPath);
+                    }
                     this.Dispatcher.BeginInvoke((Action)delegate() { this.tabControl1.SelectedItem = tabProcessManagement; });
                     clientState_SetStatusText("Application Started.");
                     return;
