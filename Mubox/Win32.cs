@@ -4574,7 +4574,6 @@ namespace Mubox
                 CloseNamedMutexes(sandbox, new string[] 
                 {
                     "AN-Mutex-Window-Guild Wars",
-                    "AN-Mutex-Window-Guild Wars 2",
                     // TODO: move list to config
                 });
             }
