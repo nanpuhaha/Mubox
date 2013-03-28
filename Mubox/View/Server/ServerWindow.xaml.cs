@@ -186,15 +186,16 @@ namespace Mubox.View.Server
                         // track mouse position
                         TrackMousePositionClientRelative(e, activeClient, clients);
 
-                        if (mouseButtonInfo != null)
-                        {
-                            var lastMouseDownTimestampExpiry = mouseButtonInfo.LastDownTimestamp.AddMilliseconds(Mubox.Configuration.MuboxConfigSection.Default.MouseBufferMilliseconds);
-                            if (e.CreatedTime.Ticks < lastMouseDownTimestampExpiry.Ticks) // TODO: this logic seems incorrect, this seems like a hacky attempt to hide 'mouse cursor centering' performed by games when panning views. this is the only place it is used
-                            {
-                                clients = new ClientBase[0];
-                            }
-                            e.Handled = e.Handled || (mouseButtonInfo.IsDown && lastMouseDownTimestampExpiry.Ticks > DateTime.Now.Ticks);
-                        }
+                        // this was experimental code, and did not address the real problem (the real problem is that mouse focus/capture is being stolen away from the target client, even when it's an only and active client)
+                        //if (mouseButtonInfo != null)
+                        //{
+                        //    var lastMouseDownTimestampExpiry = mouseButtonInfo.LastDownTimestamp.AddMilliseconds(Mubox.Configuration.MuboxConfigSection.Default.MouseBufferMilliseconds);
+                        //    if (e.CreatedTime.Ticks < lastMouseDownTimestampExpiry.Ticks) // TODO: this logic seems incorrect, this seems like a hacky attempt to hide 'mouse cursor centering' performed by games when panning views. this is the only place it is used
+                        //    {
+                        //        clients = new ClientBase[0];
+                        //    }
+                        //    e.Handled = e.Handled || (mouseButtonInfo.IsDown && lastMouseDownTimestampExpiry.Ticks > DateTime.Now.Ticks);
+                        //}
 
                         if (clients.Length > 0)
                         {
@@ -403,8 +404,8 @@ namespace Mubox.View.Server
             {
                 Win32.Beep(
                     Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled
-                        ? (uint)0x7FFF
-                        : (uint)0x7777,
+                        ? (uint)0x77FF
+                        : (uint)0x7077,
                     (uint)100);
                 return false;
             };
@@ -414,8 +415,8 @@ namespace Mubox.View.Server
                 SetInputCapture(!Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled, false);
                 Win32.Beep(
                     Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled
-                        ? (uint)0x7777
-                        : (uint)0x7FFF,
+                        ? (uint)0x77FF
+                        : (uint)0x7077,
                     (uint)100);
                 return false;
             };
@@ -423,8 +424,8 @@ namespace Mubox.View.Server
             {
                 Win32.Beep(
                     Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled
-                        ? (uint)0x7FFF
-                        : (uint)0x7777,
+                        ? (uint)0x77FF
+                        : (uint)0x7077,
                     (uint)100);
                 return false;
             };
@@ -434,8 +435,8 @@ namespace Mubox.View.Server
                 SetInputCapture(!Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled, true);
                 Win32.Beep(
                     Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled
-                        ? (uint)0x7777
-                        : (uint)0x7FFF,
+                        ? (uint)0x77FF
+                        : (uint)0x7077,
                     (uint)100);
                 return false;
             };
