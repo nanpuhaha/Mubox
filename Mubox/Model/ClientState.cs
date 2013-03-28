@@ -291,6 +291,7 @@ namespace Mubox.Model
                 {
                     Debug.WriteLine("GameProcessExited for " + this.Settings.Name);
                     GameProcess = null;
+                    Sandbox.Process = null;
                     Settings.WindowHandle = IntPtr.Zero;
                     if (NetworkClient != null)
                     {
