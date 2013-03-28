@@ -396,11 +396,47 @@ namespace Mubox.View.Server
 
         private void Keyboard_ActionMap_SetDefaultActions(Dictionary<Win32.VK, Dictionary<Win32.WM, Func<KeyboardInput, bool>>> actionMap)
         {
+            // TODO: add visual indicator (need 'overlay ui' first)
+            // TODO: audible indicator needs config setting to disable (may bother some users)
             // toggle input capture
-            actionMap[Win32.VK.ScrollLock] = actionMap[Win32.VK.NumLock];
-            actionMap[Win32.VK.NumLock][Win32.WM.KEYUP] = (e) =>
+            actionMap[Win32.VK.ScrollLock][Win32.WM.KEYDOWN] = (e) =>
             {
-                SetInputCapture(!Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled, (Win32.VK)e.VK == Win32.VK.NumLock);
+                Win32.Beep(
+                    Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled
+                        ? (uint)0x7FFF
+                        : (uint)0x7777,
+                    (uint)100);
+                return false;
+            };
+            actionMap[Win32.VK.ScrollLock][Win32.WM.KEYUP] = (e) =>
+            {
+                // toggle input capture, without client switcher
+                SetInputCapture(!Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled, false);
+                Win32.Beep(
+                    Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled
+                        ? (uint)0x7777
+                        : (uint)0x7FFF,
+                    (uint)100);
+                return false;
+            };
+            actionMap[Win32.VK.Pause][Win32.WM.KEYDOWN] = (e) =>
+            {
+                Win32.Beep(
+                    Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled
+                        ? (uint)0x7FFF
+                        : (uint)0x7777,
+                    (uint)100);
+                return false;
+            };
+            actionMap[Win32.VK.Pause][Win32.WM.KEYUP] = (e) =>
+            {
+                // toggle input capture, with client switcher
+                SetInputCapture(!Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled, true);
+                Win32.Beep(
+                    Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled
+                        ? (uint)0x7777
+                        : (uint)0x7FFF,
+                    (uint)100);
                 return false;
             };
 
@@ -660,47 +696,30 @@ namespace Mubox.View.Server
             }
         }
 
-        private void TryAutoEnableMulticastOnce()
-        {
-            if (SetMulticastOneTime)
-            {
-                if (!Mubox.Configuration.MuboxConfigSection.Default.EnableMulticast)
-                {
-                    Mubox.Configuration.MuboxConfigSection.Default.EnableMulticast = true;
-                    Mubox.Configuration.MuboxConfigSection.Default.Save();
-                }
-                SetMulticastOneTime = false;
-            }
-        }
+        // TODO: it is unclear why this is necessary, will remove after testing
+        //private void TryAutoEnableMulticastOnce()
+        //{
+        //    if (SetMulticastOneTime)
+        //    {
+        //        if (!Mubox.Configuration.MuboxConfigSection.Default.EnableMulticast)
+        //        {
+        //            Mubox.Configuration.MuboxConfigSection.Default.EnableMulticast = true;
+        //            Mubox.Configuration.MuboxConfigSection.Default.Save();
+        //        }
+        //        SetMulticastOneTime = false;
+        //    }
+        //}
 
         public void SetInputCapture(bool enable, bool showServerUI)
         {
+            // TODO: audible beep representing enable/disable states
             if (enable)
             {
-                TryAutoEnableMulticastOnce();
+                // TryAutoEnableMulticastOnce();
                 if (!Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled)
                 {
                     Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled = true;
-                    this.Dispatcher.Invoke((Action)delegate()
-                    {
-                        try
-                        {
-                            ActiveClient = listBox1.SelectedItem as ClientBase;
-                            if (ActiveClient != null)
-                            {
-                                ActiveClient.Activate();
-                            }
-                            else
-                            {
-                                this.Hide();
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine(ex.Message);
-                            Debug.WriteLine(ex.StackTrace);
-                        }
-                    });
+                    HideServerUI();
                 }
             }
             else
@@ -710,14 +729,43 @@ namespace Mubox.View.Server
                     Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled = false;
                     if (showServerUI)
                     {
-                        this.Dispatcher.Invoke((Action)delegate()
-                        {
-                            this.Show();
-                            this.Topmost = true;
-                        });
+                        ShowServerUI();
                     }
                 }
             }
+        }
+
+        private void ShowServerUI()
+        {
+            this.Dispatcher.Invoke((Action)delegate()
+            {
+                this.Show();
+                this.Topmost = true;
+            });
+        }
+
+        private void HideServerUI()
+        {
+            this.Dispatcher.Invoke((Action)delegate()
+            {
+                try
+                {
+                    ActiveClient = listBox1.SelectedItem as ClientBase;
+                    if (ActiveClient != null)
+                    {
+                        ActiveClient.Activate();
+                    }
+                    else
+                    {
+                        this.Hide();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    Debug.WriteLine(ex.StackTrace);
+                }
+            });
         }
 
         public void ToggleInputCapture(bool showServerUI)
