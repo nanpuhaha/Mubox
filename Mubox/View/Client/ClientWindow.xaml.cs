@@ -250,11 +250,11 @@ namespace Mubox.View.Client
                     IntPtr myWindowHandle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
                     if (myWindowHandle != IntPtr.Zero)
                     {
-                        IntPtr myInputQueue = IntPtr.Zero;
-                        Mubox.Win32.Threads.GetWindowThreadProcessId(myWindowHandle, out myInputQueue);
-                        if (myInputQueue != IntPtr.Zero)
+                        IntPtr myInputQueueThreadProcessId = IntPtr.Zero;
+                        Mubox.Win32.Threads.GetWindowThreadProcessId(myWindowHandle, out myInputQueueThreadProcessId);
+                        if (myInputQueueThreadProcessId != IntPtr.Zero)
                         {
-                            Mubox.Control.Network.Client.MyInputQueue = myInputQueue;
+                            Mubox.Control.Network.Client.MyInputQueue = myInputQueueThreadProcessId;
                         }
                         else
                         {
