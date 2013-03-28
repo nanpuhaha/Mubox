@@ -162,7 +162,7 @@ namespace Mubox.View
                     menuItem.Header = "Configure Keyboard..";
                     quickLaunchMenuItems.Add(menuItem);
 
-                    if (Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled)
+                    //if (Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled)
                     {
                         // "Enable Multicast"
                         menuItem = new MenuItem();
@@ -191,7 +191,7 @@ namespace Mubox.View
                         menuItem.ToolTip = "Disable Mouse Capture if you use a third-party application for the Mouse.";
                         quickLaunchMenuItems.Add(menuItem);
 
-                        if (Mubox.Configuration.MuboxConfigSection.Default.EnableMouseCapture)
+                        //if (Mubox.Configuration.MuboxConfigSection.Default.EnableMouseCapture)
                         {
                             {
                                 // "Mouse Clone" Menu
