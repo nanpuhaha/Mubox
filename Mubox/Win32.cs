@@ -1126,16 +1126,22 @@ namespace Mubox
                 }
             }
 
+            //[return: MarshalAs(UnmanagedType.Bool)]
+            //[DllImport("user32.dll", SetLastError = true)]
+            //internal static extern bool SendMessage(
+            //    IntPtr hWnd,
+            //    WM Msg,
+            //    UIntPtr wParam,
+            //    UIntPtr lParam
+            //);
+
             [return: MarshalAs(UnmanagedType.Bool)]
-            [DllImport("user32.dll", SetLastError = true)]
+            [DllImport("user32.dll", SetLastError = true, EntryPoint = "SendMessage")]
             internal static extern bool PostMessage(IntPtr hWnd, WM Msg, UIntPtr wParam, UIntPtr lParam);
 
             [return: MarshalAs(UnmanagedType.Bool)]
-            [DllImport("user32.dll", SetLastError = true)]
+            [DllImport("user32.dll", SetLastError = true, EntryPoint = "SendMessage")]
             internal static extern bool PostMessage(IntPtr hWnd, WM Msg, IntPtr wParam, UIntPtr lParam);
-
-            [DllImport("user32.dll")]
-            internal static extern IntPtr SendMessage(IntPtr hWnd, WM Msg, UIntPtr wParam, UIntPtr lParam);
 
             [DllImport("user32.dll")]
             internal static extern bool TranslateMessage(ref MSG lpMsg);

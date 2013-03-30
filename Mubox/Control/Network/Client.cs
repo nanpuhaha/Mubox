@@ -708,7 +708,7 @@ namespace Mubox.Control.Network
             }
 
             Win32.SetKeyboardState(this.pressedKeys);
-            Win32.Windows.SendMessage(WindowHandle, wm, new UIntPtr(wParam), new UIntPtr(lParam));
+            Win32.Windows.PostMessage(WindowHandle, wm, new UIntPtr(wParam), new UIntPtr(lParam));
 
             // if keydown, translate message
             if (wm == Win32.WM.KEYDOWN)
