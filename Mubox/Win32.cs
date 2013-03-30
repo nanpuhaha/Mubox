@@ -499,7 +499,7 @@ namespace Mubox
             public struct MSLLHOOKSTRUCT
             {
                 internal System.Drawing.Point pt;
-                internal UIntPtr mouseData;
+                internal uint mouseData;
                 internal LLMHF flags;
                 internal uint time;
                 internal IntPtr dwExtraInfo;
@@ -1128,14 +1128,14 @@ namespace Mubox
 
             [return: MarshalAs(UnmanagedType.Bool)]
             [DllImport("user32.dll", SetLastError = true)]
-            internal static extern bool PostMessage(IntPtr hWnd, WM Msg, IntPtr wParam, UIntPtr lParam);
-
-            [return: MarshalAs(UnmanagedType.Bool)]
-            [DllImport("user32.dll", SetLastError = true)]
             internal static extern bool PostMessage(IntPtr hWnd, WM Msg, UIntPtr wParam, UIntPtr lParam);
 
+            //[return: MarshalAs(UnmanagedType.Bool)]
+            [DllImport("user32.dll", SetLastError = true)]
+            internal static extern bool PostMessage(IntPtr hWnd, WM Msg, IntPtr wParam, UIntPtr lParam);
+
             [DllImport("user32.dll")]
-            internal static extern IntPtr SendMessage(IntPtr hWnd, WM Msg, IntPtr wParam, UIntPtr lParam);
+            internal static extern IntPtr SendMessage(IntPtr hWnd, WM Msg, UIntPtr wParam, UIntPtr lParam);
 
             [DllImport("user32.dll")]
             internal static extern bool TranslateMessage(ref MSG lpMsg);
@@ -2292,7 +2292,7 @@ namespace Mubox
                 SendInputViaMSParams((MouseEventFlags)hookStruct.flags, hookStruct.time, X, Y, hookStruct.mouseData);
             }
 
-            internal static void SendInputViaMSParams(MouseEventFlags flags, uint time, int relX, int relY, UIntPtr mouseData)
+            internal static void SendInputViaMSParams(MouseEventFlags flags, uint time, int relX, int relY, uint mouseData)
             {
                 uint result = 0;
                 if (IntPtr.Size == 8)
@@ -2382,7 +2382,7 @@ namespace Mubox
             {
                 [FieldOffset(0)]
                 internal InputType InputType;
-                [FieldOffset(8)]
+                [FieldOffset(8)] // TODO: verify this offset
                 internal KEYBDINPUT ki;
                 [FieldOffset(8)]
                 internal MOUSEINPUT mi;
@@ -2396,7 +2396,7 @@ namespace Mubox
             {
                 internal int dx;
                 internal int dy;
-                internal UIntPtr mouseData; // TODO: does this really translate to 64bit value on 64bit platform?
+                internal uint mouseData;
                 internal MouseEventFlags Flags;
                 internal uint time;
                 internal IntPtr dwExtraInfo;
@@ -5182,12 +5182,12 @@ namespace Mubox
 
         public static class MACROS
         {
-            internal static ushort GET_KEYSTATE_WPARAM(UIntPtr wParam)
+            internal static ushort GET_KEYSTATE_WPARAM(uint wParam)
             {
                 return LOWORD(wParam);
             }
 
-            internal static ushort GET_NCHITTEST_WPARAM(UIntPtr wParam)
+            internal static ushort GET_NCHITTEST_WPARAM(uint wParam)
             {
                 return LOWORD(wParam);
             }
@@ -5198,74 +5198,74 @@ namespace Mubox
                 XBUTTON2 = 2
             }
 
-            internal static XBUTTONS GET_XBUTTON_WPARAM(UIntPtr wParam)
+            internal static XBUTTONS GET_XBUTTON_WPARAM(uint wParam)
             {
                 return (XBUTTONS)HIWORD(wParam);
             }
 
-            internal static short GET_X_LPARAM(UIntPtr lp)
+            internal static short GET_X_LPARAM(uint lp)
             {
                 return (short)LOWORD(lp);
             }
 
-            internal static short GET_Y_LPARAM(UIntPtr lp)
+            internal static short GET_Y_LPARAM(uint lp)
             {
                 return (short)HIWORD(lp);
             }
 
-            internal static UIntPtr MAKEWPARAM(ushort l, ushort h)
+            internal static uint MAKEWPARAM(ushort l, ushort h)
             {
                 return MAKELONG(l, h);
             }
 
-            internal static UIntPtr MAKELPARAM(ushort l, ushort h)
+            internal static uint MAKELPARAM(ushort l, ushort h)
             {
                 return MAKELONG(l, h);
             }
 
-            internal static UIntPtr MAKELRESULT(ushort l, ushort h)
+            internal static uint MAKELRESULT(ushort l, ushort h)
             {
                 return MAKELONG(l, h);
             }
 
             internal static ushort MAKEWORD(byte a, byte b)
             {
-                return (ushort)((ushort)a | ((ushort)b << 8));
+                return (ushort)((ushort)a | (((ushort)b) << 8));
             }
 
-            internal static UIntPtr MAKELONG(ushort a, ushort b)
+            internal static uint MAKELONG(ushort l, ushort h)
             {
-                return (UIntPtr)((uint)a | ((uint)b << 16));
+                return ((uint)l) | (((uint)h) << 16);
             }
 
-            internal static uint HIDWORD(UIntPtr l)
+            internal static uint LODWORD(ulong dq)
             {
-                return (uint)(l.ToUInt64() & 0xffffffff);
+                return (uint)dq;
             }
 
-            internal static uint LODWORD(UIntPtr l)
+            internal static uint HIDWORD(ulong dq)
             {
-                return (uint)((l.ToUInt64() >> 32) & 0xffffffff);
+                return (uint)(dq >> 32);
             }
 
-            internal static ushort LOWORD(UIntPtr l)
+            internal static ushort LOWORD(uint dd)
             {
-                return (ushort)(l.ToUInt32() & 0xffff);
+                return (ushort)dd;
             }
 
-            internal static ushort HIWORD(UIntPtr l)
+            internal static ushort HIWORD(uint dd)
             {
-                return (ushort)((l.ToUInt32() >> 16) & 0xffff);
+                return (ushort)(dd >> 16);
             }
 
-            internal static byte LOBYTE(ushort w)
+            internal static byte LOBYTE(ushort dw)
             {
-                return (byte)(w & 0xff);
+                return (byte)dw;
             }
 
-            internal static byte HIBYTE(ushort w)
+            internal static byte HIBYTE(ushort dw)
             {
-                return (byte)((w >> 8) & 0xff);
+                return (byte)(dw >> 8);
             }
         }
     }

@@ -668,7 +668,7 @@ namespace Mubox.Control.Network
 
         private void OnKeyboardEventViaViq(uint vk, Win32.WindowHook.LLKHF flags, uint scan, uint time, Win32.CAS cas)
         {
-            var wParam = new IntPtr(vk);
+            var wParam = vk;
 
             Win32.WM wm = (((flags & Win32.WindowHook.LLKHF.UP) == Win32.WindowHook.LLKHF.UP) ? Win32.WM.KEYUP : Win32.WM.KEYDOWN); // TODO SYSKEYDOWN via Win32.WindowHook.LLKHF.AltKey ?
             uint lParam = 0x01;
@@ -686,23 +686,27 @@ namespace Mubox.Control.Network
 
             if ((flags & Win32.WindowHook.LLKHF.UP) != Win32.WindowHook.LLKHF.UP)
             {
+                // async Win32.GetKeyboardState or similar to capture actual/current CAS states
                 if ((cas & Win32.CAS.CONTROL) != 0)
                 {
+                    // TODO: only if '' is not already 'down' (get async key state)
                     OnKeyboardEventViaViq((uint)Win32.VK.Control, (Win32.WindowHook.LLKHF)0, (uint)0, time, (Win32.CAS)0);
                 }
                 if ((cas & Win32.CAS.ALT) != 0)
                 {
+                    // TODO: only if '' is not already 'down' (get async key state)
                     OnKeyboardEventViaViq((uint)Win32.VK.Menu, (Win32.WindowHook.LLKHF)0, (uint)0, time, (Win32.CAS)0);
                     flags |= Win32.WindowHook.LLKHF.ALTDOWN;
                 }
                 if ((cas & Win32.CAS.SHIFT) != 0)
                 {
+                    // TODO: only if '' is not already 'down' (get async key state)
                     OnKeyboardEventViaViq((uint)Win32.VK.Shift, (Win32.WindowHook.LLKHF)0, (uint)0, time, (Win32.CAS)0);
                 }
             }
 
             Win32.SetKeyboardState(this.pressedKeys);
-            Win32.Windows.SendMessage(WindowHandle, wm, wParam, new UIntPtr(lParam));
+            Win32.Windows.SendMessage(WindowHandle, wm, new UIntPtr(wParam), new UIntPtr(lParam));
 
             // if keydown, translate message
             if (wm == Win32.WM.KEYDOWN)
@@ -717,18 +721,23 @@ namespace Mubox.Control.Network
                 Win32.Windows.TranslateMessage(ref msg);
             }
 
+            // TODO: this expression should probably be checking for == UP, but the individual key states need to be refactored to check current state first)
+            // NOTE: if subsequent keys still rely on this state, it will be re-set as expected because of the sister CASE code above
             if ((flags & Win32.WindowHook.LLKHF.UP) != Win32.WindowHook.LLKHF.UP)
             {
                 if ((cas & Win32.CAS.CONTROL) != 0)
                 {
+                    // TODO: only if '' is still 'down' (get async key state)
                     OnKeyboardEventViaViq((uint)Win32.VK.Control, Win32.WindowHook.LLKHF.UP, (uint)0, Win32.SendInputApi.GetTickCount(), (Win32.CAS)0);
                 }
                 if ((cas & Win32.CAS.ALT) != 0)
                 {
+                    // TODO: only if '' is not already 'down' (get async key state)
                     OnKeyboardEventViaViq((uint)Win32.VK.Menu, Win32.WindowHook.LLKHF.UP, (uint)0, Win32.SendInputApi.GetTickCount(), (Win32.CAS)0);
                 }
                 if ((cas & Win32.CAS.SHIFT) != 0)
                 {
+                    // TODO: only if '' is not already 'down' (get async key state)
                     OnKeyboardEventViaViq((uint)Win32.VK.Shift, Win32.WindowHook.LLKHF.UP, (uint)0, Win32.SendInputApi.GetTickCount(), (Win32.CAS)0);
                 }
             }
@@ -738,7 +747,7 @@ namespace Mubox.Control.Network
 
         private static object OnMouseEventLock = new object();
 
-        private void OnMouseEvent_Action(int pointX, int pointY, int lPointX, int lPointY, Win32.WM wm, UIntPtr mouseData, bool isButtonUpEvent)
+        private void OnMouseEvent_Action(int pointX, int pointY, int lPointX, int lPointY, Win32.WM wm, uint mouseData, bool isButtonUpEvent)
         {
             var clientRelativeCoordinates = Win32.MACROS.MAKELPARAM(
                 (ushort)lPointX,
@@ -748,10 +757,10 @@ namespace Mubox.Control.Network
             lock (OnMouseEventLock)
             {
                 //Win32.Cursor.SetCapture(windowHandle);
-                Win32.Windows.PostMessage(windowHandle, Win32.WM.MOUSEMOVE, new IntPtr((int)CurrentMK), clientRelativeCoordinates);
-                Win32.Windows.PostMessage(windowHandle, Win32.WM.SETCURSOR, windowHandle, Win32.MACROS.MAKELPARAM((ushort)Win32.WM.MOUSEMOVE, (ushort)Win32.HitTestValues.HTCLIENT));
-                Win32.Windows.PostMessage(windowHandle, Win32.WM.MOUSEACTIVATE, windowHandle, Win32.MACROS.MAKELPARAM((ushort)wm, (ushort)Win32.HitTestValues.HTCLIENT));
-                Win32.Windows.PostMessage(windowHandle, wm, mouseData, clientRelativeCoordinates);
+                Win32.Windows.PostMessage(windowHandle, Win32.WM.MOUSEMOVE, new UIntPtr((uint)CurrentMK), new UIntPtr(clientRelativeCoordinates));
+                Win32.Windows.PostMessage(windowHandle, Win32.WM.SETCURSOR, windowHandle, new UIntPtr(Win32.MACROS.MAKELPARAM((ushort)Win32.WM.MOUSEMOVE, (ushort)Win32.HitTestValues.HTCLIENT)));
+                Win32.Windows.PostMessage(windowHandle, Win32.WM.MOUSEACTIVATE, windowHandle, new UIntPtr(Win32.MACROS.MAKELPARAM((ushort)wm, (ushort)Win32.HitTestValues.HTCLIENT)));
+                Win32.Windows.PostMessage(windowHandle, wm, new UIntPtr(mouseData), new UIntPtr(clientRelativeCoordinates));
                 Debug.WriteLine("OnMouseEvent SendMessage(" + windowHandle.ToString() + ", " + wm + ", " + mouseData + ", " + clientRelativeCoordinates + ", " + pointX + ", " + pointY + ", " + lPointX + ", " + lPointY + ", (" + CurrentMK + "), " + isButtonUpEvent);
                 //Win32.Cursor.ReleaseCapture();
             }

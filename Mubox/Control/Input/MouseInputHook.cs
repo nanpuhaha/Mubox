@@ -91,15 +91,15 @@ namespace Mubox.Control.Input
 
         public static event EventHandler<MouseInput> MouseInputReceived;
 
-        private static bool OnMouseInputReceived(Win32.WM wParam, Win32.WindowHook.MSLLHOOKSTRUCT hookStruct)
+        private static bool OnMouseInputReceived(Win32.WM wm, Win32.WindowHook.MSLLHOOKSTRUCT hookStruct)
         {
             if (Win32.WindowHook.LLMHF.INJECTED == (hookStruct.flags & Win32.WindowHook.LLMHF.INJECTED))
             {
                 return false;
             }
 
-            MouseInput mouseInputEventArgs = MouseInput.CreateFrom((Win32.WM)wParam, hookStruct);
-            mouseInputEventArgs.WM = wParam;
+            MouseInput mouseInputEventArgs = MouseInput.CreateFrom(wm, hookStruct);
+
             if (Performance.IsPerformanceEnabled)
             {
                 MouseInputPerformance.Count(Convert.ToInt64(mouseInputEventArgs.Time));

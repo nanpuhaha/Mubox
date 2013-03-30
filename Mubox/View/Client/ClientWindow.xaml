@@ -9,7 +9,7 @@
     <Grid>
         <Grid Margin="12,0,93,12" Name="grid1" Height="55" VerticalAlignment="Bottom">
             <Border BorderBrush="Black" Background="Gainsboro" CornerRadius="3">
-                <TextBlock TextWrapping="WrapWithOverflow"  Padding="0" Margin="0" Name="textStatus" />
+                <TextBlock TextWrapping="WrapWithOverflow"  Padding="0" Margin="0" x:Name="textStatus" />
             </Border>
         </Grid>
         <Label HorizontalAlignment="Left" Margin="17,10,0,0" Name="label3" Width="98" Height="24" VerticalAlignment="Top" TabIndex="7">Client Name</Label>
@@ -26,14 +26,21 @@
             </TabItem>
             <TabItem Header="Game Settings" Name="tabGameSettings">
                 <Grid >
-                    <Label  Height="24" HorizontalAlignment="Left" Margin="34,26,0,0" Name="label6" TabIndex="7" VerticalAlignment="Top" Width="92">Game EXE</Label>
-                    <TextBox Height="23" Margin="132,28,27,0" Name="textApplicationPath" TabIndex="8" ToolTip="Path to EXE" VerticalAlignment="Top" TextChanged="textApplicationPath_TextChanged">C:\World of Warcraft\wow.exe</TextBox>
-                    <CheckBox  Margin="132,0,112,109" Name="checkIsolateApplication" Checked="checkIsolateApplication_Checked" Unchecked="checkIsolateApplication_Unchecked" Height="16.08" VerticalAlignment="Bottom">Game Isolation (e.g. SymLinks)</CheckBox>
-                    <TextBox Margin="132,0,27,80" Name="textIsolationPath" TabIndex="8" ToolTip="Path to EXE" Text="Z:\" TextChanged="textIsolationPath_TextChanged" Height="23.08" VerticalAlignment="Bottom" />
-                    <Button Height="24" Margin="132,0,71,34" Name="buttonInstallMuboxer" VerticalAlignment="Bottom" ToolTip="The Muboxer AddOn adds a /mbx command to WoW that offers Auto-Follow, Auto-Accept Group and Auto-Accept Shared Quest features." Click="buttonInstallMuboxer_Click">Install WoW AddOn</Button>
-                    <TextBox Height="23" Margin="132,65,27,0" Name="textApplicationArguments" TabIndex="8" ToolTip="Path to EXE" VerticalAlignment="Top" TextChanged="textApplicationArguments_TextChanged">-windowed</TextBox>
-                    <Label HorizontalAlignment="Left" Margin="34,0,0,80" Name="label9" TabIndex="7" Width="92" Height="23.08" VerticalAlignment="Bottom">Isolation Folder</Label>
-                    <Label  Height="32" HorizontalAlignment="Left" Margin="34,64,0,0" Name="label7" TabIndex="7" VerticalAlignment="Top" Width="92">Arguments</Label>
+                    <Label HorizontalAlignment="Left" Margin="34,10,0,0" Name="labelPreset" TabIndex="7" Width="92" Height="24" VerticalAlignment="Top">Game Preset</Label>
+                    <ComboBox Name="groupPreset" Margin="132,10,27,0" Height="24" VerticalAlignment="Top">
+                        <!-- TODO: store/load selection from config -->
+                        <!-- TODO: the UI parts need to be refactored into game-specific versions of the UI, bound to the same common model -->
+                        <ComboBoxItem>Guild Wars 2</ComboBoxItem>
+                        <ComboBoxItem>World of Warcraft</ComboBoxItem>
+                    </ComboBox>
+                    <Label  Height="24" HorizontalAlignment="Left" Margin="34,59,0,0" Name="label6" TabIndex="7" VerticalAlignment="Top" Width="92">Game EXE</Label>
+                    <TextBox Height="23" Margin="132,61,27,0" Name="textApplicationPath" TabIndex="8" ToolTip="Path to EXE" VerticalAlignment="Top" TextChanged="textApplicationPath_TextChanged">D:\Games\Guild Wars 2\gw2.exe</TextBox>
+                    <CheckBox  Margin="132,0,112,92" Name="checkIsolateApplication" Checked="checkIsolateApplication_Checked" Unchecked="checkIsolateApplication_Unchecked" Height="16" VerticalAlignment="Bottom">Game Isolation (e.g. SymLinks)</CheckBox>
+                    <TextBox Margin="132,0,27,63" Name="textIsolationPath" TabIndex="8" ToolTip="Path to EXE" Text="D:\Isolated" TextChanged="textIsolationPath_TextChanged" Height="23" VerticalAlignment="Bottom" />
+                    <Button Height="24" Margin="132,0,71,17" Name="buttonInstallMuboxer" VerticalAlignment="Bottom" ToolTip="The Muboxer AddOn adds a /mbx command to WoW that offers Auto-Follow, Auto-Accept Group and Auto-Accept Shared Quest features." Click="buttonInstallMuboxer_Click">Install WoW AddOn</Button>
+                    <TextBox Height="23" Margin="132,98,27,0" Name="textApplicationArguments" TabIndex="8" ToolTip="Path to EXE" VerticalAlignment="Top" TextChanged="textApplicationArguments_TextChanged">-windowed</TextBox>
+                    <Label HorizontalAlignment="Left" Margin="34,0,0,63" Name="label9" TabIndex="7" Width="92" Height="23" VerticalAlignment="Bottom">Isolation Folder</Label>
+                    <Label  Height="32" HorizontalAlignment="Left" Margin="34,97,0,0" Name="label7" TabIndex="7" VerticalAlignment="Top" Width="92">Arguments</Label>
                 </Grid>
             </TabItem>
             <TabItem Header="File Replication">

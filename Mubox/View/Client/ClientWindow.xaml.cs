@@ -247,7 +247,10 @@ namespace Mubox.View.Client
             {
                 this.Dispatcher.Invoke((Action)delegate()
                 {
-                    IntPtr myWindowHandle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+                    // TODO: experimentally using ServerWindow as 'myWindowHandle'
+                    // NOTE: seems there is no difference in behavior
+                    var window = Mubox.View.Server.ServerWindow.Instance; // this;
+                    IntPtr myWindowHandle = new System.Windows.Interop.WindowInteropHelper(window).Handle;
                     if (myWindowHandle != IntPtr.Zero)
                     {
                         IntPtr myInputQueueThreadProcessId = IntPtr.Zero;

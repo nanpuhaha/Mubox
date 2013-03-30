@@ -9,12 +9,13 @@ namespace Mubox.Model.Input
     {
         public static MouseInput CreateFrom(Win32.WM wm, Mubox.Win32.WindowHook.MSLLHOOKSTRUCT hookStruct)
         {
-            MouseInput e = new MouseInput();
-            e.WM = wm;
-            e.Point = new System.Windows.Point(hookStruct.pt.X, hookStruct.pt.Y);
-            e.MouseData = hookStruct.mouseData;
-            e.Time = hookStruct.time;
-            return e;
+            return new MouseInput
+            {
+                WM = wm,
+                Point = new System.Windows.Point(hookStruct.pt.X, hookStruct.pt.Y),
+                MouseData = hookStruct.mouseData,
+                Time = hookStruct.time,
+            };
         }
 
         [DataMember]
@@ -27,7 +28,7 @@ namespace Mubox.Model.Input
         public System.Windows.Point Point { get; set; }
 
         [DataMember]
-        public UIntPtr MouseData { get; set; }
+        public uint MouseData { get; set; }
 
         public Win32.SendInputApi.MouseEventFlags Flags
         {
