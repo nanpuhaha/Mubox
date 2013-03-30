@@ -25,18 +25,28 @@ namespace Mubox.Model.Input
         public DateTime LastUpTimestamp { get; set; }
 
         /// <summary>
+        /// Timestamp of the last time IsClick transitioned into a True state from a False state.
+        /// </summary>
+        public DateTime LastClickTimestamp { get; set; }
+
+        /// <summary>
+        /// Timestamp of the last time IsDoubleClick transitioned into a True state from a False state.
+        /// </summary>
+        public DateTime LastDoubleClickTimestamp { get; set; }
+
+        /// <summary>
         /// True if the button transitioned from a Down state to an Up state, as an 'atomic' "Click" gesture.
         /// </summary>
-        public bool IsClick { get { return LastUpTimestamp.Ticks <= LastDownTimestamp.AddMilliseconds(Mubox.Configuration.MuboxConfigSection.Default.MouseBufferMilliseconds).Ticks; } }
+        public bool IsClick { get; set; }
+
+        /// <summary>
+        /// True if the button transitioned from a Down state to an Up state, twice, as an 'atomic' "Double Click" gesture.
+        /// </summary>
+        public bool IsDoubleClick { get; set; }
 
         /// <summary>
         /// True if the button is Down due to a Multicast (e.g. Mouse Clone, Key Clone).
         /// </summary>
         public bool IsMulticast { get; set; }
-
-        /// <summary>
-        /// True if IsClick was True when the current gesture began, necessary for implementing an 'atomic' "Double Click" gesture.
-        /// </summary>
-        public bool LastGestureWasClick { get; set; }
     }
 }

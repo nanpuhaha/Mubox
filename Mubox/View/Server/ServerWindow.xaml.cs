@@ -48,27 +48,43 @@ namespace Mubox.View.Server
         private static Dictionary<Win32.WM, ButtonState> InitializeMouseButtons()
         {
             Dictionary<Win32.WM, ButtonState> buttons = new Dictionary<Win32.WM, ButtonState>();
-            foreach (var button in new Win32.WM[]
+            foreach (var group in new Win32.WM[][]
                 {
-                    Win32.WM.LBUTTONDOWN,
-                    Win32.WM.RBUTTONDOWN,
-                    Win32.WM.MBUTTONDOWN,
-                    Win32.WM.XBUTTONDOWN,
-                    //Win32.WM.LBUTTONDBLCLK,
-                    //Win32.WM.RBUTTONDBLCLK,
-                    //Win32.WM.MBUTTONDBLCLK,
-                    //Win32.WM.XBUTTONDBLCLK,
-                    Win32.WM.LBUTTONUP,
-                    Win32.WM.RBUTTONUP,
-                    Win32.WM.MBUTTONUP,
-                    Win32.WM.XBUTTONUP
+                    new Win32.WM[] 
+                    {
+                        Win32.WM.LBUTTONDOWN,
+                        Win32.WM.LBUTTONDBLCLK,
+                        Win32.WM.LBUTTONUP,
+                    },
+                    new Win32.WM[] 
+                    {
+                        Win32.WM.MBUTTONDOWN,
+                        Win32.WM.MBUTTONDBLCLK,
+                        Win32.WM.MBUTTONUP,
+                    },
+                    new Win32.WM[] 
+                    {
+                        Win32.WM.RBUTTONDOWN,
+                        Win32.WM.RBUTTONDBLCLK,
+                        Win32.WM.RBUTTONUP,
+                    },
+                    new Win32.WM[] 
+                    {
+                        Win32.WM.XBUTTONDOWN,
+                        Win32.WM.XBUTTONDBLCLK,
+                        Win32.WM.XBUTTONUP
+                    },
                 })
             {
-                buttons[button] = new ButtonState
+                var state = new ButtonState
                 {
                     LastDownTimestamp = DateTime.MinValue,
                     LastUpTimestamp = DateTime.MinValue
                 };
+                foreach (var button in group)
+                {
+                    buttons[button] = state;
+                }
             }
             return buttons;
         }
@@ -137,12 +153,19 @@ namespace Mubox.View.Server
                     case Win32.WM.LBUTTONDOWN:
                     case Win32.WM.RBUTTONDOWN:
                     case Win32.WM.MBUTTONDOWN:
-                    case Win32.WM.XBUTTONDOWN:
+                    case Win32.WM.XBUTTONDOWN:                    
                         if (!mouseButtonInfo.IsDown)
                         {
-                            mouseButtonInfo.LastGestureWasClick = mouseButtonInfo.IsClick;
+                            mouseButtonInfo.IsClick = false;
+                            mouseButtonInfo.IsDoubleClick = false;
                             mouseButtonInfo.LastDownTimestamp = DateTime.Now;
                         }
+                        break;
+                    case Win32.WM.LBUTTONDBLCLK:
+                    case Win32.WM.MBUTTONDBLCLK:
+                    case Win32.WM.RBUTTONDBLCLK:
+                    case Win32.WM.XBUTTONDBLCLK:
+                        mouseButtonInfo.IsDoubleClick = true;
                         break;
                     case Win32.WM.LBUTTONUP:
                     case Win32.WM.RBUTTONUP:
@@ -150,11 +173,53 @@ namespace Mubox.View.Server
                     case Win32.WM.XBUTTONUP:
                         if (mouseButtonInfo.IsDown)
                         {
+                            var isClick =
+                                // within buffer timestamp for down/up transition to be interpretted as a click
+                                DateTime.Now.Ticks <= mouseButtonInfo.LastUpTimestamp.AddMilliseconds(Mubox.Configuration.MuboxConfigSection.Default.MouseBufferMilliseconds).Ticks;
+                            mouseButtonInfo.IsClick = isClick;
+                            if (isClick)
+                            {
+                                var isDoubleClick =
+                                    // within buffer timestamp for a second down/up transition to be interpretted as a double-click
+                                    (DateTime.Now.Ticks <= mouseButtonInfo.LastClickTimestamp.AddMilliseconds(Mubox.Configuration.MuboxConfigSection.Default.MouseBufferMilliseconds).Ticks)
+                                    // and last click event was not also a double-click event
+                                    && mouseButtonInfo.LastDoubleClickTimestamp <= mouseButtonInfo.LastClickTimestamp;
+                                mouseButtonInfo.IsDoubleClick = isDoubleClick;
+                                if (isDoubleClick)
+                                {
+                                    switch (e.WM)
+                                    {
+                                        case Win32.WM.LBUTTONUP:
+                                            e.WM = Win32.WM.LBUTTONDBLCLK;
+                                            MouseInputHook_MouseInputReceived(sender, e);
+                                            e.WM = Win32.WM.LBUTTONUP;
+                                            break;
+                                        case Win32.WM.RBUTTONUP:
+                                            e.WM = Win32.WM.RBUTTONDBLCLK;
+                                            MouseInputHook_MouseInputReceived(sender, e);
+                                            e.WM = Win32.WM.RBUTTONUP;
+                                            break;
+                                        case Win32.WM.MBUTTONUP:
+                                            e.WM = Win32.WM.MBUTTONDBLCLK;
+                                            MouseInputHook_MouseInputReceived(sender, e);
+                                            e.WM = Win32.WM.MBUTTONUP;
+                                            break;
+                                        case Win32.WM.XBUTTONUP:
+                                            e.WM = Win32.WM.XBUTTONDBLCLK;
+                                            MouseInputHook_MouseInputReceived(sender, e);
+                                            e.WM = Win32.WM.XBUTTONUP;
+                                            break;
+                                    }
+                                    mouseButtonInfo.LastDoubleClickTimestamp = DateTime.Now;
+                                }
+                                mouseButtonInfo.LastClickTimestamp = DateTime.Now;
+                            }
                             mouseButtonInfo.LastUpTimestamp = DateTime.Now;
                         }
                         break;
                 }
                 e.IsClickEvent = mouseButtonInfo.IsClick;
+                e.IsDoubleClickEvent = mouseButtonInfo.IsDoubleClick;
             }
 
             #endregion
