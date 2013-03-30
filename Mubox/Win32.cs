@@ -2289,41 +2289,43 @@ namespace Mubox
 
             internal static void SendInputViaHookStruct(Win32.WindowHook.MSLLHOOKSTRUCT hookStruct, int X, int Y)
             {
-                SendInputViaMSParams((MouseEventFlags)hookStruct.flags, hookStruct.time, X, Y, hookStruct.mouseData);
+                // attempting to deprecate, as it does not allow for inject of particular WM values
+                //SendInputViaMSParams((MouseEventFlags)hookStruct.flags, hookStruct.time, X, Y, hookStruct.mouseData);
             }
 
             internal static void SendInputViaMSParams(MouseEventFlags flags, uint time, int relX, int relY, uint mouseData)
             {
-                uint result = 0;
-                if (IntPtr.Size == 8)
-                {
-                    INPUT64[] input = new INPUT64[1];
-                    input[0].InputType = InputType.INPUT_MOUSE;
-                    input[0].mi.dwExtraInfo = GetMessageExtraInfo();
-                    input[0].mi.Flags = flags;
-                    input[0].mi.time = GetTickCount();
-                    input[0].mi.dx = (int)relX;
-                    input[0].mi.dy = (int)relY;
-                    input[0].mi.mouseData = mouseData;
-                    result = SendInput(1, input, Marshal.SizeOf(input[0]));
-                }
-                else
-                {
-                    INPUT[] input = new INPUT[1];
-                    input[0].InputType = InputType.INPUT_MOUSE;
-                    input[0].mi.dwExtraInfo = GetMessageExtraInfo();
-                    input[0].mi.Flags = flags;
-                    input[0].mi.time = GetTickCount();
-                    input[0].mi.dx = (int)relX;
-                    input[0].mi.dy = (int)relY;
-                    input[0].mi.mouseData = mouseData;
-                    result = SendInput(1, input, Marshal.SizeOf(input[0]));
-                }
-                if (result == 0)
-                {
-                    int err = Marshal.GetLastWin32Error();
-                    Debug.WriteLine("SendInput(mi) Blocked, 0x" + err.ToString("X"));
-                }
+                // attempting to deprecate, as it does not allow for inject of particular WM values
+                //uint result = 0;
+                //if (IntPtr.Size == 8)
+                //{
+                //    INPUT64[] input = new INPUT64[1];
+                //    input[0].InputType = InputType.INPUT_MOUSE;
+                //    input[0].mi.dwExtraInfo = GetMessageExtraInfo();
+                //    input[0].mi.Flags = flags;
+                //    input[0].mi.time = GetTickCount();
+                //    input[0].mi.dx = (int)relX;
+                //    input[0].mi.dy = (int)relY;
+                //    input[0].mi.mouseData = mouseData;
+                //    result = SendInput(1, input, Marshal.SizeOf(input[0]));
+                //}
+                //else
+                //{
+                //    INPUT[] input = new INPUT[1];
+                //    input[0].InputType = InputType.INPUT_MOUSE;
+                //    input[0].mi.dwExtraInfo = GetMessageExtraInfo();
+                //    input[0].mi.Flags = flags;
+                //    input[0].mi.time = GetTickCount();
+                //    input[0].mi.dx = (int)relX;
+                //    input[0].mi.dy = (int)relY;
+                //    input[0].mi.mouseData = mouseData;
+                //    result = SendInput(1, input, Marshal.SizeOf(input[0]));
+                //}
+                //if (result == 0)
+                //{
+                //    int err = Marshal.GetLastWin32Error();
+                //    Debug.WriteLine("SendInput(mi) Blocked, 0x" + err.ToString("X"));
+                //}
             }
 
             public enum InputType : int
