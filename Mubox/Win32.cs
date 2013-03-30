@@ -1130,7 +1130,7 @@ namespace Mubox
             [DllImport("user32.dll", SetLastError = true)]
             internal static extern bool PostMessage(IntPtr hWnd, WM Msg, UIntPtr wParam, UIntPtr lParam);
 
-            //[return: MarshalAs(UnmanagedType.Bool)]
+            [return: MarshalAs(UnmanagedType.Bool)]
             [DllImport("user32.dll", SetLastError = true)]
             internal static extern bool PostMessage(IntPtr hWnd, WM Msg, IntPtr wParam, UIntPtr lParam);
 

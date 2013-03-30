@@ -22,16 +22,16 @@ namespace Mubox.Control.Network
         {
             get
             {
-                return windowHandle;
+                return _windowHandle;
             }
             set
             {
-                if (windowHandle != value)
+                if (_windowHandle != value)
                 {
                     lock (inputQueueLock)
                     {
-                        windowHandle = value;
-                        if (windowHandle == IntPtr.Zero)
+                        _windowHandle = value;
+                        if (_windowHandle == IntPtr.Zero)
                         {
                             WindowInputQueue = IntPtr.Zero;
                             return;
@@ -39,11 +39,11 @@ namespace Mubox.Control.Network
                         IntPtr windowInputQueue = WindowInputQueue;
                         if (WindowInputQueue == IntPtr.Zero)
                         {
-                            if (windowHandle != IntPtr.Zero)
+                            if (_windowHandle != IntPtr.Zero)
                             {
-                                if (Win32.Windows.GetWindowThreadProcessId(windowHandle, out windowInputQueue) == 0)
+                                if (Win32.Windows.GetWindowThreadProcessId(_windowHandle, out windowInputQueue) == 0)
                                 {
-                                    Debug.WriteLine("GWTPID Failed for set_WindowHandle(" + windowHandle + ") ");
+                                    Debug.WriteLine("GWTPID Failed for set_WindowHandle(" + _windowHandle + ") ");
                                 }
                                 WindowInputQueue = windowInputQueue;
                             }
@@ -53,7 +53,7 @@ namespace Mubox.Control.Network
             }
         }
 
-        private IntPtr windowHandle;
+        private IntPtr _windowHandle;
 
         private static object inputQueueLock = new object();
         public IntPtr WindowInputQueue { get; set; }
@@ -757,11 +757,11 @@ namespace Mubox.Control.Network
             lock (OnMouseEventLock)
             {
                 //Win32.Cursor.SetCapture(windowHandle);
-                Win32.Windows.PostMessage(windowHandle, Win32.WM.MOUSEMOVE, new UIntPtr((uint)CurrentMK), new UIntPtr(clientRelativeCoordinates));
-                Win32.Windows.PostMessage(windowHandle, Win32.WM.SETCURSOR, windowHandle, new UIntPtr(Win32.MACROS.MAKELPARAM((ushort)Win32.WM.MOUSEMOVE, (ushort)Win32.HitTestValues.HTCLIENT)));
-                Win32.Windows.PostMessage(windowHandle, Win32.WM.MOUSEACTIVATE, windowHandle, new UIntPtr(Win32.MACROS.MAKELPARAM((ushort)wm, (ushort)Win32.HitTestValues.HTCLIENT)));
-                Win32.Windows.PostMessage(windowHandle, wm, new UIntPtr(mouseData), new UIntPtr(clientRelativeCoordinates));
-                Debug.WriteLine("OnMouseEvent SendMessage(" + windowHandle.ToString() + ", " + wm + ", " + mouseData + ", " + clientRelativeCoordinates + ", " + pointX + ", " + pointY + ", " + lPointX + ", " + lPointY + ", (" + CurrentMK + "), " + isButtonUpEvent);
+                Win32.Windows.PostMessage(_windowHandle, Win32.WM.MOUSEMOVE, new UIntPtr((uint)CurrentMK), new UIntPtr(clientRelativeCoordinates));
+                // there is a visual anomaly in GW2, experimental removal: Win32.Windows.PostMessage(windowHandle, Win32.WM.SETCURSOR, windowHandle, new UIntPtr(Win32.MACROS.MAKELPARAM((ushort)Win32.WM.MOUSEMOVE, (ushort)Win32.HitTestValues.HTCLIENT)));
+                Win32.Windows.PostMessage(_windowHandle, Win32.WM.MOUSEACTIVATE, _windowHandle, new UIntPtr(Win32.MACROS.MAKELPARAM((ushort)wm, (ushort)Win32.HitTestValues.HTCLIENT)));
+                Win32.Windows.PostMessage(_windowHandle, wm, new UIntPtr(mouseData), new UIntPtr(clientRelativeCoordinates));
+                Debug.WriteLine("OnMouseEvent SendMessage(" + _windowHandle.ToString() + ", " + wm + ", " + mouseData + ", " + clientRelativeCoordinates + ", " + pointX + ", " + pointY + ", " + lPointX + ", " + lPointY + ", (" + CurrentMK + "), " + isButtonUpEvent);
                 //Win32.Cursor.ReleaseCapture();
             }
         }
@@ -774,7 +774,7 @@ namespace Mubox.Control.Network
             {
                 Debug.WriteLine("ActivateClientLock took " + onActivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName);
                 onActivateClientReceivedTimestamp = DateTime.Now;
-                LastActivatedClientWindowHandle = windowHandle;
+                LastActivatedClientWindowHandle = _windowHandle;
                 long activationExpiryTime = DateTime.Now.AddMilliseconds(1000).Ticks;
                 do
                 {
@@ -806,10 +806,10 @@ namespace Mubox.Control.Network
                     {
                         try
                         {
-                            Win32.Windows.SetForegroundWindow(windowHandle);
-                            Win32.Windows.SetWindowPos(windowHandle, Win32.Windows.Position.HWND_TOP, -1, -1, -1, -1, Win32.Windows.Options.SWP_NOSIZE | Win32.Windows.Options.SWP_NOMOVE | Win32.Windows.Options.SWP_SHOWWINDOW);
+                            Win32.Windows.SetForegroundWindow(_windowHandle);
+                            Win32.Windows.SetWindowPos(_windowHandle, Win32.Windows.Position.HWND_TOP, -1, -1, -1, -1, Win32.Windows.Options.SWP_NOSIZE | Win32.Windows.Options.SWP_NOMOVE | Win32.Windows.Options.SWP_SHOWWINDOW);
                             System.Threading.Thread.Sleep(1);
-                            Win32.Windows.SetForegroundWindow(windowHandle);
+                            Win32.Windows.SetForegroundWindow(_windowHandle);
                         }
                         catch (Exception ex)
                         {
@@ -818,7 +818,7 @@ namespace Mubox.Control.Network
                         }
                     };
                     ActionViaViq(action, foregroundInputQueue, "OnActivateClient");
-                } while ((DateTime.Now.Ticks < activationExpiryTime) && (windowHandle != Win32.Windows.GetForegroundWindow()));
+                } while ((DateTime.Now.Ticks < activationExpiryTime) && (_windowHandle != Win32.Windows.GetForegroundWindow()));
                 Debug.WriteLine("ActivateClientAction took " + onActivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName);
             }
             NotifyClientActivated();
@@ -832,7 +832,7 @@ namespace Mubox.Control.Network
             {
                 Debug.WriteLine("DeactivateClientLock took " + onDeactivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName);
                 onDeactivateClientReceivedTimestamp = DateTime.Now;
-                LastActivatedClientWindowHandle = windowHandle;
+                LastActivatedClientWindowHandle = _windowHandle;
                 long activationExpiryTime = DateTime.Now.AddMilliseconds(1000).Ticks;
 
                 Debug.WriteLine("DeactivateClientAttempt@" + WindowHandle + " for " + this.DisplayName);
@@ -863,7 +863,7 @@ namespace Mubox.Control.Network
                 {
                     try
                     {
-                        Win32.Windows.SetWindowPos(windowHandle, Win32.Windows.Position.HWND_TOP, -1, -1, -1, -1, Win32.Windows.Options.SWP_NOSIZE | Win32.Windows.Options.SWP_NOMOVE | Win32.Windows.Options.SWP_NOACTIVATE);
+                        Win32.Windows.SetWindowPos(_windowHandle, Win32.Windows.Position.HWND_TOP, -1, -1, -1, -1, Win32.Windows.Options.SWP_NOSIZE | Win32.Windows.Options.SWP_NOMOVE | Win32.Windows.Options.SWP_NOACTIVATE);
                     }
                     catch (Exception ex)
                     {
