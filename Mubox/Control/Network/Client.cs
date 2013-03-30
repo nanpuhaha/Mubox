@@ -174,7 +174,7 @@ namespace Mubox.Control.Network
                     receiveBuffer = temp;
                 }
 
-                Debug.WriteLine("MCNC: receiveBuffer=" + System.Text.Encoding.ASCII.GetString(receiveBuffer));
+                //Debug.WriteLine("MCNC: receiveBuffer=" + System.Text.Encoding.ASCII.GetString(receiveBuffer));
 
                 var stream = new System.IO.MemoryStream(receiveBuffer);
                 using (var reader = new System.IO.BinaryReader(stream))
@@ -195,7 +195,7 @@ namespace Mubox.Control.Network
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine("MCNC: lastReadPosition=" + lastReadPosition + " currentPosition=" + stream.Position);
+                            //Debug.WriteLine("MCNC: lastReadPosition=" + lastReadPosition + " currentPosition=" + stream.Position);
 
                             Debug.WriteLine(ex.Message);
                             Debug.WriteLine(ex.StackTrace);
@@ -269,7 +269,8 @@ namespace Mubox.Control.Network
 
         private void OnMouseInputReceived(Model.Input.MouseInput mouseInput)
         {
-            bool useVIQ = (Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE == (mouseInput.Flags & Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE));
+            bool useVIQ = 
+                (Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE == (mouseInput.Flags & Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE));
 
             // translate message and track MK changes
             Win32.WM wm = Win32.WM.USER;
@@ -354,7 +355,8 @@ namespace Mubox.Control.Network
                     wm = Win32.WM.MOUSEWHEEL;
                     break;
                 default:
-                    return;
+                    wm = mouseInput.WM;
+                    break;
             }
 
             mouseInput.MouseData = Win32.MACROS.MAKEWPARAM((ushort)CurrentMK, wheelDelta);
