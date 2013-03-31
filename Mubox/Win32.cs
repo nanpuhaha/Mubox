@@ -1126,22 +1126,49 @@ namespace Mubox
                 }
             }
 
-            //[return: MarshalAs(UnmanagedType.Bool)]
-            //[DllImport("user32.dll", SetLastError = true)]
-            //internal static extern bool SendMessage(
-            //    IntPtr hWnd,
-            //    WM Msg,
-            //    UIntPtr wParam,
-            //    UIntPtr lParam
-            //);
+            internal static bool SendMessage(IntPtr hWnd, WM Msg, UIntPtr wParam, UIntPtr lParam)
+            {
+                var dwResult = new IntPtr(0);
+                return SendMessageTimeout(hWnd, Msg, wParam, lParam, SMTO_FLAGS.SMTO_BLOCK, 250, out dwResult);
+            }
+
+            internal static bool SendMessage(IntPtr hWnd, WM Msg, IntPtr wParam, UIntPtr lParam)
+            {
+                var dwResult = new IntPtr(0);
+                return SendMessageTimeout(hWnd, Msg, wParam, lParam, SMTO_FLAGS.SMTO_BLOCK, 250, out dwResult);
+            }
 
             [return: MarshalAs(UnmanagedType.Bool)]
-            [DllImport("user32.dll", SetLastError = true, EntryPoint = "SendMessage")]
-            internal static extern bool PostMessage(IntPtr hWnd, WM Msg, UIntPtr wParam, UIntPtr lParam);
+            [DllImport("user32.dll", SetLastError = true)]
+            internal static extern bool SendMessageTimeout(
+                IntPtr hWnd, 
+                WM Msg, 
+                UIntPtr wParam, 
+                UIntPtr lParam, 
+                SMTO_FLAGS fuFlags, 
+                uint uTimeoutMilliseconds, 
+                out IntPtr lpdwResult);
 
-            [return: MarshalAs(UnmanagedType.Bool)]
-            [DllImport("user32.dll", SetLastError = true, EntryPoint = "SendMessage")]
-            internal static extern bool PostMessage(IntPtr hWnd, WM Msg, IntPtr wParam, UIntPtr lParam);
+                        [return: MarshalAs(UnmanagedType.Bool)]
+            [DllImport("user32.dll", SetLastError = true)]
+            internal static extern bool SendMessageTimeout(
+                IntPtr hWnd, 
+                WM Msg, 
+                IntPtr wParam, 
+                UIntPtr lParam, 
+                SMTO_FLAGS fuFlags, 
+                uint uTimeoutMilliseconds, 
+                out IntPtr lpdwResult);
+
+            [Flags]
+            public enum SMTO_FLAGS : uint
+            {
+                SMTO_NORMAL = 0x0000,
+                SMTO_BLOCK = 0x0001,
+                SMTO_ABORTIFHUNG = 0x0002,
+                SMTO_NOTIMEOUTIFNOTHUNG = 0x0008,
+                SMTO_ERRORONEXIT = 0x0020,
+            }
 
             [DllImport("user32.dll")]
             internal static extern bool TranslateMessage(ref MSG lpMsg);

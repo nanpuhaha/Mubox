@@ -269,17 +269,16 @@ namespace Mubox.Control.Network
 
         private void OnMouseInputReceived(Model.Input.MouseInput mouseInput)
         {
-            bool useVIQ = 
+            bool useVIQ = // only use VIQ for absolute events
                 (Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE == (mouseInput.Flags & Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE));
 
             // translate message and track MK changes
             Win32.WM wm = Win32.WM.USER;
             bool isButtonUpEvent = false;
             ushort wheelDelta = 0;
-            Win32.SendInputApi.MouseEventFlags lFlags = useVIQ
-                ? mouseInput.Flags ^ Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE
-                : mouseInput.Flags;
-            switch (lFlags)
+
+            // strip 'absolute' flag from mask and process result
+            switch ((mouseInput.Flags | Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE) ^ Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE)
             {
                 case Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_MOVE:
                     wm = Win32.WM.MOUSEMOVE;
@@ -569,15 +568,16 @@ namespace Mubox.Control.Network
         {
             foregroundWindowHandle = IntPtr.Zero;
             foregroundInputQueue = IntPtr.Zero;
-            while ((foregroundInputQueue == IntPtr.Zero) && (DateTime.Now.Ticks <= activationExpiryTime))
+            var wait = 0;
+            do
             {
                 foregroundWindowHandle = Win32.Windows.GetForegroundWindow();
                 if (foregroundWindowHandle != IntPtr.Zero)
                 {
                     Win32.Windows.GetWindowThreadProcessId(foregroundWindowHandle, out foregroundInputQueue);
                 }
-                System.Threading.Thread.Sleep(1);
-            }
+                System.Threading.Thread.Sleep(wait++);
+            } while ((foregroundInputQueue == IntPtr.Zero) && (DateTime.Now.Ticks <= activationExpiryTime));
             return foregroundInputQueue != IntPtr.Zero;
         }
 
@@ -708,12 +708,15 @@ namespace Mubox.Control.Network
             }
 
             Win32.SetKeyboardState(this.pressedKeys);
-            Win32.Windows.PostMessage(WindowHandle, wm, new UIntPtr(wParam), new UIntPtr(lParam));
+
+            // TODO: SendMessage / PostMessage bypass VIQ, technically only reason these process is because the foreground window is being waited+verified before proceeding (a requirement for VIQ to function to begin with)
+            // TODO: need to interface at a lower level (e.g. SendInput
+            Win32.Windows.SendMessage(WindowHandle, wm, new UIntPtr(wParam), new UIntPtr(lParam));
 
             // if keydown, translate message
             if (wm == Win32.WM.KEYDOWN)
             {
-                Mubox.Win32.Windows.MSG msg = new Win32.Windows.MSG();
+                var msg = new Win32.Windows.MSG();
                 msg.hwnd = WindowHandle;
                 msg.lParam = lParam;
                 msg.message = wm;
@@ -759,10 +762,12 @@ namespace Mubox.Control.Network
             lock (OnMouseEventLock)
             {
                 //Win32.Cursor.SetCapture(windowHandle);
-                Win32.Windows.PostMessage(_windowHandle, Win32.WM.MOUSEMOVE, new UIntPtr((uint)CurrentMK), new UIntPtr(clientRelativeCoordinates));
-                // there is a visual anomaly in GW2, experimental removal: Win32.Windows.PostMessage(windowHandle, Win32.WM.SETCURSOR, windowHandle, new UIntPtr(Win32.MACROS.MAKELPARAM((ushort)Win32.WM.MOUSEMOVE, (ushort)Win32.HitTestValues.HTCLIENT)));
-                Win32.Windows.PostMessage(_windowHandle, Win32.WM.MOUSEACTIVATE, _windowHandle, new UIntPtr(Win32.MACROS.MAKELPARAM((ushort)wm, (ushort)Win32.HitTestValues.HTCLIENT)));
-                Win32.Windows.PostMessage(_windowHandle, wm, new UIntPtr(mouseData), new UIntPtr(clientRelativeCoordinates));
+
+                // TODO: SendMessage / PostMessage bypass VIQ, technically only reason these process is because the foreground window is being waited+verified before proceeding (a requirement for VIQ to function to begin with)
+
+                Win32.Windows.SendMessage(_windowHandle, Win32.WM.MOUSEMOVE, new UIntPtr((uint)CurrentMK), new UIntPtr(clientRelativeCoordinates));
+                Win32.Windows.SendMessage(_windowHandle, Win32.WM.MOUSEACTIVATE, _windowHandle, new UIntPtr(Win32.MACROS.MAKELPARAM((ushort)wm, (ushort)Win32.HitTestValues.HTCLIENT)));
+                Win32.Windows.SendMessage(_windowHandle, wm, new UIntPtr(mouseData), new UIntPtr(clientRelativeCoordinates));
                 Debug.WriteLine("OnMouseEvent SendMessage(" + _windowHandle.ToString() + ", " + wm + ", " + mouseData + ", " + clientRelativeCoordinates + ", " + pointX + ", " + pointY + ", " + lPointX + ", " + lPointY + ", (" + CurrentMK + "), " + isButtonUpEvent);
                 //Win32.Cursor.ReleaseCapture();
             }
