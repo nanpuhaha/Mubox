@@ -269,8 +269,7 @@ namespace Mubox.Control.Network
 
         private void OnMouseInputReceived(Model.Input.MouseInput mouseInput)
         {
-            bool useVIQ = // only use VIQ for absolute events
-                (Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE == (mouseInput.Flags & Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE));
+            bool useVIQ = false; // DOES NOT WORK
 
             // translate message and track MK changes
             Win32.WM wm = Win32.WM.USER;
@@ -359,51 +358,56 @@ namespace Mubox.Control.Network
             }
 
             mouseInput.MouseData = Win32.MACROS.MAKEWPARAM((ushort)CurrentMK, wheelDelta);
-            // only use VIQ for "mouse clone" events
-            if (!useVIQ)
-            {
-                Win32.SendInputApi.SendInputViaMSParams(mouseInput.Flags, mouseInput.Time, (int)mouseInput.Point.X, (int)mouseInput.Point.Y, mouseInput.MouseData);
-                return;
-            }
 
             // no target window? can't use
             if (WindowHandle == IntPtr.Zero)
             {
                 Debug.WriteLine("NoWindowHandle Failed OnMouseInputReceived, Input Loss for " + this.DisplayName);
-                return;
             }
-
-            // can't resolve VIQ? can't use
-            IntPtr windowInputQueue = WindowInputQueue;
-            if (windowInputQueue == IntPtr.Zero)
+            else
             {
-                Debug.WriteLine("NoWindowInputQueue Failed OnMouseInputReceived, Input Loss for " + this.DisplayName);
-                return;
+                if (useVIQ)
+                {
+                    // can't resolve VIQ? can't use
+                    IntPtr windowInputQueue = WindowInputQueue;
+                    if (windowInputQueue == IntPtr.Zero)
+                    {
+                        Debug.WriteLine("NoWindowInputQueue Failed OnMouseInputReceived, Input Loss for " + this.DisplayName);
+                        useVIQ = false;
+                    }
+                    else
+                    {
+                        // resolve VIQ
+                        IntPtr foregroundWindowHandle;
+                        IntPtr foregroundInputQueue;
+                        if (!TryResolveViq(out foregroundInputQueue, out foregroundWindowHandle, DateTime.Now.AddMilliseconds(1000).Ticks))
+                        {
+                            Debug.WriteLine("TryResolveVIQ Failed OnMouseInputReceived, Input Loss for " + this.DisplayName);
+                            useVIQ = false;
+                        }
+                        else
+                        {
+                            ActionViaViq(() =>
+                            {
+                                Win32.SendInputApi.MouseActionViaSendInput(mouseInput.Flags, mouseInput.Time, (int)mouseInput.Point.X, (int)mouseInput.Point.Y, mouseInput.MouseData);
+                            },
+                                foregroundInputQueue, "OnMouseInputReceived");
+                        }
+                    }
+                }
+
+                if (!useVIQ)
+                {
+                    // denormalize coordinates
+                    Win32.Windows.RECT clientRect;
+                    Win32.Windows.GetClientRect(WindowHandle, out clientRect);
+                    int lPointX = (int)(((double)clientRect.Width / (double)65536) * mouseInput.Point.X);
+                    int lPointY = (int)(((double)clientRect.Height / (double)65536) * mouseInput.Point.Y);
+
+                    // dispatch
+                    MouseActionViaSendMessage((int)mouseInput.Point.X, (int)mouseInput.Point.Y, lPointX, lPointY, wm, mouseInput.MouseData, isButtonUpEvent);
+                }
             }
-
-            // denormalize coordinates
-            Win32.Windows.RECT clientRect;
-            Win32.Windows.GetClientRect(WindowHandle, out clientRect);
-            int lPointX = (int)(((double)clientRect.Width / (double)65536) * mouseInput.Point.X);
-            int lPointY = (int)(((double)clientRect.Height / (double)65536) * mouseInput.Point.Y);
-
-            // prep action
-            Action action = () =>
-            {
-                Debug.WriteLine("MouseVIQAction for " + this.DisplayName);
-                OnMouseEvent_Action((int)mouseInput.Point.X, (int)mouseInput.Point.Y, lPointX, lPointY, wm, mouseInput.MouseData, isButtonUpEvent);
-            };
-
-            // resolve VIQ
-            IntPtr foregroundWindowHandle;
-            IntPtr foregroundInputQueue;
-            if (!TryResolveViq(out foregroundInputQueue, out foregroundWindowHandle, DateTime.Now.AddMilliseconds(1000).Ticks))
-            {
-                Debug.WriteLine("TryResolveVIQ Failed OnMouseInputReceived, Input Loss for " + this.DisplayName);
-                return;
-            }
-
-            ActionViaViq(action, foregroundInputQueue, "OnMouseInputReceived");
         }
 
         private void OnKeyboardInputReceived(Model.Input.KeyboardInput keyboardInput)
@@ -584,25 +588,25 @@ namespace Mubox.Control.Network
         private void ActionViaViq(Action action, IntPtr foregroundInputQueue, string callingComponent)
         {
             bool detachWIQ = false;
-            bool detachMIQ = false;
+            //bool detachMIQ = false;
             IntPtr oldFocusWindowHandle = IntPtr.Zero;
             try
             {
                 lock (inputQueueLock) // TODO: profile this lock
                 {
-                    if (MyInputQueue != foregroundInputQueue)
-                    {
-                        detachMIQ = true;
-                        if (Win32.Windows.AttachThreadInput(MyInputQueue, foregroundInputQueue, true))
-                        {
-                            Debug.WriteLine("ATI MIQ Failed " + callingComponent + " for " + this.DisplayName);
-                        }
-                    }
+                    //if (MyInputQueue != foregroundInputQueue)
+                    //{
+                    //    detachMIQ = true;
+                    //    if (Win32.Windows.AttachThreadInput(MyInputQueue, foregroundInputQueue, true))
+                    //    {
+                    //        Debug.WriteLine("ATI MIQ Failed " + callingComponent + " for " + this.DisplayName);
+                    //    }
+                    //}
 
                     if (WindowInputQueue != foregroundInputQueue)
                     {
                         detachWIQ = true;
-                        if (Win32.Windows.AttachThreadInput(WindowInputQueue, foregroundInputQueue, true))
+                        if (Win32.Windows.AttachThreadInput(foregroundInputQueue, WindowInputQueue, true))
                         {
                             Debug.WriteLine("ATI WIQ Failed " + callingComponent + " for " + this.DisplayName);
                         }
@@ -625,12 +629,12 @@ namespace Mubox.Control.Network
                 }
                 if (detachWIQ)
                 {
-                    Win32.Windows.AttachThreadInput(WindowInputQueue, foregroundInputQueue, false);
+                    Win32.Windows.AttachThreadInput(foregroundInputQueue, WindowInputQueue, false);
                 }
-                if (detachMIQ)
-                {
-                    Win32.Windows.AttachThreadInput(MyInputQueue, foregroundInputQueue, false);
-                }
+                //if (detachMIQ)
+                //{
+                //    Win32.Windows.AttachThreadInput(MyInputQueue, foregroundInputQueue, false);
+                //}
             }
         }
 
@@ -752,7 +756,7 @@ namespace Mubox.Control.Network
 
         private static object OnMouseEventLock = new object();
 
-        private void OnMouseEvent_Action(int pointX, int pointY, int lPointX, int lPointY, Win32.WM wm, uint mouseData, bool isButtonUpEvent)
+        private void MouseActionViaSendMessage(int pointX, int pointY, int lPointX, int lPointY, Win32.WM wm, uint mouseData, bool isButtonUpEvent)
         {
             var clientRelativeCoordinates = Win32.MACROS.MAKELPARAM(
                 (ushort)lPointX,
