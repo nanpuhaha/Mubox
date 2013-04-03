@@ -2320,7 +2320,7 @@ namespace Mubox
                 return newFlags;
             }
 
-            internal static void SendInputViaHookStruct(Win32.WindowHook.MSLLHOOKSTRUCT hookStruct, int X, int Y)
+            internal static void MouseActionViaSendInput(Win32.WindowHook.MSLLHOOKSTRUCT hookStruct, int X, int Y)
             {
                 MouseActionViaSendInput((MouseEventFlags)hookStruct.flags, hookStruct.time, X, Y, hookStruct.mouseData);
             }
