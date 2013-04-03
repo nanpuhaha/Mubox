@@ -735,7 +735,10 @@ namespace Mubox.View.Client
                     // new 'sandboxed' process launches
                     if (ClientState.Sandbox == null)
                     {
-                        ClientState.Sandbox = Win32.SandboxApi.SafeCreateSandbox(ClientState.NetworkClient.DisplayName);
+                        var key = ClientState.Settings.SandboxKey;
+                        var name = ClientState.NetworkClient.DisplayName;
+                        ClientState.Sandbox = Win32.SandboxApi.SafeCreateSandbox(name, key);
+                        ClientState.Settings.SandboxKey = key;
                     }
 
                     lock (_global_process_launch_lock)

@@ -3722,6 +3722,11 @@ namespace Mubox
         #endregion
         #region KeyState
 
+        /// <summary>
+        /// <para>Async Key State is said to be shared over all VIQs, and is thus not 'only representative' of the 'active viq'.</para>
+        /// </summary>
+        /// <param name="vk"></param>
+        /// <returns></returns>
         [DllImport("user32.dll")]
         private static extern KeyState GetAsyncKeyState(uint vk);
 
@@ -4897,14 +4902,14 @@ namespace Mubox
             }
 
             // NOTE: may have a problem with cleaning these up
-            public static Win32.SandboxApi.Sandbox SafeCreateSandbox(string clientName)
+            public static Win32.SandboxApi.Sandbox SafeCreateSandbox(string clientName, string password)
             {
                 var sandbox = new Sandbox
                 {
                     UserName = "Mbx" + (clientName.Length > 20
                         ? clientName.Substring(0, 20)
                         : clientName),
-                    Password = "J*rf@#$sl3x",
+                    Password = password,
                 };
 
                 var exists = DoesSandboxExist(sandbox);

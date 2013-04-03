@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Configuration;
+using System.Web.Security;
 
 namespace Mubox.Configuration
 {
@@ -56,6 +57,50 @@ namespace Mubox.Configuration
             set { if (!ServerPortNumber.Equals(value)) { base["ServerPortNumber"] = value; this.OnPropertyChanged(o => o.ServerPortNumber); } }
         }
 
+        #region SandboxKey
+
+        [ConfigurationProperty("SandboxKey", IsRequired = false)]
+        public string SandboxKey
+        {
+            get
+            {
+                try
+                {
+                    var secure = (string)base["SandboxKey"];
+                    var buf = Convert.FromBase64String(secure);
+                    var plain = MachineKey.Unprotect(
+                        buf,
+                        new string[] {
+                            Name,
+                            Environment.MachineName, 
+                            Environment.UserName,
+                        });
+                    return System.Text.Encoding.UTF8.GetString(plain);
+                }
+                catch
+                {
+                    return Guid.NewGuid().ToString();
+                }
+            }
+            set
+            {
+                if (!SandboxKey.Equals(value, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var buf = System.Text.Encoding.UTF8.GetBytes(value);
+                    var secure = MachineKey.Protect(
+                        buf,
+                        new string[] {
+                            Name,
+                            Environment.MachineName, 
+                            Environment.UserName,
+                        });
+                    base["SandboxKey"] = Convert.ToBase64String(secure);
+                    this.OnPropertyChanged(o => o.SandboxKey);
+                }
+            }
+        }
+
+        #endregion
         #region PerformConnectOnLoad
 
         [ConfigurationProperty("PerformConnectOnLoad", IsRequired = false, DefaultValue = false)]
