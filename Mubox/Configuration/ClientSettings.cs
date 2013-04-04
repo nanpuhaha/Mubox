@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Configuration;
+using System.Text;
 using System.Web.Security;
 
 namespace Mubox.Configuration
@@ -59,14 +60,20 @@ namespace Mubox.Configuration
 
         #region SandboxKey
 
-        [ConfigurationProperty("SandboxKey", IsRequired = false)]
+        [ConfigurationProperty("SandboxKey", IsRequired = false, DefaultValue="")]
         public string SandboxKey
         {
             get
             {
-                try
+                var secure = (string)base["SandboxKey"];
+                if (string.IsNullOrEmpty(secure))
                 {
-                    var secure = (string)base["SandboxKey"];
+                    // if no key has been set, generate a new key
+                    return Guid.NewGuid().ToString();
+                }
+                else
+                {
+                    // else, use existing key
                     var buf = Convert.FromBase64String(secure);
                     var plain = MachineKey.Unprotect(
                         buf,
@@ -75,16 +82,12 @@ namespace Mubox.Configuration
                             Environment.MachineName, 
                             Environment.UserName,
                         });
-                    return System.Text.Encoding.UTF8.GetString(plain);
-                }
-                catch
-                {
-                    return Guid.NewGuid().ToString();
+                    return Encoding.UTF8.GetString(plain);
                 }
             }
             set
             {
-                if (!SandboxKey.Equals(value, StringComparison.InvariantCultureIgnoreCase))
+                //if (!SandboxKey.Equals(value, StringComparison.InvariantCultureIgnoreCase))
                 {
                     var buf = System.Text.Encoding.UTF8.GetBytes(value);
                     var secure = MachineKey.Protect(

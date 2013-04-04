@@ -739,6 +739,7 @@ namespace Mubox.View.Client
                         var name = ClientState.NetworkClient.DisplayName;
                         ClientState.Sandbox = Win32.SandboxApi.SafeCreateSandbox(name, key);
                         ClientState.Settings.SandboxKey = key;
+                        Mubox.Configuration.MuboxConfigSection.Default.Save();
                     }
 
                     lock (_global_process_launch_lock)
