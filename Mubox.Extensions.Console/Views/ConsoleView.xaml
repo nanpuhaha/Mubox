@@ -4,9 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             xmlns:l="clr-namespace:Mubox.Extensions.Console.Views"
+             d:DesignHeight="480" d:DesignWidth="640">
     <Grid>
-        <ListBox ItemsSource="{Binding Messages}" Margin="10">
-        </ListBox>
+        <ListBox ItemsSource="{Binding Messages}" FontFamily="Consolas" FontSize="10" Foreground="#FF127816" Background="Black"
+                 SelectedItem="{Binding LatestMessage}"
+                 IsSynchronizedWithCurrentItem="True" l:ListBoxExtenders.AutoScrollToCurrentItem="True"/>
     </Grid>
 </UserControl>

@@ -56,19 +56,19 @@ namespace Mubox.Extensions.Console
         public void Keyboard_InputReceived(object sender, Extensibility.Input.KeyboardEventArgs e)
         {
             //e.Log();
-            _viewModel.AddMessageInternal("{0}: {1}", "Keyboard Input", e.Client != null ? e.Client.Name : "(no client)");
+            _viewModel.AddMessageInternal("Keyboard Input", e.Client != null ? e.Client.Name : "(no client)");
         }
 
         public void Mouse_InputReceived(object sender, Extensibility.Input.MouseEventArgs e)
         {
             //e.Log();
-            _viewModel.AddMessageInternal("{0}: {1}", "Mouse Input", e.Client != null ? e.Client.Name : "(no client)");
+            _viewModel.AddMessageInternal("Mouse Input", e.Client != null ? e.Client.Name : "(no client)");
         }
 
         public void _mubox_ActiveClientChanged(object sender, ClientEventArgs e)
         {
             //e.Log();
-            _viewModel.AddMessageInternal("{0}: {1}", "Active Client Changed", e.Client != null ? e.Client.Name : "(no client)");
+            _viewModel.AddMessageInternal("Active Client Changed", e.Client != null ? e.Client.Name : "(no client)");
         }
 
         private void Show()
@@ -93,6 +93,7 @@ namespace Mubox.Extensions.Console
                 _presenter = new System.Windows.Window();
                 _presenter.Title = (AppDomain.CurrentDomain.FriendlyName ?? "Default").Replace('.', ' ');
                 _presenter.Topmost = true;
+                _presenter.WindowStyle = WindowStyle.SingleBorderWindow;
                 /* transparent window
                 _presenter.WindowStyle = WindowStyle.None;
                 _presenter.BorderThickness = new Thickness(1);
@@ -101,6 +102,7 @@ namespace Mubox.Extensions.Console
                  */
                 _presenter.DataContext = _viewModel;
                 _presenter.Content = _view;
+                _view.Margin = new Thickness(0);
                 _presenter.Closing += OnWindowClosing;
                 // TODO: save/restore last-known size and position
                 _presenter.WindowStartupLocation = WindowStartupLocation.Manual;
