@@ -1,9 +1,20 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mubox", "Mubox\Mubox.csproj", "{D1F5FEEC-7438-46F3-8DAA-641CED5D8939}"
+	ProjectSection(ProjectDependencies) = postProject
+		{300DF516-7474-4F14-AFC0-B17099BF3460} = {300DF516-7474-4F14-AFC0-B17099BF3460}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mubox.QuickLaunch", "Mubox.QuickLaunch\Mubox.QuickLaunch.csproj", "{6776AAE8-F646-46FB-BA3F-11DE575CF0A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mubox.Extensibility", "Mubox.Extensibility\Mubox.Extensibility.csproj", "{5452F309-67B4-4250-81B0-F3C62394DAB0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{A6CAFF2D-2CE9-4CCC-9D06-798B1F98213D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mubox.Extensions.Console", "Mubox.Extensions.Console\Mubox.Extensions.Console.csproj", "{300DF516-7474-4F14-AFC0-B17099BF3460}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Drivers", "Drivers", "{957B05CF-AE9F-40A2-AF6E-00E2BEE2AA2A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,8 +30,19 @@ Global
 		{6776AAE8-F646-46FB-BA3F-11DE575CF0A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6776AAE8-F646-46FB-BA3F-11DE575CF0A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6776AAE8-F646-46FB-BA3F-11DE575CF0A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5452F309-67B4-4250-81B0-F3C62394DAB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5452F309-67B4-4250-81B0-F3C62394DAB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5452F309-67B4-4250-81B0-F3C62394DAB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5452F309-67B4-4250-81B0-F3C62394DAB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{300DF516-7474-4F14-AFC0-B17099BF3460}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{300DF516-7474-4F14-AFC0-B17099BF3460}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{300DF516-7474-4F14-AFC0-B17099BF3460}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{300DF516-7474-4F14-AFC0-B17099BF3460}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{300DF516-7474-4F14-AFC0-B17099BF3460} = {A6CAFF2D-2CE9-4CCC-9D06-798B1F98213D}
 	EndGlobalSection
 EndGlobal
