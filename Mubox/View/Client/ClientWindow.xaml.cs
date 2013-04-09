@@ -370,11 +370,7 @@ namespace Mubox.View.Client
                         textServerName.IsEnabled = false;
                         textPortNumber.IsEnabled = false;
                     }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex.Message);
-                        Debug.WriteLine(ex.StackTrace);
-                    }
+                    catch { }
                 }
             });
         }
