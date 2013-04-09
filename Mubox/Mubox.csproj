@@ -111,6 +111,8 @@
     <Compile Include="Configuration\TeamSettingsCollection.cs" />
     <Compile Include="Control\FileReplicationManager.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Extensions\ExtensionManager.cs" />
+    <Compile Include="Extensions\ExtensionState.cs" />
     <Compile Include="Model\Input\ButtonState.cs" />
     <Compile Include="Control\Performance.cs" />
     <Compile Include="Diagnostics\TraceListenerStreamWriter.cs" />
@@ -153,6 +155,9 @@
     <Compile Include="View\SysTrayMenu.cs" />
     <Resource Include="Content\Images\ExtraLifeBanner.png" />
     <Content Include="Content\Icons\Mubox2013.ico" />
+    <Content Include="Extensions\README.TXT">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\ExtraLifeBanner.png" />
     <Content Include="View\Themes\BrushedGlass.xaml">
       <SubType>Designer</SubType>
@@ -343,6 +348,12 @@
     <Content Include="AddOns\Muboxer\MbxDebug.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mubox.Extensibility\Mubox.Extensibility.csproj">
+      <Project>{5452f309-67b4-4250-81b0-f3c62394dab0}</Project>
+      <Name>Mubox.Extensibility</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
