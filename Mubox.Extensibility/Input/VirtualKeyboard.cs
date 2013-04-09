@@ -7,25 +7,23 @@ using System.Threading.Tasks;
 namespace Mubox.Extensibility.Input
 {
     public class VirtualKeyboard
-        : MarshalByRefObject, IVirtualKeyboard
+        : MarshalByRefObject
     {
         public event EventHandler<KeyboardEventArgs> InputReceived;
-        private MuboxClientBridge muboxClientBridge;
+        
+        private MuboxClientBridge _muboxClientBridge;
 
         public VirtualKeyboard(MuboxClientBridge muboxClientBridge)
         {
             // TODO: Complete member initialization
-            this.muboxClientBridge = muboxClientBridge;
+            _muboxClientBridge = muboxClientBridge;
         }
 
-        internal void OnInputReceived(IMuboxClient sender)
+        internal void OnInputReceived(IMuboxClient sender, KeyboardEventArgs e)
         {
             if (InputReceived != null)
             {
-                InputReceived(sender, new KeyboardEventArgs
-                {
-                    Client = sender,
-                });
+                InputReceived(sender, e);
             }
         }
     }

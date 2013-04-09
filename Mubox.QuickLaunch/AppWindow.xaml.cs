@@ -179,7 +179,7 @@ namespace Mubox.QuickLaunch
                 () =>
                 {
                     WindowState = WindowState.Minimized;
-                    App._extensionManager.Shutdown();
+                    Mubox.Extensions.ExtensionManager.Instance.Shutdown();
                     Close();
                 });
             sysTrayMenu.IsOpen = true;

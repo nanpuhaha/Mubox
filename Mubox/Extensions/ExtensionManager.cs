@@ -9,6 +9,13 @@ namespace Mubox.Extensions
 {
     public sealed class ExtensionManager
     {
+        public static Mubox.Extensions.ExtensionManager Instance { get; private set; }
+
+        static ExtensionManager()
+        {
+            Instance = new ExtensionManager();
+        }
+
         private IDictionary<string /*DllName*/, ExtensionState> _extensions;
         private ICollection<Extensibility.MuboxClientBridge> _clients;
 
@@ -36,6 +43,9 @@ namespace Mubox.Extensions
 
             // TODO: to support multiple teams, this event handler & related will need to be refactored
             Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam.ActiveClientChanged += ActiveTeam_ActiveClientChanged;
+
+
+
 
             var extensionsPath = Path.Combine(Environment.CurrentDirectory, "Extensions");
             var files = System.IO.Directory.EnumerateFiles(extensionsPath, "*.dll");
@@ -169,6 +179,70 @@ namespace Mubox.Extensions
         public void StartAll()
         {
             throw new NotImplementedException();
+        }
+
+        internal bool OnKeyboardInputReceived(object sender, Model.Input.KeyboardInput e)
+        {
+            e.Handled = false;
+
+            // translate input, dispatch to extensions for processing
+            var client = default(Extensibility.IMuboxClient);
+            // TODO: resolve client
+            _extensions.Values.ToList()
+                .ForEach(ext =>
+                {
+                    try
+                    {
+                        var L_e = new Extensibility.Input.KeyboardEventArgs
+                        {
+                            Client = client,
+                            Handled = e.Handled,
+                        };
+                        ext.Bridge.Keyboard.OnInputReceived(client, L_e);
+                        e.Handled = L_e.Handled;
+                    }
+                    catch (Exception ex)
+                    {
+                        Extensibility.TraceExtensions.Log(ex);
+                    }
+                });
+
+            // return true if no further processing should be performed, i.e. swallow the input
+            return e.Handled;
+        }
+
+        internal bool OnMouseInputReceived(object sender, Model.Input.MouseInput e)
+        {
+            e.Handled = false;
+
+            // translate input, dispatch to extensions for processing
+            var client = default(Extensibility.IMuboxClient);
+            if (sender != null)
+            {
+                client = sender as Extensibility.IMuboxClient;
+            }
+            // TODO: resolve client
+            _extensions.Values.ToList()
+                .ForEach(ext =>
+                {
+                    try
+                    {
+                        var L_e = new Extensibility.Input.MouseEventArgs
+                        {
+                            Client = client,
+                            Handled = e.Handled,
+                        };
+                        ext.Bridge.Mouse.OnInputReceived(client, L_e);
+                        e.Handled = L_e.Handled;
+                    }
+                    catch (Exception ex)
+                    {
+                        Extensibility.TraceExtensions.Log(ex);
+                    }
+                });
+
+            // return true if no further processing should be performed, i.e. swallow the input
+            return e.Handled;
         }
     }
 }

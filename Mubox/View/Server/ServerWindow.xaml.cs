@@ -97,6 +97,12 @@ namespace Mubox.View.Server
                 return;
             }
 
+            if (Mubox.Extensions.ExtensionManager.Instance.OnMouseInputReceived(sender, e))
+            {
+                e.Handled = false;
+                return;
+            }
+
             ClientBase activeClient = ActiveClient;
 
             #region Mouse_RelativeMovement
@@ -667,6 +673,11 @@ namespace Mubox.View.Server
             }
 
             if (!Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled)
+            {
+                return;
+            }
+
+            if (Mubox.Extensions.ExtensionManager.Instance.OnKeyboardInputReceived(sender, e))
             {
                 return;
             }

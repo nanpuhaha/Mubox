@@ -20,9 +20,9 @@ namespace Mubox.Extensibility
             Mouse = new Input.VirtualMouse(null);
         }
 
-        public Input.IVirtualKeyboard Keyboard { get; private set; }
+        public Input.VirtualKeyboard Keyboard { get; private set; }
 
-        public Input.IVirtualMouse Mouse { get; private set; }
+        public Input.VirtualMouse Mouse { get; private set; }
 
         public ICollection<IMuboxClient> Clients { get; private set; }
 

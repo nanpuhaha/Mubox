@@ -16,7 +16,7 @@ namespace Mubox.Extensions.Console
     /// <para>Provides a 'Console Window' where misc Events and Data can be reviewed.</para>
     /// <para>This mainly exists for Extension Debugging within Mubox, it also makes a nice sample project.</para>
     /// </summary>
-    public class Extension
+    public class ConsoleExtension
         : MarshalByRefObject, IExtension
     {
         IMubox _mubox;
@@ -55,32 +55,20 @@ namespace Mubox.Extensions.Console
 
         public void Keyboard_InputReceived(object sender, Extensibility.Input.KeyboardEventArgs e)
         {
-            new
-            {
-                EventType = "Keyboard Input",
-                EventSource = e.Client.Name,
-            }.Log();
-            _viewModel.AddMessageInternal("{0}: {1}", "Keyboard Input", e.Client.Name);
+            //e.Log();
+            _viewModel.AddMessageInternal("{0}: {1}", "Keyboard Input", e.Client != null ? e.Client.Name : "(no client)");
         }
 
         public void Mouse_InputReceived(object sender, Extensibility.Input.MouseEventArgs e)
         {
-            new
-            {
-                EventType = "Mouse Input",
-                EventSource = e.Client.Name,
-            }.Log();
-            _viewModel.AddMessageInternal("{0}: {1}", "Mouse Input", e.Client.Name);
+            //e.Log();
+            _viewModel.AddMessageInternal("{0}: {1}", "Mouse Input", e.Client != null ? e.Client.Name : "(no client)");
         }
 
         public void _mubox_ActiveClientChanged(object sender, ClientEventArgs e)
         {
-            new
-            {
-                EventType = "Active Client Changed",
-                EventSource = e.Client.Name,
-            }.Log();
-            _viewModel.AddMessageInternal("{0}: {1}", "Active Client Changed", e.Client.Name);
+            //e.Log();
+            _viewModel.AddMessageInternal("{0}: {1}", "Active Client Changed", e.Client != null ? e.Client.Name : "(no client)");
         }
 
         private void Show()

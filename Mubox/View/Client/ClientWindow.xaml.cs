@@ -359,11 +359,6 @@ namespace Mubox.View.Client
                     ClientState.NetworkClient = null;
                     try
                     {
-                        try
-                        {
-                            this.Show();
-                        }
-                        catch { }
                         clientState_SetStatusText("Disconnected " + DateTime.Now);
                         buttonConnect.IsEnabled = true;
                         clientState_AutoReconnect = true;

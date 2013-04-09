@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Mubox.Extensibility.Input
 {
     public class VirtualMouse
-        : MarshalByRefObject, IVirtualMouse
+        : MarshalByRefObject
     {
         public event EventHandler<MouseEventArgs> InputReceived;
         private MuboxClientBridge muboxClientBridge;
@@ -18,14 +18,11 @@ namespace Mubox.Extensibility.Input
             this.muboxClientBridge = muboxClientBridge;
         }
 
-        internal void OnInputReceived(IMuboxClient sender)
+        internal void OnInputReceived(IMuboxClient sender, MouseEventArgs e)
         {
             if (InputReceived != null)
             {
-                InputReceived(sender, new MouseEventArgs
-                {
-                    Client = sender,
-                });
+                InputReceived(sender, e);
             }
         }
     }

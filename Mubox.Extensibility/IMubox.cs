@@ -20,14 +20,14 @@ namespace Mubox.Extensibility
         /// <para>Events raised on this instance regardless of 'Clients'</para>
         /// <para>Output to this instance is dispatched to 'the Active Client'</para>
         /// </summary>
-        Input.IVirtualKeyboard Keyboard { get; }
+        Input.VirtualKeyboard Keyboard { get; }
 
         /// <summary>
         /// <para>Global, Virtualized Mouse</para>
         /// <para>Events raised on this instance regardless of 'Clients'</para>
         /// <para>Output to this instance is dispatched to 'the Active Client'</para>
         /// </summary>
-        Input.IVirtualMouse Mouse { get; }
+        Input.VirtualMouse Mouse { get; }
 
         /// <summary>
         /// <para>Raised when 'the Active Client' changes.</para>

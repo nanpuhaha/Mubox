@@ -46,8 +46,6 @@
     <Compile Include="IExtension.cs" />
     <Compile Include="IMubox.cs" />
     <Compile Include="IMuboxClient.cs" />
-    <Compile Include="Input\IVirtualKeyboard.cs" />
-    <Compile Include="Input\IVirtualMouse.cs" />
     <Compile Include="Input\KeyboardEventArgs.cs" />
     <Compile Include="Input\MouseEventArgs.cs" />
     <Compile Include="MuboxBridge.cs" />

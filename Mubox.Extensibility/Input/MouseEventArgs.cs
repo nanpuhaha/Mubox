@@ -9,5 +9,6 @@ namespace Mubox.Extensibility.Input
     public class MouseEventArgs
         : ClientEventArgs
     {
+        public bool Handled { get; set; }
     }
 }

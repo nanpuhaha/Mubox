@@ -21,14 +21,14 @@ namespace Mubox.Extensibility
         /// <para>Events raised on this instance only for 'this Client'</para>
         /// <para>Output to this instance is only sent to 'this Client'</para>
         /// </summary>
-        Input.IVirtualKeyboard Keyboard { get; }
+        Input.VirtualKeyboard Keyboard { get; }
 
         /// <summary>
         /// <para>Client Affine, Virtualized Mouse</para>
         /// <para>Events raised on this instance only for 'this Client'</para>
         /// <para>Output to this instance is only sent to 'this Client'</para>
         /// </summary>
-        Input.IVirtualMouse Mouse { get; }
+        Input.VirtualMouse Mouse { get; }
 
         /// <summary>
         /// <para>Raised when Mubox 'attaches' to a game Process, i.e. Game Launched</para>

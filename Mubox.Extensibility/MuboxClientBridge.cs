@@ -17,8 +17,8 @@ namespace Mubox.Extensibility
 
         public string Name { get; internal set; }
 
-        public Input.IVirtualKeyboard Keyboard { get; private set; }
-        public Input.IVirtualMouse Mouse { get; private set; }
+        public Input.VirtualKeyboard Keyboard { get; private set; }
+        public Input.VirtualMouse Mouse { get; private set; }
 
         public event EventHandler<ClientEventArgs> Attached;
 

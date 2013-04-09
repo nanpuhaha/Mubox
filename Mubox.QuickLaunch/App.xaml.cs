@@ -14,8 +14,6 @@ namespace Mubox.QuickLaunch
     /// </summary>
     public partial class App : Application
     {
-        internal static Mubox.Extensions.ExtensionManager _extensionManager;
-
         static App()
         {
             try
@@ -75,13 +73,12 @@ namespace Mubox.QuickLaunch
 
             try
             {
-                _extensionManager = new Extensions.ExtensionManager();
-                _extensionManager.Initialize();
+                Mubox.Extensions.ExtensionManager.Instance.Initialize();
 
-                _extensionManager.Extensions
+                Mubox.Extensions.ExtensionManager.Instance.Extensions
                     .Select(ext => ext.Name)
                     .ToList()
-                    .ForEach(name => _extensionManager.Start(name));
+                    .ForEach(name => Mubox.Extensions.ExtensionManager.Instance.Start(name));
             }
             catch (Exception ex)
             {
