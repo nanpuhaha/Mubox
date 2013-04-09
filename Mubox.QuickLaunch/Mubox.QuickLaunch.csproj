@@ -176,6 +176,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Mubox.Extensibility\Mubox.Extensibility.csproj">
+      <Project>{5452f309-67b4-4250-81b0-f3c62394dab0}</Project>
+      <Name>Mubox.Extensibility</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Mubox\Mubox.csproj">
       <Project>{D1F5FEEC-7438-46F3-8DAA-641CED5D8939}</Project>
       <Name>Mubox</Name>

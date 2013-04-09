@@ -59,6 +59,7 @@ namespace Mubox.QuickLaunch
         }
 
         private Dictionary<string, System.Drawing.Icon> IconHandles = null;
+        private bool disposed;
 
         protected override void OnInitialized(EventArgs e)
         {
@@ -156,7 +157,7 @@ namespace Mubox.QuickLaunch
                 }
                 this.Title = this.Title + " | " + version.ToString() + " (final)";
 
-                Uri uri = new Uri("http://www.dualbox.net/");
+                Uri uri = new Uri("http://mrshaunwilson.com/mubox");
                 NavigateInternal(uri);
             }
             notifyIcon.Visible = true;
@@ -172,12 +173,13 @@ namespace Mubox.QuickLaunch
             Mubox.View.SysTrayMenu sysTrayMenu = new Mubox.View.SysTrayMenu(
                 () =>
                 {
-                    NavigateInternal(new Uri("http://www.dualbox.net/"));
+                    NavigateInternal(new Uri("http://mrshaunwilson.com/mubox"));
                     ShowNavigationWindow();
                 },
                 () =>
                 {
                     WindowState = WindowState.Minimized;
+                    App._extensionManager.Shutdown();
                     Close();
                 });
             sysTrayMenu.IsOpen = true;
@@ -258,8 +260,9 @@ namespace Mubox.QuickLaunch
 
         private void Dispose(bool disposing)
         {
-            if (disposing)
+            if (!disposed)
             {
+                disposed = true;
                 var notifyIcon = this.notifyIcon;
                 this.notifyIcon = null;
                 if (notifyIcon != null)
