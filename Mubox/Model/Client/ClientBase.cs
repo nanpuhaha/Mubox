@@ -123,6 +123,8 @@ namespace Mubox.Model.Client
             set { SetValue(DisplayNameProperty, value); }
         }
 
+        public event EventHandler<EventArgs> DisplayNameChanged;
+
         /// <summary>
         /// Handles changes to the DisplayName property.
         /// </summary>
@@ -131,7 +133,15 @@ namespace Mubox.Model.Client
             ClientBase clientBase = d as ClientBase;
             if (d != null)
             {
-                Debug.WriteLine("SrxDisplayNameChanged for " + clientBase.ClientId.ToString() + " to " + clientBase.DisplayName ?? "");
+                var name = clientBase.DisplayName ?? "";
+                Debug.WriteLine("SrxDisplayNameChanged for " + clientBase.ClientId.ToString() + " to " + name);
+                if (!string.IsNullOrEmpty(name))
+                {
+                    if (clientBase.DisplayNameChanged != null)
+                    {
+                        clientBase.DisplayNameChanged(clientBase, new EventArgs());
+                    }
+                }
                 ((ClientBase)d).OnDisplayNameChanged(e);
             }
         }
