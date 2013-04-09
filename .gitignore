@@ -94,3 +94,7 @@ _vti_pvt/
 
 #Ignore private folder
 /Private/
+
+#ignore in-built extension dependencies
+/Mubox/Extensions/Mubox.Extensibility.dll
+/Mubox/Extensions/Mubox.Extensibility.pdb
