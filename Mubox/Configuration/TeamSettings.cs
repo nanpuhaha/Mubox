@@ -21,7 +21,32 @@ namespace Mubox.Configuration
             set { base["Clients"] = value; }
         }
 
-        public ClientSettings ActiveClient { get; set; }
+        private ClientSettings _activeClient;
+        public ClientSettings ActiveClient
+        {
+            get
+            {
+                return _activeClient;
+            }
+            set
+            {
+                if (_activeClient != value)
+                {
+                    _activeClient = value;
+                    OnActiveClientChanged();
+                }
+            }
+        }
+
+        public event EventHandler<EventArgs> ActiveClientChanged;
+
+        private void OnActiveClientChanged()
+        {
+            if (ActiveClientChanged != null)
+            {
+                ActiveClientChanged(_activeClient, new EventArgs());
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
     }
