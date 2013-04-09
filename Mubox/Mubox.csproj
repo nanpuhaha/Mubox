@@ -155,6 +155,12 @@
     <Compile Include="View\SysTrayMenu.cs" />
     <Resource Include="Content\Images\ExtraLifeBanner.png" />
     <Content Include="Content\Icons\Mubox2013.ico" />
+    <Content Include="Extensions\Mubox.Extensions.Console.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Extensions\Mubox.Extensions.Console.pdb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Extensions\README.TXT">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
