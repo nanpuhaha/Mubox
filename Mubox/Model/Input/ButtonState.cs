@@ -12,7 +12,7 @@ namespace Mubox.Model.Input
         /// <summary>
         /// True if the button is currently down.
         /// </summary>
-        public bool IsDown { get { return LastDownTimestamp.Ticks <= LastUpTimestamp.Ticks; } }
+        public bool IsDown { get { return LastDownTimestamp.Ticks > LastUpTimestamp.Ticks; } }
 
         /// <summary>
         /// Timestamp of the last time IsDown transitioned into a True state from a False state.

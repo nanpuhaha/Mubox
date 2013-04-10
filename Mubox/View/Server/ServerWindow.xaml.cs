@@ -154,6 +154,7 @@ namespace Mubox.View.Server
             ButtonState mouseButtonInfo = null;
             if (Mouse_Buttons.TryGetValue(e.WM, out mouseButtonInfo))
             {
+                var dateTimeNow = DateTime.Now;
                 switch (e.WM)
                 {
                     case WinAPI.WM.LBUTTONDOWN:
@@ -164,7 +165,7 @@ namespace Mubox.View.Server
                         {
                             mouseButtonInfo.IsClick = false;
                             mouseButtonInfo.IsDoubleClick = false;
-                            mouseButtonInfo.LastDownTimestamp = DateTime.Now;
+                            mouseButtonInfo.LastDownTimestamp = dateTimeNow;
                         }
                         break;
                     case WinAPI.WM.LBUTTONDBLCLK:
@@ -181,7 +182,7 @@ namespace Mubox.View.Server
                         {
                             var isClick =
                                 // within buffer timestamp for down/up transition to be interpretted as a click
-                                DateTime.Now.Ticks <= mouseButtonInfo.LastUpTimestamp.AddMilliseconds(Mubox.Configuration.MuboxConfigSection.Default.MouseBufferMilliseconds).Ticks;
+                                dateTimeNow.Ticks <= mouseButtonInfo.LastDownTimestamp.AddMilliseconds(Mubox.Configuration.MuboxConfigSection.Default.MouseBufferMilliseconds).Ticks;
                             mouseButtonInfo.IsClick = isClick;
                             if (isClick)
                             {
@@ -189,7 +190,7 @@ namespace Mubox.View.Server
                                     // within buffer timestamp for a second down/up transition to be interpretted as a double-click
                                     (DateTime.Now.Ticks <= mouseButtonInfo.LastClickTimestamp.AddMilliseconds(Mubox.Configuration.MuboxConfigSection.Default.MouseBufferMilliseconds).Ticks)
                                     // and last click event was not also a double-click event
-                                    && mouseButtonInfo.LastDoubleClickTimestamp <= mouseButtonInfo.LastClickTimestamp;
+                                    && mouseButtonInfo.LastDoubleClickTimestamp != mouseButtonInfo.LastClickTimestamp;
                                 mouseButtonInfo.IsDoubleClick = isDoubleClick;
                                 if (isDoubleClick)
                                 {
@@ -216,11 +217,11 @@ namespace Mubox.View.Server
                                             e.WM = WinAPI.WM.XBUTTONUP;
                                             break;
                                     }
-                                    mouseButtonInfo.LastDoubleClickTimestamp = DateTime.Now;
+                                    mouseButtonInfo.LastDoubleClickTimestamp = dateTimeNow;
                                 }
-                                mouseButtonInfo.LastClickTimestamp = DateTime.Now;
+                                mouseButtonInfo.LastClickTimestamp = dateTimeNow;
                             }
-                            mouseButtonInfo.LastUpTimestamp = DateTime.Now;
+                            mouseButtonInfo.LastUpTimestamp = dateTimeNow;
                         }
                         break;
                 }
