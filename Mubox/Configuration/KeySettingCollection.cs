@@ -16,7 +16,7 @@ namespace Mubox.Configuration
             return (element as KeySetting).InputKey;
         }
 
-        internal KeySetting CreateNew(Win32.VK inputKey)
+        internal KeySetting CreateNew(WinAPI.VK inputKey)
         {
             ConfigurationElement element = CreateNewElement();
             KeySetting settings = element as KeySetting;
@@ -26,7 +26,7 @@ namespace Mubox.Configuration
             return settings;
         }
 
-        public KeySetting GetOrCreateNew(Win32.VK inputKey)
+        public KeySetting GetOrCreateNew(WinAPI.VK inputKey)
         {
             foreach (KeySetting s in this)
             {
@@ -38,12 +38,12 @@ namespace Mubox.Configuration
             return CreateNew(inputKey);
         }
 
-        public void Remove(Win32.VK inputKey)
+        public void Remove(WinAPI.VK inputKey)
         {
             base.BaseRemove(inputKey);
         }
 
-        public bool TryGetKeySetting(Win32.VK vk, out KeySetting keySetting)
+        public bool TryGetKeySetting(WinAPI.VK vk, out KeySetting keySetting)
         {
             keySetting = base.BaseGet(vk) as KeySetting;
             return keySetting != null;

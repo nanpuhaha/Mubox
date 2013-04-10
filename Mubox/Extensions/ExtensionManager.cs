@@ -74,16 +74,39 @@ namespace Mubox.Extensions
 
         void ActiveTeam_ActiveClientChanged(object sender, EventArgs e)
         {
-            var clientName = Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam.ActiveClient.Name;
-            var client = _clients
-                .Where(c => c.Name == clientName)
-                .FirstOrDefault();
+            var client = GetActiveClient();
             _extensions.Values
                 .ToList()
                 .ForEach(ext =>
                     {
                         (ext.Bridge as Extensibility.MuboxBridge).OnActiveClientChanged(client);
                     });
+        }
+
+        private Extensibility.MuboxClientBridge GetActiveClient()
+        {
+            var clientSettings = Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam.ActiveClient;
+            return clientSettings == null
+                ? null
+                : GetClientByName(clientSettings.Name);
+        }
+
+        private Extensibility.MuboxClientBridge GetClientByHandle(IntPtr handle)
+        {
+            var clientSettings = Mubox.Configuration.MuboxConfigSection.Default
+                .Teams.ActiveTeam.Clients.OfType<Mubox.Configuration.ClientSettings>()
+                .Where(client => client.WindowHandle == handle)
+                .FirstOrDefault();
+            return clientSettings == null
+                ? null
+                : GetClientByName(clientSettings.Name);
+        }
+
+        private Extensibility.MuboxClientBridge GetClientByName(string clientName)
+        {
+            return _clients
+                .Where(c => c.Name == clientName)
+                .FirstOrDefault();
         }
 
         public void Shutdown()
@@ -185,9 +208,10 @@ namespace Mubox.Extensions
         {
             e.Handled = false;
 
-            // translate input, dispatch to extensions for processing
-            var client = default(Extensibility.IMuboxClient);
-            // TODO: resolve client
+            // translate input
+            var client = GetClientByHandle(e.WindowHandle) ?? GetActiveClient();
+
+            // dispatch to extensions
             _extensions.Values.ToList()
                 .ForEach(ext =>
                 {
@@ -197,9 +221,12 @@ namespace Mubox.Extensions
                         {
                             Client = client,
                             Handled = e.Handled,
+                            CAS = e.CAS,
+                            VK = (Mubox.WinAPI.VK)e.VK,
+                            WM = e.WM,
                         };
                         ext.Bridge.Keyboard.OnInputReceived(client, L_e);
-                        e.Handled = L_e.Handled;
+                        e.Handled = e.Handled || L_e.Handled;
                     }
                     catch (Exception ex)
                     {
@@ -213,15 +240,16 @@ namespace Mubox.Extensions
 
         internal bool OnMouseInputReceived(object sender, Model.Input.MouseInput e)
         {
-            e.Handled = false;
-
-            // translate input, dispatch to extensions for processing
-            var client = default(Extensibility.IMuboxClient);
-            if (sender != null)
+            // do not forward mouse-move events to extensions (they are unecessary, and it wastes cpu)
+            if (e.WM == WinAPI.WM.MOUSEMOVE)
             {
-                client = sender as Extensibility.IMuboxClient;
+                return e.Handled;
             }
-            // TODO: resolve client
+
+            // translate input
+            var client = GetClientByHandle(e.WindowHandle) ?? GetActiveClient();
+
+            // dispatch to extensions
             _extensions.Values.ToList()
                 .ForEach(ext =>
                 {
@@ -231,9 +259,15 @@ namespace Mubox.Extensions
                         {
                             Client = client,
                             Handled = e.Handled,
+                            Time = e.Time,
+                            IsAbsolute = e.IsAbsolute,
+                            X = e.Point.X,
+                            Y = e.Point.Y,
+                            WM = e.WM,
+                            Flags = e.Flags,
                         };
                         ext.Bridge.Mouse.OnInputReceived(client, L_e);
-                        e.Handled = L_e.Handled;
+                        e.Handled = e.Handled || L_e.Handled;
                     }
                     catch (Exception ex)
                     {

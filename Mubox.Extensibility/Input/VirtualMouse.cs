@@ -9,13 +9,14 @@ namespace Mubox.Extensibility.Input
     public class VirtualMouse
         : MarshalByRefObject
     {
+        private MuboxClientBridge _muboxClientBridge;
+
         public event EventHandler<MouseEventArgs> InputReceived;
-        private MuboxClientBridge muboxClientBridge;
 
         public VirtualMouse(MuboxClientBridge muboxClientBridge)
         {
             // TODO: Complete member initialization
-            this.muboxClientBridge = muboxClientBridge;
+            _muboxClientBridge = muboxClientBridge;
         }
 
         internal void OnInputReceived(IMuboxClient sender, MouseEventArgs e)

@@ -45,4 +45,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{300DF516-7474-4F14-AFC0-B17099BF3460} = {A6CAFF2D-2CE9-4CCC-9D06-798B1F98213D}
 	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 EndGlobal

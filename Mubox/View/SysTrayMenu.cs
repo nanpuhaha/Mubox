@@ -39,7 +39,7 @@ namespace Mubox.View
             try
             {
                 System.Drawing.Point mousePosition = new System.Drawing.Point(System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Right - 16, System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - 24);
-                Win32.Cursor.GetCursorPos(out mousePosition);
+                WinAPI.Cursor.GetCursorPos(out mousePosition);
 
                 List<object> quickLaunchMenuItems = new List<object>();
                 ItemsSource = quickLaunchMenuItems;

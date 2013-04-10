@@ -6,7 +6,7 @@ namespace Mubox.Model.Input
     public class KeyboardInput
         : StationInput
     {
-        public static KeyboardInput CreateFrom(Win32.WM wParam, Mubox.Win32.WindowHook.KBDLLHOOKSTRUCT hookStruct)
+        public static KeyboardInput CreateFrom(WinAPI.WM wParam, Mubox.WinAPI.WindowHook.KBDLLHOOKSTRUCT hookStruct)
         {
             KeyboardInput e = new KeyboardInput();
             e.VK = hookStruct.vkCode;
@@ -21,16 +21,16 @@ namespace Mubox.Model.Input
         public uint VK { get; set; }
 
         [DataMember]
-        public Win32.CAS CAS { get; set; }
+        public WinAPI.CAS CAS { get; set; }
 
         [DataMember]
         public uint Scan { get; set; }
 
         [DataMember]
-        public Win32.WindowHook.LLKHF Flags { get; set; }
+        public WinAPI.WindowHook.LLKHF Flags { get; set; }
 
         [DataMember]
-        public Win32.WM WM { get; set; }
+        public WinAPI.WM WM { get; set; }
 
         public override string ToString()
         {

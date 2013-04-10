@@ -8,6 +8,7 @@
              d:DesignHeight="480" d:DesignWidth="640">
     <Grid>
         <ListBox ItemsSource="{Binding Messages}" FontFamily="Consolas" FontSize="10" Foreground="#FF127816" Background="Black"
+                 VirtualizingPanel.ScrollUnit="Item" ScrollViewer.IsDeferredScrollingEnabled="True"
                  SelectedItem="{Binding LatestMessage}"
                  IsSynchronizedWithCurrentItem="True" l:ListBoxExtenders.AutoScrollToCurrentItem="True"/>
     </Grid>

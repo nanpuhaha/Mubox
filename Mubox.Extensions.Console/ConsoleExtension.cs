@@ -27,15 +27,25 @@ namespace Mubox.Extensions.Console
         Application _application;
         Thread _thread;
         Dispatcher _dispatcher;
-        bool _exitYet; 
+        bool _exitYet;
+
+        private ProxyEventHandler<ClientEventArgs> _onActiveClientChanged;
+        private ProxyEventHandler<Extensibility.Input.KeyboardEventArgs> _onKeyboardInputReceived;
+        private ProxyEventHandler<Extensibility.Input.MouseEventArgs> _onMouseInputReceived;
 
         public void OnLoad(IMubox mubox)
         {
             "Console::OnLoad".Log();
             _mubox = mubox;
-            _mubox.ActiveClientChanged += (new ProxyEventHandler<ClientEventArgs>(_mubox_ActiveClientChanged).Proxy);
-            _mubox.Keyboard.InputReceived += (new ProxyEventHandler<Mubox.Extensibility.Input.KeyboardEventArgs>(Keyboard_InputReceived).Proxy);
-            _mubox.Mouse.InputReceived += (new ProxyEventHandler<Mubox.Extensibility.Input.MouseEventArgs>(Mouse_InputReceived).Proxy);
+
+            _onActiveClientChanged = new ProxyEventHandler<ClientEventArgs>(_mubox_ActiveClientChanged);
+            _mubox.ActiveClientChanged += _onActiveClientChanged.Proxy;
+
+            _onKeyboardInputReceived = new ProxyEventHandler<Mubox.Extensibility.Input.KeyboardEventArgs>(Keyboard_InputReceived);
+            _mubox.Keyboard.InputReceived += _onKeyboardInputReceived.Proxy;
+
+            _onMouseInputReceived = new ProxyEventHandler<Mubox.Extensibility.Input.MouseEventArgs>(Mouse_InputReceived);
+            _mubox.Mouse.InputReceived += _onMouseInputReceived.Proxy;
 
             _exitYet = false;
 
@@ -45,6 +55,11 @@ namespace Mubox.Extensions.Console
         public void OnUnload()
         {
             "Console::OnUnload".Log();
+
+            _mubox.ActiveClientChanged -= _onActiveClientChanged.Proxy;
+            _mubox.Keyboard.InputReceived -= _onKeyboardInputReceived.Proxy;
+            _mubox.Mouse.InputReceived -= _onMouseInputReceived.Proxy;
+            
             _exitYet = true;
             _presenter.Close();
             if (!_thread.Join(2500)) // 2.5 seconds
@@ -56,13 +71,19 @@ namespace Mubox.Extensions.Console
         public void Keyboard_InputReceived(object sender, Extensibility.Input.KeyboardEventArgs e)
         {
             //e.Log();
-            _viewModel.AddMessageInternal("Keyboard Input", e.Client != null ? e.Client.Name : "(no client)");
+            _viewModel.AddMessageInternal("Keyboard Input",
+                string.Format("name={0} {1}",
+                    e.Client != null ? e.Client.Name : "(no client)",
+                    e.ToString()));
         }
 
         public void Mouse_InputReceived(object sender, Extensibility.Input.MouseEventArgs e)
         {
             //e.Log();
-            _viewModel.AddMessageInternal("Mouse Input", e.Client != null ? e.Client.Name : "(no client)");
+            _viewModel.AddMessageInternal("Mouse Input",
+                string.Format("name={0} {1}",
+                    e.Client != null ? e.Client.Name : "(no client)",
+                    e.ToString()));
         }
 
         public void _mubox_ActiveClientChanged(object sender, ClientEventArgs e)

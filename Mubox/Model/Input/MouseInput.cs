@@ -8,7 +8,7 @@ namespace Mubox.Model.Input
     public class MouseInput
         : StationInput
     {
-        public static MouseInput CreateFrom(Win32.WM wm, Mubox.Win32.WindowHook.MSLLHOOKSTRUCT hookStruct)
+        public static MouseInput CreateFrom(WinAPI.WM wm, Mubox.WinAPI.WindowHook.MSLLHOOKSTRUCT hookStruct)
         {
             return new MouseInput
             {
@@ -26,7 +26,7 @@ namespace Mubox.Model.Input
         public bool IsDoubleClickEvent { get; set; }
 
         [DataMember]
-        public Win32.WM WM { get; set; }
+        public WinAPI.WM WM { get; set; }
 
         [DataMember]
         public System.Windows.Point Point { get; set; }
@@ -34,51 +34,51 @@ namespace Mubox.Model.Input
         [DataMember]
         public uint MouseData { get; set; }
 
-        public Win32.SendInputApi.MouseEventFlags Flags
+        public WinAPI.SendInputApi.MouseEventFlags Flags
         {
             get
             {
-                Win32.SendInputApi.MouseEventFlags flags = IsAbsolute
-                    ? Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE
-                    : Win32.SendInputApi.MouseEventFlags.NotSet;
+                WinAPI.SendInputApi.MouseEventFlags flags = IsAbsolute
+                    ? WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE
+                    : WinAPI.SendInputApi.MouseEventFlags.NotSet;
 
                 switch (WM)
                 {
-                    case Win32.WM.MOUSEMOVE:
-                        flags |= Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_MOVE;
+                    case WinAPI.WM.MOUSEMOVE:
+                        flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_MOVE;
                         break;
-                    case Win32.WM.LBUTTONDOWN:
-                        flags |= Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_LEFTDOWN;
+                    case WinAPI.WM.LBUTTONDOWN:
+                        flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_LEFTDOWN;
                         break;
-                    case Win32.WM.LBUTTONUP:
-                        flags |= Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_LEFTUP;
+                    case WinAPI.WM.LBUTTONUP:
+                        flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_LEFTUP;
                         break;
-                    case Win32.WM.RBUTTONDOWN:
-                        flags |= Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_RIGHTDOWN;
+                    case WinAPI.WM.RBUTTONDOWN:
+                        flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_RIGHTDOWN;
                         break;
-                    case Win32.WM.RBUTTONUP:
-                        flags |= Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_RIGHTUP;
+                    case WinAPI.WM.RBUTTONUP:
+                        flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_RIGHTUP;
                         break;
-                    case Win32.WM.MBUTTONDOWN:
-                        flags |= Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_MIDDLEDOWN;
+                    case WinAPI.WM.MBUTTONDOWN:
+                        flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_MIDDLEDOWN;
                         break;
-                    case Win32.WM.MBUTTONUP:
-                        flags |= Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_MIDDLEUP;
+                    case WinAPI.WM.MBUTTONUP:
+                        flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_MIDDLEUP;
                         break;
-                    case Win32.WM.XBUTTONDOWN:
-                        flags |= Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_XDOWN;
+                    case WinAPI.WM.XBUTTONDOWN:
+                        flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_XDOWN;
                         break;
-                    case Win32.WM.XBUTTONUP:
-                        flags |= Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_XUP;
+                    case WinAPI.WM.XBUTTONUP:
+                        flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_XUP;
                         break;
-                    case Win32.WM.MOUSEWHEEL:
-                    case Win32.WM.MOUSEHWHEEL:
-                        flags |= Win32.SendInputApi.MouseEventFlags.MOUSEEVENTF_WHEEL;
+                    case WinAPI.WM.MOUSEWHEEL:
+                    case WinAPI.WM.MOUSEHWHEEL:
+                        flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_WHEEL;
                         break;
-                    case Win32.WM.LBUTTONDBLCLK:
-                    case Win32.WM.MBUTTONDBLCLK:
-                    case Win32.WM.RBUTTONDBLCLK:
-                    case Win32.WM.XBUTTONDBLCLK:
+                    case WinAPI.WM.LBUTTONDBLCLK:
+                    case WinAPI.WM.MBUTTONDBLCLK:
+                    case WinAPI.WM.RBUTTONDBLCLK:
+                    case WinAPI.WM.XBUTTONDBLCLK:
                     default:
                         // TODO: ?
                         break;

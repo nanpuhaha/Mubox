@@ -7,23 +7,23 @@ namespace Mubox.Configuration
         : ConfigurationElement, INotifyPropertyChanged
     {
         [ConfigurationProperty("InputKey", IsRequired = true, IsKey = true)]
-        public Win32.VK InputKey
+        public WinAPI.VK InputKey
         {
-            get { return (Win32.VK)base["InputKey"]; }
+            get { return (WinAPI.VK)base["InputKey"]; }
             set { if (!InputKey.Equals(value)) { base["InputKey"] = value; this.OnPropertyChanged(o => o.InputKey); } }
         }
 
         [ConfigurationProperty("OutputKey", IsRequired = true, IsKey = false)]
-        public Win32.VK OutputKey
+        public WinAPI.VK OutputKey
         {
-            get { return (Win32.VK)base["OutputKey"]; }
+            get { return (WinAPI.VK)base["OutputKey"]; }
             set { if (!OutputKey.Equals(value)) { base["OutputKey"] = value; this.OnPropertyChanged(o => o.OutputKey); } }
         }
 
-        [ConfigurationProperty("OutputModifiers", IsRequired = false, DefaultValue = default(Win32.CAS))]
-        public Win32.CAS OutputModifiers
+        [ConfigurationProperty("OutputModifiers", IsRequired = false, DefaultValue = default(WinAPI.CAS))]
+        public WinAPI.CAS OutputModifiers
         {
-            get { return (Win32.CAS)base["OutputModifiers"]; }
+            get { return (WinAPI.CAS)base["OutputModifiers"]; }
             set { if (!OutputModifiers.Equals(value)) { base["OutputModifiers"] = value; this.OnPropertyChanged(o => o.OutputModifiers); } }
         }
 

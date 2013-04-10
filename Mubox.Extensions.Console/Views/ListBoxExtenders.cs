@@ -59,7 +59,7 @@ namespace Mubox.Extensions.Console.Views
                 {
                     var newValue = (bool)e.NewValue;
 
-                    var autoScrollToCurrentItemWorker = new EventHandler((s1, e2) => OnAutoScrollToCurrentItem(listBox, listBox.Items.CurrentPosition));
+                    var autoScrollToCurrentItemWorker = new EventHandler((s1, e2) => OnAutoScrollToCurrentItem(listBox));
 
                     if (newValue)
                         listBoxItems.CurrentChanged += autoScrollToCurrentItemWorker;
@@ -75,10 +75,9 @@ namespace Mubox.Extensions.Console.Views
         /// </summary>
         /// <param name="listBox">The ListBox which should be scrolled</param>
         /// <param name="index">The index of the item to which it should be scrolled</param>
-        public static void OnAutoScrollToCurrentItem(ListBox listBox, int index)
+        public static void OnAutoScrollToCurrentItem(ListBox listBox)
         {
-            if (listBox != null && listBox.Items != null && listBox.Items.Count > index && index >= 0)
-                listBox.ScrollIntoView(listBox.Items[index]);
+            listBox.ScrollIntoView(listBox.Items.CurrentItem);
         }
 
         #endregion

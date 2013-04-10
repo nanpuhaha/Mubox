@@ -8,7 +8,7 @@ namespace Mubox.Model
 {
     public class ClientState : IDisposable
     {
-        public Win32.SandboxApi.Sandbox Sandbox { get; set; }
+        public WinAPI.SandboxApi.Sandbox Sandbox { get; set; }
         
         private ClientState()
         {
@@ -84,27 +84,27 @@ namespace Mubox.Model
                 if (Settings.RemoveWindowBorderEnabled && !windowBorderRemoved)
                 {
                     this.clientState_windowBorderRemoved = true;
-                    Win32.Windows.WindowStyles ws = (Win32.Windows.WindowStyles)Win32.Windows.GetWindowLong(this.Settings.WindowHandle, Win32.Windows.GWL.GWL_STYLE);
-                    Win32.Windows.WindowStyles wsNew = ws;
-                    if (Win32.Windows.WindowStyles.WS_BORDER == (ws & Win32.Windows.WindowStyles.WS_BORDER))
+                    WinAPI.Windows.WindowStyles ws = (WinAPI.Windows.WindowStyles)WinAPI.Windows.GetWindowLong(this.Settings.WindowHandle, WinAPI.Windows.GWL.GWL_STYLE);
+                    WinAPI.Windows.WindowStyles wsNew = ws;
+                    if (WinAPI.Windows.WindowStyles.WS_BORDER == (ws & WinAPI.Windows.WindowStyles.WS_BORDER))
                     {
-                        wsNew ^= Win32.Windows.WindowStyles.WS_BORDER;
+                        wsNew ^= WinAPI.Windows.WindowStyles.WS_BORDER;
                     }
-                    if (Win32.Windows.WindowStyles.WS_CAPTION == (ws & Win32.Windows.WindowStyles.WS_CAPTION))
+                    if (WinAPI.Windows.WindowStyles.WS_CAPTION == (ws & WinAPI.Windows.WindowStyles.WS_CAPTION))
                     {
-                        wsNew ^= Win32.Windows.WindowStyles.WS_CAPTION;
+                        wsNew ^= WinAPI.Windows.WindowStyles.WS_CAPTION;
                     }
-                    if (Win32.Windows.WindowStyles.WS_EX_STATICEDGE == (ws & Win32.Windows.WindowStyles.WS_EX_STATICEDGE))
+                    if (WinAPI.Windows.WindowStyles.WS_EX_STATICEDGE == (ws & WinAPI.Windows.WindowStyles.WS_EX_STATICEDGE))
                     {
-                        wsNew ^= Win32.Windows.WindowStyles.WS_EX_STATICEDGE;
+                        wsNew ^= WinAPI.Windows.WindowStyles.WS_EX_STATICEDGE;
                     }
-                    if (Win32.Windows.WindowStyles.WS_SIZEBOX == (ws & Win32.Windows.WindowStyles.WS_SIZEBOX))
+                    if (WinAPI.Windows.WindowStyles.WS_SIZEBOX == (ws & WinAPI.Windows.WindowStyles.WS_SIZEBOX))
                     {
-                        wsNew ^= Win32.Windows.WindowStyles.WS_SIZEBOX;
+                        wsNew ^= WinAPI.Windows.WindowStyles.WS_SIZEBOX;
                     }
                     if (ws != wsNew)
                     {
-                        Win32.Windows.SetWindowLong(this.Settings.WindowHandle, Win32.Windows.GWL.GWL_STYLE, (uint)wsNew);
+                        WinAPI.Windows.SetWindowLong(this.Settings.WindowHandle, WinAPI.Windows.GWL.GWL_STYLE, (uint)wsNew);
                     }
                 }
             }
@@ -233,23 +233,23 @@ namespace Mubox.Model
 
             bool windowPositionRestored = (force ? false : this.clientState_windowPositionRestored);
 
-            Win32.Windows.RECT windowRect;
+            WinAPI.Windows.RECT windowRect;
             if (!windowPositionRestored && (this.Settings.WindowSize.Width > 0))
             {
-                Win32.Windows.GetWindowRect(this.Settings.WindowHandle, out windowRect);
+                WinAPI.Windows.GetWindowRect(this.Settings.WindowHandle, out windowRect);
                 if (!force && ((windowRect.Top == position.Y) && (windowRect.Left == position.X) && (size.Width == (windowRect.Right - windowRect.Left)) && (size.Height == (windowRect.Bottom - windowRect.Top))))
                 {
                     this.clientState_windowPositionRestored = true;
                 }
                 else
                 {
-                    Win32.Windows.SetWindowPos(this.Settings.WindowHandle, (IntPtr)Mubox.Win32.Windows.Position.HWND_TOP,
-                        (int)position.X, (int)position.Y, (int)size.Width, (int)size.Height, (uint)(Win32.Windows.Options.SWP_ASYNCWINDOWPOS | Win32.Windows.Options.SWP_NOZORDER));
+                    WinAPI.Windows.SetWindowPos(this.Settings.WindowHandle, (IntPtr)Mubox.WinAPI.Windows.Position.HWND_TOP,
+                        (int)position.X, (int)position.Y, (int)size.Width, (int)size.Height, (uint)(WinAPI.Windows.Options.SWP_ASYNCWINDOWPOS | WinAPI.Windows.Options.SWP_NOZORDER));
                 }
             }
             else
             {
-                if (Win32.Windows.GetWindowRect(this.Settings.WindowHandle, out windowRect))
+                if (WinAPI.Windows.GetWindowRect(this.Settings.WindowHandle, out windowRect))
                 {
                     this.Settings.WindowPosition = new Point(windowRect.Left, windowRect.Top);
                     this.Settings.WindowSize = new Size(windowRect.Right - windowRect.Left, windowRect.Bottom - windowRect.Top);

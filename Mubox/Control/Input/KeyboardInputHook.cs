@@ -10,11 +10,11 @@ namespace Mubox.Control.Input
     {
         static KeyboardInputHook()
         {
-            hookProc = new Win32.WindowHook.HookProc(KeyboardHook);
+            hookProc = new WinAPI.WindowHook.HookProc(KeyboardHook);
             hookProcPtr = Marshal.GetFunctionPointerForDelegate(hookProc);
         }
 
-        private static Win32.WindowHook.HookProc hookProc = null;
+        private static WinAPI.WindowHook.HookProc hookProc = null;
         private static IntPtr hookProcPtr = IntPtr.Zero;
 
         public static UIntPtr KeyboardHook(int nCode, IntPtr wParam, IntPtr lParam)
@@ -23,8 +23,8 @@ namespace Mubox.Control.Input
             {
                 if (nCode == 0)
                 {
-                    Mubox.Win32.WindowHook.KBDLLHOOKSTRUCT keyboardHookStruct = (Mubox.Win32.WindowHook.KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(Mubox.Win32.WindowHook.KBDLLHOOKSTRUCT));
-                    if (OnKeyboardInputReceived((Win32.WM)wParam, keyboardHookStruct))
+                    Mubox.WinAPI.WindowHook.KBDLLHOOKSTRUCT keyboardHookStruct = (Mubox.WinAPI.WindowHook.KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(Mubox.WinAPI.WindowHook.KBDLLHOOKSTRUCT));
+                    if (OnKeyboardInputReceived((WinAPI.WM)wParam, keyboardHookStruct))
                     {
                         return new UIntPtr(1);
                     }
@@ -37,7 +37,7 @@ namespace Mubox.Control.Input
             }
             try
             {
-                return Mubox.Win32.WindowHook.CallNextHookEx(hHook, nCode, wParam, lParam);
+                return Mubox.WinAPI.WindowHook.CallNextHookEx(hHook, nCode, wParam, lParam);
             }
             catch (Exception ex)
             {
@@ -75,7 +75,7 @@ namespace Mubox.Control.Input
                 IntPtr hModule = Marshal.GetHINSTANCE(modules[0]);
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate()
                 {
-                    hHook = Win32.WindowHook.SetWindowsHookEx(Win32.WindowHook.HookType.WH_KEYBOARD_LL, hookProcPtr, hModule, 0);
+                    hHook = WinAPI.WindowHook.SetWindowsHookEx(WinAPI.WindowHook.HookType.WH_KEYBOARD_LL, hookProcPtr, hModule, 0);
                     if (hHook == IntPtr.Zero)
                     {
                         // failed
@@ -129,7 +129,7 @@ namespace Mubox.Control.Input
 
                 if (hHook != IntPtr.Zero)
                 {
-                    Mubox.Win32.WindowHook.UnhookWindowsHookEx(hHook);
+                    Mubox.WinAPI.WindowHook.UnhookWindowsHookEx(hHook);
                     hHook = IntPtr.Zero;
                 }
 
@@ -145,7 +145,7 @@ namespace Mubox.Control.Input
         private static Performance KeyboardInputPerformance = Performance.CreatePerformance("_KeyboardInput");
         private static Performance KeyboardHandlerPerformance = Performance.CreatePerformance("_KeyboardHandler");
 
-        private static bool OnKeyboardInputReceived(Win32.WM wParam, Win32.WindowHook.KBDLLHOOKSTRUCT hookStruct)
+        private static bool OnKeyboardInputReceived(WinAPI.WM wParam, WinAPI.WindowHook.KBDLLHOOKSTRUCT hookStruct)
         {
             // fix for 'key repeat' windows feature
             if (pressedKeys.Contains((byte)(hookStruct.vkCode & 0xFF)))
@@ -155,7 +155,7 @@ namespace Mubox.Control.Input
 
             // and ignore "global desktop keys"
             Mubox.Configuration.KeySetting globalKeySetting = null;
-            if (Mubox.Configuration.MuboxConfigSection.Default.Keys.TryGetKeySetting((Win32.VK)hookStruct.vkCode, out globalKeySetting) && (globalKeySetting.SendToDesktop))
+            if (Mubox.Configuration.MuboxConfigSection.Default.Keys.TryGetKeySetting((WinAPI.VK)hookStruct.vkCode, out globalKeySetting) && (globalKeySetting.SendToDesktop))
             {
                 return false;
             }
@@ -183,7 +183,7 @@ namespace Mubox.Control.Input
                         Mubox.Configuration.ClientSettings activeClient = Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam.ActiveClient;
                         if (activeClient != null)
                         {
-                            activeClient.Keys.TryGetKeySetting((Win32.VK)keyboardInputEventArgs.VK, out keySetting);
+                            activeClient.Keys.TryGetKeySetting((WinAPI.VK)keyboardInputEventArgs.VK, out keySetting);
                         }
                         if (keySetting != null)
                         {
@@ -199,13 +199,13 @@ namespace Mubox.Control.Input
             return false;
         }
 
-        private static bool IsRepeatKey(Win32.WindowHook.KBDLLHOOKSTRUCT hookStruct)
+        private static bool IsRepeatKey(WinAPI.WindowHook.KBDLLHOOKSTRUCT hookStruct)
         {
             int vk = (int)(hookStruct.vkCode & 0xFF);
             lock (pressedKeysLock)
             {
                 bool keyIsPressed = pressedKeys[vk] == 0x80;
-                if (Win32.WindowHook.LLKHF.UP != (hookStruct.flags & Win32.WindowHook.LLKHF.UP))
+                if (WinAPI.WindowHook.LLKHF.UP != (hookStruct.flags & WinAPI.WindowHook.LLKHF.UP))
                 {
                     if (keyIsPressed)
                     {
@@ -224,7 +224,7 @@ namespace Mubox.Control.Input
                     }
                     else
                     {
-                        pressedKeys[vk] = (byte)(Win32.IsToggled((Win32.VK)vk) ? 1 : 0);
+                        pressedKeys[vk] = (byte)(WinAPI.IsToggled((WinAPI.VK)vk) ? 1 : 0);
                     }
                 }
             }

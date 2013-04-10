@@ -26,8 +26,8 @@ namespace Mubox.View.Server
         internal double Mouse_RelativeMovement_LastX = double.MinValue, RelativeMovement_LastY = double.MinValue;
 
         internal long Mouse_AbsoluteMovement_Screen_Resolution_UpdateTimestampTicks;
-        internal int Mouse_AbsoluteMovement_Screen_ResolutionX = Win32.SystemMetrics.GetSystemMetrics(Win32.SystemMetrics.SM.SM_CXSCREEN);
-        internal int Mouse_AbsoluteMovement_Screen_ResolutionY = Win32.SystemMetrics.GetSystemMetrics(Win32.SystemMetrics.SM.SM_CYSCREEN);
+        internal int Mouse_AbsoluteMovement_Screen_ResolutionX = WinAPI.SystemMetrics.GetSystemMetrics(WinAPI.SystemMetrics.SM.SM_CXSCREEN);
+        internal int Mouse_AbsoluteMovement_Screen_ResolutionY = WinAPI.SystemMetrics.GetSystemMetrics(WinAPI.SystemMetrics.SM.SM_CYSCREEN);
 
         public ClientBase ActiveClient { get; private set; }
 
@@ -43,36 +43,36 @@ namespace Mubox.View.Server
         private Point L_e_Point = new Point(0, 0);
         private ClientBase[] clientsCached = null;
         private int[/*vk*/] roundRobinTable = new int[ushort.MaxValue];
-        private Dictionary<Win32.WM, ButtonState> Mouse_Buttons = InitializeMouseButtons();
+        private Dictionary<WinAPI.WM, ButtonState> Mouse_Buttons = InitializeMouseButtons();
 
-        private static Dictionary<Win32.WM, ButtonState> InitializeMouseButtons()
+        private static Dictionary<WinAPI.WM, ButtonState> InitializeMouseButtons()
         {
-            Dictionary<Win32.WM, ButtonState> buttons = new Dictionary<Win32.WM, ButtonState>();
-            foreach (var group in new Win32.WM[][]
+            Dictionary<WinAPI.WM, ButtonState> buttons = new Dictionary<WinAPI.WM, ButtonState>();
+            foreach (var group in new WinAPI.WM[][]
                 {
-                    new Win32.WM[] 
+                    new WinAPI.WM[] 
                     {
-                        Win32.WM.LBUTTONDOWN,
-                        Win32.WM.LBUTTONDBLCLK,
-                        Win32.WM.LBUTTONUP,
+                        WinAPI.WM.LBUTTONDOWN,
+                        WinAPI.WM.LBUTTONDBLCLK,
+                        WinAPI.WM.LBUTTONUP,
                     },
-                    new Win32.WM[] 
+                    new WinAPI.WM[] 
                     {
-                        Win32.WM.MBUTTONDOWN,
-                        Win32.WM.MBUTTONDBLCLK,
-                        Win32.WM.MBUTTONUP,
+                        WinAPI.WM.MBUTTONDOWN,
+                        WinAPI.WM.MBUTTONDBLCLK,
+                        WinAPI.WM.MBUTTONUP,
                     },
-                    new Win32.WM[] 
+                    new WinAPI.WM[] 
                     {
-                        Win32.WM.RBUTTONDOWN,
-                        Win32.WM.RBUTTONDBLCLK,
-                        Win32.WM.RBUTTONUP,
+                        WinAPI.WM.RBUTTONDOWN,
+                        WinAPI.WM.RBUTTONDBLCLK,
+                        WinAPI.WM.RBUTTONUP,
                     },
-                    new Win32.WM[] 
+                    new WinAPI.WM[] 
                     {
-                        Win32.WM.XBUTTONDOWN,
-                        Win32.WM.XBUTTONDBLCLK,
-                        Win32.WM.XBUTTONUP
+                        WinAPI.WM.XBUTTONDOWN,
+                        WinAPI.WM.XBUTTONDBLCLK,
+                        WinAPI.WM.XBUTTONUP
                     },
                 })
             {
@@ -134,7 +134,7 @@ namespace Mubox.View.Server
             relY -= (int)this.RelativeMovement_LastY;
 
             // if a mousemove, track relative change
-            if (e.WM == Win32.WM.MOUSEMOVE)
+            if (e.WM == WinAPI.WM.MOUSEMOVE)
             {
                 this.Mouse_RelativeMovement_LastX += relX;
                 if (this.Mouse_RelativeMovement_LastX <= 0)
@@ -156,10 +156,10 @@ namespace Mubox.View.Server
             {
                 switch (e.WM)
                 {
-                    case Win32.WM.LBUTTONDOWN:
-                    case Win32.WM.RBUTTONDOWN:
-                    case Win32.WM.MBUTTONDOWN:
-                    case Win32.WM.XBUTTONDOWN:                    
+                    case WinAPI.WM.LBUTTONDOWN:
+                    case WinAPI.WM.RBUTTONDOWN:
+                    case WinAPI.WM.MBUTTONDOWN:
+                    case WinAPI.WM.XBUTTONDOWN:                    
                         if (!mouseButtonInfo.IsDown)
                         {
                             mouseButtonInfo.IsClick = false;
@@ -167,16 +167,16 @@ namespace Mubox.View.Server
                             mouseButtonInfo.LastDownTimestamp = DateTime.Now;
                         }
                         break;
-                    case Win32.WM.LBUTTONDBLCLK:
-                    case Win32.WM.MBUTTONDBLCLK:
-                    case Win32.WM.RBUTTONDBLCLK:
-                    case Win32.WM.XBUTTONDBLCLK:
+                    case WinAPI.WM.LBUTTONDBLCLK:
+                    case WinAPI.WM.MBUTTONDBLCLK:
+                    case WinAPI.WM.RBUTTONDBLCLK:
+                    case WinAPI.WM.XBUTTONDBLCLK:
                         mouseButtonInfo.IsDoubleClick = true;
                         break;
-                    case Win32.WM.LBUTTONUP:
-                    case Win32.WM.RBUTTONUP:
-                    case Win32.WM.MBUTTONUP:
-                    case Win32.WM.XBUTTONUP:
+                    case WinAPI.WM.LBUTTONUP:
+                    case WinAPI.WM.RBUTTONUP:
+                    case WinAPI.WM.MBUTTONUP:
+                    case WinAPI.WM.XBUTTONUP:
                         if (mouseButtonInfo.IsDown)
                         {
                             var isClick =
@@ -195,25 +195,25 @@ namespace Mubox.View.Server
                                 {
                                     switch (e.WM)
                                     {
-                                        case Win32.WM.LBUTTONUP:
-                                            e.WM = Win32.WM.LBUTTONDBLCLK;
+                                        case WinAPI.WM.LBUTTONUP:
+                                            e.WM = WinAPI.WM.LBUTTONDBLCLK;
                                             MouseInputHook_MouseInputReceived(sender, e);
-                                            e.WM = Win32.WM.LBUTTONUP;
+                                            e.WM = WinAPI.WM.LBUTTONUP;
                                             break;
-                                        case Win32.WM.RBUTTONUP:
-                                            e.WM = Win32.WM.RBUTTONDBLCLK;
+                                        case WinAPI.WM.RBUTTONUP:
+                                            e.WM = WinAPI.WM.RBUTTONDBLCLK;
                                             MouseInputHook_MouseInputReceived(sender, e);
-                                            e.WM = Win32.WM.RBUTTONUP;
+                                            e.WM = WinAPI.WM.RBUTTONUP;
                                             break;
-                                        case Win32.WM.MBUTTONUP:
-                                            e.WM = Win32.WM.MBUTTONDBLCLK;
+                                        case WinAPI.WM.MBUTTONUP:
+                                            e.WM = WinAPI.WM.MBUTTONDBLCLK;
                                             MouseInputHook_MouseInputReceived(sender, e);
-                                            e.WM = Win32.WM.MBUTTONUP;
+                                            e.WM = WinAPI.WM.MBUTTONUP;
                                             break;
-                                        case Win32.WM.XBUTTONUP:
-                                            e.WM = Win32.WM.XBUTTONDBLCLK;
+                                        case WinAPI.WM.XBUTTONUP:
+                                            e.WM = WinAPI.WM.XBUTTONDBLCLK;
                                             MouseInputHook_MouseInputReceived(sender, e);
-                                            e.WM = Win32.WM.XBUTTONUP;
+                                            e.WM = WinAPI.WM.XBUTTONUP;
                                             break;
                                     }
                                     mouseButtonInfo.LastDoubleClickTimestamp = DateTime.Now;
@@ -246,13 +246,13 @@ namespace Mubox.View.Server
                 //}
                 //else
                 {
-                    e.Handled = (e.WM != Win32.WM.MOUSEMOVE);
+                    e.Handled = (e.WM != WinAPI.WM.MOUSEMOVE);
 
                     ClientBase[] clients = shouldCloneMouse
                         ? GetCachedClients()
                         : new[] { activeClient };
 
-                    if (e.WM == Win32.WM.MOUSEMOVE)
+                    if (e.WM == WinAPI.WM.MOUSEMOVE)
                     {
                         // track mouse position
                         TrackMousePositionClientRelative(e, activeClient, clients);
@@ -315,19 +315,19 @@ namespace Mubox.View.Server
             }
         }
 
-        private static bool IsMouseInClientArea(MouseInput e, Win32.Windows.RECT calcRect)
+        private static bool IsMouseInClientArea(MouseInput e, WinAPI.Windows.RECT calcRect)
         {
             return (calcRect.Left <= (int)e.Point.X && calcRect.Top <= (int)e.Point.Y) && (calcRect.Right >= (int)e.Point.X && calcRect.Bottom >= (int)e.Point.Y);
         }
 
-        private static Win32.Windows.RECT GetScreenRelativeClientRect(ClientBase item)
+        private static WinAPI.Windows.RECT GetScreenRelativeClientRect(ClientBase item)
         {
             if (item.CachedScreenFromClientRectExpiry.Ticks < DateTime.Now.Ticks)
             {
-                Win32.Windows.RECT calcRect;
-                Win32.Windows.RECT clientRect;
-                Win32.Windows.GetWindowRect(item.WindowHandle, out calcRect);
-                Win32.Windows.GetClientRect(item.WindowHandle, out clientRect);
+                WinAPI.Windows.RECT calcRect;
+                WinAPI.Windows.RECT clientRect;
+                WinAPI.Windows.GetWindowRect(item.WindowHandle, out calcRect);
+                WinAPI.Windows.GetClientRect(item.WindowHandle, out clientRect);
                 int borderOffset = ((calcRect.Width - clientRect.Width) / 2);
                 calcRect.Left += borderOffset;
                 calcRect.Bottom -= borderOffset;
@@ -362,8 +362,8 @@ namespace Mubox.View.Server
 
         private void Mouse_Screen_OnResolutionChanged()
         {
-            Mouse_AbsoluteMovement_Screen_ResolutionX = Win32.SystemMetrics.GetSystemMetrics(Win32.SystemMetrics.SM.SM_CXSCREEN);
-            Mouse_AbsoluteMovement_Screen_ResolutionY = Win32.SystemMetrics.GetSystemMetrics(Win32.SystemMetrics.SM.SM_CYSCREEN);
+            Mouse_AbsoluteMovement_Screen_ResolutionX = WinAPI.SystemMetrics.GetSystemMetrics(WinAPI.SystemMetrics.SM.SM_CXSCREEN);
+            Mouse_AbsoluteMovement_Screen_ResolutionY = WinAPI.SystemMetrics.GetSystemMetrics(WinAPI.SystemMetrics.SM.SM_CYSCREEN);
             // center server window on screen
             this.Dispatcher.BeginInvoke((Action)delegate()
             {
@@ -391,9 +391,9 @@ namespace Mubox.View.Server
         {
             return
                 (
-                    ((Mubox.Configuration.MuboxConfigSection.Default.MouseCloneMode == MouseCloneModeType.Toggled) && Win32.IsToggled(Win32.VK.Capital))
+                    ((Mubox.Configuration.MuboxConfigSection.Default.MouseCloneMode == MouseCloneModeType.Toggled) && WinAPI.IsToggled(WinAPI.VK.Capital))
                     ||
-                    ((Mubox.Configuration.MuboxConfigSection.Default.MouseCloneMode == MouseCloneModeType.Pressed) && Win32.IsPressed(Win32.VK.Capital))
+                    ((Mubox.Configuration.MuboxConfigSection.Default.MouseCloneMode == MouseCloneModeType.Pressed) && WinAPI.IsPressed(WinAPI.VK.Capital))
                 );
         }
 
@@ -448,16 +448,16 @@ namespace Mubox.View.Server
             }
         }
 
-        public Dictionary<Mubox.Win32.VK, Dictionary<Mubox.Win32.WM, Func<KeyboardInput, bool>>> Keyboard_ActionMap { get; set; }
+        public Dictionary<Mubox.WinAPI.VK, Dictionary<Mubox.WinAPI.WM, Func<KeyboardInput, bool>>> Keyboard_ActionMap { get; set; }
 
         private Func<KeyboardInput, bool> Keyboard_DefaultAction = null;
 
-        private Dictionary<Win32.VK, Dictionary<Mubox.Win32.WM, Func<KeyboardInput, bool>>> Keyboard_ActionMap_CreateNew(Func<KeyboardInput, bool> keyboardAction)
+        private Dictionary<WinAPI.VK, Dictionary<Mubox.WinAPI.WM, Func<KeyboardInput, bool>>> Keyboard_ActionMap_CreateNew(Func<KeyboardInput, bool> keyboardAction)
         {
-            Dictionary<Win32.VK, Dictionary<Win32.WM, Func<KeyboardInput, bool>>> actionMap = new Dictionary<Win32.VK, Dictionary<Win32.WM, Func<KeyboardInput, bool>>>();
-            foreach (Win32.VK vk in Enum.GetValues(typeof(Win32.VK)))
+            Dictionary<WinAPI.VK, Dictionary<WinAPI.WM, Func<KeyboardInput, bool>>> actionMap = new Dictionary<WinAPI.VK, Dictionary<WinAPI.WM, Func<KeyboardInput, bool>>>();
+            foreach (WinAPI.VK vk in Enum.GetValues(typeof(WinAPI.VK)))
             {
-                actionMap[vk] = new Dictionary<Win32.WM, Func<KeyboardInput, bool>>();
+                actionMap[vk] = new Dictionary<WinAPI.WM, Func<KeyboardInput, bool>>();
             }
 
             // set default keyboard action
@@ -466,45 +466,45 @@ namespace Mubox.View.Server
             return actionMap;
         }
 
-        private void Keyboard_ActionMap_SetDefaultActions(Dictionary<Win32.VK, Dictionary<Win32.WM, Func<KeyboardInput, bool>>> actionMap)
+        private void Keyboard_ActionMap_SetDefaultActions(Dictionary<WinAPI.VK, Dictionary<WinAPI.WM, Func<KeyboardInput, bool>>> actionMap)
         {
             // TODO: add visual indicator (need 'overlay ui' first)
             // TODO: audible indicator needs config setting to disable (may bother some users)
             // toggle input capture
-            actionMap[Win32.VK.ScrollLock][Win32.WM.KEYDOWN] = (e) =>
+            actionMap[WinAPI.VK.ScrollLock][WinAPI.WM.KEYDOWN] = (e) =>
             {
-                Win32.Beep(
+                WinAPI.Beep(
                     Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled
                         ? (uint)0x77FF
                         : (uint)0x7077,
                     (uint)100);
                 return false;
             };
-            actionMap[Win32.VK.ScrollLock][Win32.WM.KEYUP] = (e) =>
+            actionMap[WinAPI.VK.ScrollLock][WinAPI.WM.KEYUP] = (e) =>
             {
                 // toggle input capture, without client switcher
                 SetInputCapture(!Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled, false);
-                Win32.Beep(
+                WinAPI.Beep(
                     Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled
                         ? (uint)0x77FF
                         : (uint)0x7077,
                     (uint)100);
                 return false;
             };
-            actionMap[Win32.VK.Pause][Win32.WM.KEYDOWN] = (e) =>
+            actionMap[WinAPI.VK.Pause][WinAPI.WM.KEYDOWN] = (e) =>
             {
-                Win32.Beep(
+                WinAPI.Beep(
                     Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled
                         ? (uint)0x77FF
                         : (uint)0x7077,
                     (uint)100);
                 return false;
             };
-            actionMap[Win32.VK.Pause][Win32.WM.KEYUP] = (e) =>
+            actionMap[WinAPI.VK.Pause][WinAPI.WM.KEYUP] = (e) =>
             {
                 // toggle input capture, with client switcher
                 SetInputCapture(!Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled, true);
-                Win32.Beep(
+                WinAPI.Beep(
                     Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled
                         ? (uint)0x77FF
                         : (uint)0x7077,
@@ -513,9 +513,9 @@ namespace Mubox.View.Server
             };
 
             // accept switched-to client
-            actionMap[Win32.VK.LeftMenu] = actionMap[Win32.VK.Menu];
-            actionMap[Win32.VK.RightMenu] = actionMap[Win32.VK.Menu];
-            actionMap[Win32.VK.Menu][Win32.WM.KEYUP] = (e) =>
+            actionMap[WinAPI.VK.LeftMenu] = actionMap[WinAPI.VK.Menu];
+            actionMap[WinAPI.VK.RightMenu] = actionMap[WinAPI.VK.Menu];
+            actionMap[WinAPI.VK.Menu][WinAPI.WM.KEYUP] = (e) =>
             {
                 if (Mubox.Configuration.MuboxConfigSection.Default.DisableAltTabHook)
                 {
@@ -546,7 +546,7 @@ namespace Mubox.View.Server
             };
 
             // replace windows task-switcher
-            actionMap[Win32.VK.Tab][Win32.WM.SYSKEYDOWN] = (e) =>
+            actionMap[WinAPI.VK.Tab][WinAPI.WM.SYSKEYDOWN] = (e) =>
             {
                 if (Mubox.Configuration.MuboxConfigSection.Default.DisableAltTabHook)
                 {
@@ -579,7 +579,7 @@ namespace Mubox.View.Server
                                 this.Topmost = true;
                             }
                         }
-                        bool reverseSelection = Mubox.Configuration.MuboxConfigSection.Default.ReverseClientSwitching ? !Win32.IsPressed(Win32.VK.Shift) : Win32.IsPressed(Win32.VK.Shift);
+                        bool reverseSelection = Mubox.Configuration.MuboxConfigSection.Default.ReverseClientSwitching ? !WinAPI.IsPressed(WinAPI.VK.Shift) : WinAPI.IsPressed(WinAPI.VK.Shift);
                         if (reverseSelection)
                         {
                             // reverse-selection
@@ -615,7 +615,7 @@ namespace Mubox.View.Server
                 return false;
             };
 
-            actionMap[Win32.VK.Capital][Win32.WM.KEYDOWN] = (e) =>
+            actionMap[WinAPI.VK.Capital][WinAPI.WM.KEYDOWN] = (e) =>
             {
                 // work around for mouse hook breakage under W7, e.g. resetting the mouse hook
                 Control.Input.MouseInputHook.Stop();
@@ -623,7 +623,7 @@ namespace Mubox.View.Server
                 e.Handled = false;
                 return true;
             };
-            actionMap[Win32.VK.Capital][Win32.WM.KEYUP] = (e) =>
+            actionMap[WinAPI.VK.Capital][WinAPI.WM.KEYUP] = (e) =>
             {
                 e.Handled = false;
                 return true;
@@ -664,7 +664,7 @@ namespace Mubox.View.Server
             }
 
             Func<KeyboardInput, bool> action = null;
-            if (Keyboard_ActionMap[(Win32.VK)e.VK].TryGetValue(e.WM, out action))
+            if (Keyboard_ActionMap[(WinAPI.VK)e.VK].TryGetValue(e.WM, out action))
             {
                 if (action(e) || e.Handled)
                 {
@@ -691,7 +691,7 @@ namespace Mubox.View.Server
                 ClientBase[] clients = GetCachedClients();
 
                 KeySetting globalKeySetting;
-                if (MuboxConfigSection.Default.Keys.TryGetKeySetting((Win32.VK)e.VK, out globalKeySetting))
+                if (MuboxConfigSection.Default.Keys.TryGetKeySetting((WinAPI.VK)e.VK, out globalKeySetting))
                 {
                     if (globalKeySetting.RoundRobinKey)
                     {
@@ -728,17 +728,17 @@ namespace Mubox.View.Server
                 if (clientSettings.Name.Equals(client.DisplayName, StringComparison.InvariantCultureIgnoreCase))
                 {
                     Mubox.Configuration.KeySetting keySetting;
-                    if (clientSettings.Keys.TryGetKeySetting((Win32.VK)e.VK, out keySetting) && keySetting.EnableNoModActiveClient)
+                    if (clientSettings.Keys.TryGetKeySetting((WinAPI.VK)e.VK, out keySetting) && keySetting.EnableNoModActiveClient)
                     {
                         cas = (byte)e.CAS;
-                        e.CAS = (Win32.CAS)0;
+                        e.CAS = (WinAPI.CAS)0;
                     }
                 }
             }
             ForwardEventToClient(e, client);
             if (cas != 0)
             {
-                e.CAS = (Win32.CAS)cas;
+                e.CAS = (WinAPI.CAS)cas;
             }
         }
 
@@ -748,7 +748,7 @@ namespace Mubox.View.Server
             bool activeClientOnly = false;
             foreach (var item in Mubox.Configuration.MuboxConfigSection.Default.Keys.Cast<Mubox.Configuration.KeySetting>())
             {
-                if (item.ActiveClientOnly && (Win32.VK)e.VK == item.InputKey)
+                if (item.ActiveClientOnly && (WinAPI.VK)e.VK == item.InputKey)
                 {
                     activeClientOnly = true;
                     break;

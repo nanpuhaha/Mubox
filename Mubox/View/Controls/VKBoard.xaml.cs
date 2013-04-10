@@ -22,7 +22,7 @@ namespace Mubox.View.Controls
         {
             try
             {
-                Win32.VK vk = (Win32.VK)Enum.Parse(typeof(Win32.VK), (e.OriginalSource as System.Windows.Controls.Primitives.ToggleButton).Tag as string, true);
+                WinAPI.VK vk = (WinAPI.VK)Enum.Parse(typeof(WinAPI.VK), (e.OriginalSource as System.Windows.Controls.Primitives.ToggleButton).Tag as string, true);
                 Mubox.Configuration.KeySetting keySetting;
                 if (!KeySettings.TryGetKeySetting(vk, out keySetting))
                 {
@@ -41,7 +41,7 @@ namespace Mubox.View.Controls
         {
             try
             {
-                Win32.VK vk = (Win32.VK)Enum.Parse(typeof(Win32.VK), (e.OriginalSource as System.Windows.Controls.Primitives.ToggleButton).Tag as string, true);
+                WinAPI.VK vk = (WinAPI.VK)Enum.Parse(typeof(WinAPI.VK), (e.OriginalSource as System.Windows.Controls.Primitives.ToggleButton).Tag as string, true);
                 Mubox.Configuration.KeySetting keySetting;
                 if (KeySettings.TryGetKeySetting(vk, out keySetting))
                 {
@@ -78,7 +78,7 @@ namespace Mubox.View.Controls
                     {
                         Mubox.Configuration.KeySetting keySetting;
                         toggleButton.IsChecked =
-                            KeySettings.TryGetKeySetting((Win32.VK)Enum.Parse(typeof(Win32.VK), toggleButton.Tag as string, true), out keySetting)
+                            KeySettings.TryGetKeySetting((WinAPI.VK)Enum.Parse(typeof(WinAPI.VK), toggleButton.Tag as string, true), out keySetting)
                             && FilterCallback(keySetting);
                     }
                 }

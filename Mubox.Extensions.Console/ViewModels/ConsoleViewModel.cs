@@ -34,12 +34,15 @@ namespace Mubox.Extensions.Console.ViewModels
                 };
             _dispatcher.InvokeAsync(() =>
             {
-                Messages.Add(message);
-                LatestMessage = message;
-                PropertyChanged(this, new PropertyChangedEventArgs("LatestMessage"));
-                while (Messages.Count > 8192)
+                if (Messages.Count > 127)
                 {
                     Messages.RemoveAt(0);
+                }
+                Messages.Add(message);
+                LatestMessage = message;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("LatestMessage"));
                 }
             });
         }

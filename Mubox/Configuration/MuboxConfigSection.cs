@@ -116,7 +116,7 @@ namespace Mubox.Configuration
                         Debug.WriteLine("Creating Default 'Active Client Only' Keys: " + defaultActiveClientOnlyKeys);
                         foreach (string vkString in defaultActiveClientOnlyKeys.Split(','))
                         {
-                            Keys.CreateNew((Win32.VK)Enum.Parse(typeof(Win32.VK), vkString, true)).ActiveClientOnly = true;
+                            Keys.CreateNew((WinAPI.VK)Enum.Parse(typeof(WinAPI.VK), vkString, true)).ActiveClientOnly = true;
                         }
                         Save();
                     }

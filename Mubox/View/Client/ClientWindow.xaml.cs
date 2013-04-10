@@ -254,7 +254,7 @@ namespace Mubox.View.Client
                     if (myWindowHandle != IntPtr.Zero)
                     {
                         IntPtr myInputQueueThreadProcessId = IntPtr.Zero;
-                        Mubox.Win32.Threads.GetWindowThreadProcessId(myWindowHandle, out myInputQueueThreadProcessId);
+                        Mubox.WinAPI.Threads.GetWindowThreadProcessId(myWindowHandle, out myInputQueueThreadProcessId);
                         if (myInputQueueThreadProcessId != IntPtr.Zero)
                         {
                             Mubox.Control.Network.Client.MyInputQueue = myInputQueueThreadProcessId;
@@ -728,14 +728,14 @@ namespace Mubox.View.Client
                     {
                         var key = ClientState.Settings.SandboxKey;
                         var name = ClientState.NetworkClient.DisplayName;
-                        ClientState.Sandbox = Win32.SandboxApi.SafeCreateSandbox(name, key);
+                        ClientState.Sandbox = WinAPI.SandboxApi.SafeCreateSandbox(name, key);
                         ClientState.Settings.SandboxKey = key;
                         Mubox.Configuration.MuboxConfigSection.Default.Save();
                     }
 
                     lock (_global_process_launch_lock)
                     {
-                        this.ClientState.GameProcess = Win32.SandboxApi.LaunchProcess(
+                        this.ClientState.GameProcess = WinAPI.SandboxApi.LaunchProcess(
                             ClientState.Sandbox,
                             ApplicationLaunchPath,
                             ClientState.Settings.ApplicationArguments,
@@ -743,7 +743,7 @@ namespace Mubox.View.Client
                         
                         System.Threading.Thread.Sleep(250);
 
-                        Win32.SandboxApi.TryFixMultilaunch(
+                        WinAPI.SandboxApi.TryFixMultilaunch(
                             ClientState.Sandbox, 
                             ApplicationLaunchPath);
                     }
@@ -793,7 +793,7 @@ namespace Mubox.View.Client
                 {
                     if (!System.IO.Directory.Exists(target))
                     {
-                        Win32.IsolationApi.CreateFolder(target, directory);
+                        WinAPI.IsolationApi.CreateFolder(target, directory);
                     }
                 }
             }
@@ -1050,9 +1050,9 @@ namespace Mubox.View.Client
             foreach (var keySetting in this.ClientState.Settings.Keys.OfType<Configuration.KeySetting>())
             {
                 hasInitializedFtlButtonState = false;
-                checkCASControl.IsChecked = (keySetting.OutputModifiers & Win32.CAS.CONTROL) == Win32.CAS.CONTROL;
-                checkCASAlt.IsChecked = (keySetting.OutputModifiers & Win32.CAS.ALT) == Win32.CAS.ALT;
-                checkCASShift.IsChecked = (keySetting.OutputModifiers & Win32.CAS.SHIFT) == Win32.CAS.SHIFT;
+                checkCASControl.IsChecked = (keySetting.OutputModifiers & WinAPI.CAS.CONTROL) == WinAPI.CAS.CONTROL;
+                checkCASAlt.IsChecked = (keySetting.OutputModifiers & WinAPI.CAS.ALT) == WinAPI.CAS.ALT;
+                checkCASShift.IsChecked = (keySetting.OutputModifiers & WinAPI.CAS.SHIFT) == WinAPI.CAS.SHIFT;
                 checkNoModActiveClient.IsChecked = keySetting.EnableNoModActiveClient;
                 break;
             }
@@ -1062,31 +1062,31 @@ namespace Mubox.View.Client
                 (keySetting) =>
                 {
                     return
-                        (checkCASControl.IsChecked.GetValueOrDefault(default(bool)) && ((keySetting.OutputModifiers & Win32.CAS.CONTROL) == Win32.CAS.CONTROL)) ||
-                        (checkCASAlt.IsChecked.GetValueOrDefault(default(bool)) && ((keySetting.OutputModifiers & Win32.CAS.ALT) == Win32.CAS.ALT)) ||
-                        (checkCASShift.IsChecked.GetValueOrDefault(default(bool)) && ((keySetting.OutputModifiers & Win32.CAS.SHIFT) == Win32.CAS.SHIFT)) ||
+                        (checkCASControl.IsChecked.GetValueOrDefault(default(bool)) && ((keySetting.OutputModifiers & WinAPI.CAS.CONTROL) == WinAPI.CAS.CONTROL)) ||
+                        (checkCASAlt.IsChecked.GetValueOrDefault(default(bool)) && ((keySetting.OutputModifiers & WinAPI.CAS.ALT) == WinAPI.CAS.ALT)) ||
+                        (checkCASShift.IsChecked.GetValueOrDefault(default(bool)) && ((keySetting.OutputModifiers & WinAPI.CAS.SHIFT) == WinAPI.CAS.SHIFT)) ||
                         (checkNoModActiveClient.IsChecked.GetValueOrDefault(default(bool)) && keySetting.EnableNoModActiveClient);
                 },
                 (keySetting) =>
                 {
-                    keySetting.OutputModifiers = (Win32.CAS)0;
+                    keySetting.OutputModifiers = (WinAPI.CAS)0;
                     if (checkCASControl.IsChecked.GetValueOrDefault(default(bool)))
                     {
-                        keySetting.OutputModifiers |= Win32.CAS.CONTROL;
+                        keySetting.OutputModifiers |= WinAPI.CAS.CONTROL;
                     }
                     if (checkCASAlt.IsChecked.GetValueOrDefault(default(bool)))
                     {
-                        keySetting.OutputModifiers |= Win32.CAS.ALT;
+                        keySetting.OutputModifiers |= WinAPI.CAS.ALT;
                     }
                     if (checkCASShift.IsChecked.GetValueOrDefault(default(bool)))
                     {
-                        keySetting.OutputModifiers |= Win32.CAS.SHIFT;
+                        keySetting.OutputModifiers |= WinAPI.CAS.SHIFT;
                     }
                     keySetting.EnableNoModActiveClient = checkNoModActiveClient.IsChecked.GetValueOrDefault(default(bool));
                 },
                 (keySetting) =>
                 {
-                    keySetting.OutputModifiers = (Win32.CAS)0;
+                    keySetting.OutputModifiers = (WinAPI.CAS)0;
                     keySetting.EnableNoModActiveClient = false;
                 });
         }
@@ -1101,18 +1101,18 @@ namespace Mubox.View.Client
             }
             foreach (var keySetting in this.ClientState.Settings.Keys.OfType<Configuration.KeySetting>())
             {
-                keySetting.OutputModifiers = (Win32.CAS)0;
+                keySetting.OutputModifiers = (WinAPI.CAS)0;
                 if (checkCASControl.IsChecked.GetValueOrDefault(default(bool)))
                 {
-                    keySetting.OutputModifiers |= Win32.CAS.CONTROL;
+                    keySetting.OutputModifiers |= WinAPI.CAS.CONTROL;
                 }
                 if (checkCASAlt.IsChecked.GetValueOrDefault(default(bool)))
                 {
-                    keySetting.OutputModifiers |= Win32.CAS.ALT;
+                    keySetting.OutputModifiers |= WinAPI.CAS.ALT;
                 }
                 if (checkCASShift.IsChecked.GetValueOrDefault(default(bool)))
                 {
-                    keySetting.OutputModifiers |= Win32.CAS.SHIFT;
+                    keySetting.OutputModifiers |= WinAPI.CAS.SHIFT;
                 }
                 keySetting.EnableNoModActiveClient = checkNoModActiveClient.IsChecked.GetValueOrDefault(default(bool));
             }
@@ -1128,7 +1128,7 @@ namespace Mubox.View.Client
             }
             foreach (var keySetting in this.ClientState.Settings.Keys.OfType<Configuration.KeySetting>())
             {
-                keySetting.OutputModifiers = (Win32.CAS)0;
+                keySetting.OutputModifiers = (WinAPI.CAS)0;
                 keySetting.EnableNoModActiveClient = false;
             }
             Mubox.Configuration.MuboxConfigSection.Default.Save();

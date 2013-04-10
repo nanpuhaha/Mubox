@@ -156,7 +156,7 @@ namespace Mubox.Model.Client
         #endregion
         public static string Sanitize(string text)
         {
-            byte[] textBytes = Win32.CodePage.ConvertToCodePage(text, 1251);
+            byte[] textBytes = WinAPI.CodePage.ConvertToCodePage(text, 1251);
             text = System.Text.Encoding.ASCII.GetString(textBytes);
             if (string.IsNullOrEmpty(text))
             {
@@ -191,7 +191,7 @@ namespace Mubox.Model.Client
         #endregion
         #region CachedScreenFromClientRect
 
-        public Win32.Windows.RECT CachedScreenFromClientRect { get; set; }
+        public WinAPI.Windows.RECT CachedScreenFromClientRect { get; set; }
 
         public DateTime CachedScreenFromClientRectExpiry { get; set; }
 
@@ -254,8 +254,8 @@ namespace Mubox.Model.Client
 
         public virtual void Dispatch(ushort vk)
         {
-            Dispatch(new KeyboardInput { WM = Mubox.Win32.WM.KEYDOWN, VK = vk, Time = Win32.SendInputApi.GetTickCount() });
-            Dispatch(new KeyboardInput { WM = Mubox.Win32.WM.KEYUP, VK = vk, Time = Win32.SendInputApi.GetTickCount() });
+            Dispatch(new KeyboardInput { WM = Mubox.WinAPI.WM.KEYDOWN, VK = vk, Time = WinAPI.SendInputApi.GetTickCount() });
+            Dispatch(new KeyboardInput { WM = Mubox.WinAPI.WM.KEYUP, VK = vk, Time = WinAPI.SendInputApi.GetTickCount() });
         }
 
         private void Dispatch(IEnumerable<ushort> vkSet)
