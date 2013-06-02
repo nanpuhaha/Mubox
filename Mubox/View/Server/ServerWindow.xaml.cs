@@ -1,4 +1,9 @@
-﻿using System;
+﻿using Mubox.Configuration;
+using Mubox.Extensibility;
+using Mubox.Model;
+using Mubox.Model.Client;
+using Mubox.Model.Input;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -7,10 +12,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
-using Mubox.Configuration;
-using Mubox.Model;
-using Mubox.Model.Client;
-using Mubox.Model.Input;
 
 // TODO the horrible naming conventions, such as "Mouse_AbsoluteMovement_Screen_Resolution_UpdateTimestampTicks" represent code that should be factored into domain objects.
 
@@ -160,11 +161,34 @@ namespace Mubox.View.Server
                     case WinAPI.WM.LBUTTONDOWN:
                     case WinAPI.WM.RBUTTONDOWN:
                     case WinAPI.WM.MBUTTONDOWN:
-                    case WinAPI.WM.XBUTTONDOWN:                    
+                    case WinAPI.WM.XBUTTONDOWN:
                         if (!mouseButtonInfo.IsDown)
                         {
                             mouseButtonInfo.IsClick = false;
-                            mouseButtonInfo.IsDoubleClick = false;
+                            mouseButtonInfo.IsDoubleClick =
+                                // within buffer timestamp for a second down/up transition to be interpretted as a double-click
+                                (DateTime.Now.Ticks <= mouseButtonInfo.LastClickTimestamp.AddMilliseconds(Mubox.Configuration.MuboxConfigSection.Default.ClickBufferMilliseconds).Ticks)
+                                // and last click event was not also a double-click event
+                                && mouseButtonInfo.LastDoubleClickTimestamp != mouseButtonInfo.LastClickTimestamp;
+                            if (mouseButtonInfo.IsDoubleClick)
+                            {
+                                // translate message
+                                switch (e.WM)
+                                {
+                                    case WinAPI.WM.LBUTTONDOWN:
+                                        e.WM = WinAPI.WM.LBUTTONDBLCLK;
+                                        break;
+                                    case WinAPI.WM.RBUTTONDOWN:
+                                        e.WM = WinAPI.WM.RBUTTONDBLCLK;
+                                        break;
+                                    case WinAPI.WM.MBUTTONDOWN:
+                                        e.WM = WinAPI.WM.MBUTTONDBLCLK;
+                                        break;
+                                    case WinAPI.WM.XBUTTONDOWN:
+                                        e.WM = WinAPI.WM.XBUTTONDBLCLK;
+                                        break;
+                                }
+                            }
                             mouseButtonInfo.LastDownTimestamp = dateTimeNow;
                         }
                         break;
@@ -180,45 +204,22 @@ namespace Mubox.View.Server
                     case WinAPI.WM.XBUTTONUP:
                         if (mouseButtonInfo.IsDown)
                         {
-                            var isClick =
-                                // within buffer timestamp for down/up transition to be interpretted as a click
-                                dateTimeNow.Ticks <= mouseButtonInfo.LastDownTimestamp.AddMilliseconds(Mubox.Configuration.MuboxConfigSection.Default.MouseBufferMilliseconds).Ticks;
-                            mouseButtonInfo.IsClick = isClick;
-                            if (isClick)
+                            mouseButtonInfo.IsClick =
+                                // within buffer timestamp for down/up transition to be interpretted as a 'click' gesture
+                                dateTimeNow.Ticks <= mouseButtonInfo.LastDownTimestamp.AddMilliseconds(Mubox.Configuration.MuboxConfigSection.Default.ClickBufferMilliseconds).Ticks;
+                            if (mouseButtonInfo.IsClick)
                             {
-                                var isDoubleClick =
-                                    // within buffer timestamp for a second down/up transition to be interpretted as a double-click
-                                    (DateTime.Now.Ticks <= mouseButtonInfo.LastClickTimestamp.AddMilliseconds(Mubox.Configuration.MuboxConfigSection.Default.MouseBufferMilliseconds).Ticks)
-                                    // and last click event was not also a double-click event
-                                    && mouseButtonInfo.LastDoubleClickTimestamp != mouseButtonInfo.LastClickTimestamp;
-                                mouseButtonInfo.IsDoubleClick = isDoubleClick;
-                                if (isDoubleClick)
+                                if (mouseButtonInfo.IsDoubleClick)
                                 {
-                                    switch (e.WM)
-                                    {
-                                        case WinAPI.WM.LBUTTONUP:
-                                            e.WM = WinAPI.WM.LBUTTONDBLCLK;
-                                            MouseInputHook_MouseInputReceived(sender, e);
-                                            e.WM = WinAPI.WM.LBUTTONUP;
-                                            break;
-                                        case WinAPI.WM.RBUTTONUP:
-                                            e.WM = WinAPI.WM.RBUTTONDBLCLK;
-                                            MouseInputHook_MouseInputReceived(sender, e);
-                                            e.WM = WinAPI.WM.RBUTTONUP;
-                                            break;
-                                        case WinAPI.WM.MBUTTONUP:
-                                            e.WM = WinAPI.WM.MBUTTONDBLCLK;
-                                            MouseInputHook_MouseInputReceived(sender, e);
-                                            e.WM = WinAPI.WM.MBUTTONUP;
-                                            break;
-                                        case WinAPI.WM.XBUTTONUP:
-                                            e.WM = WinAPI.WM.XBUTTONDBLCLK;
-                                            MouseInputHook_MouseInputReceived(sender, e);
-                                            e.WM = WinAPI.WM.XBUTTONUP;
-                                            break;
-                                    }
+                                    ("** DOUBLE-CLICK - UP **").Log();
+                                    mouseButtonInfo.IsDoubleClick = false;
                                     mouseButtonInfo.LastDoubleClickTimestamp = dateTimeNow;
                                 }
+                                else
+                                {
+                                    ("** CLICK - UP **").Log();
+                                }
+                                mouseButtonInfo.IsClick = false;
                                 mouseButtonInfo.LastClickTimestamp = dateTimeNow;
                             }
                             mouseButtonInfo.LastUpTimestamp = dateTimeNow;

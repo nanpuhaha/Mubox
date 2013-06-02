@@ -242,18 +242,17 @@ namespace Mubox.View
                                 quickLaunchMenuItems.Add(menuItem);
                             }
                             {
-                                // "Mouse Buffer" Option
+                                // "Click Buffer" Option
                                 List<MenuItem> mouseClickBufferMenu = new List<MenuItem>();
 
                                 foreach (double time in new double[] { 0.0, 100.0, 150.0, 200.0, 250.0, 500.0, 750.0, 1000.0 })
                                 {
-                                    // "Disabled"
                                     CreateMouseBufferMenuItem(menuItem, mouseClickBufferMenu, time);
                                 }
 
                                 menuItem = new MenuItem();
-                                menuItem.Header = "Mouse Buffer";
-                                menuItem.ToolTip = "Mouse Buffer prevents Mouse Movement from interrupting a Click gesture.";
+                                menuItem.Header = "Click Buffer";
+                                menuItem.ToolTip = "Click Buffer prevents Mouse Movement from interrupting a Click gesture.";
                                 menuItem.ItemsSource = mouseClickBufferMenu;
                                 quickLaunchMenuItems.Add(menuItem);
                             }
@@ -433,10 +432,10 @@ namespace Mubox.View
         {
             menuItem = new MenuItem();
             menuItem.IsCheckable = true;
-            menuItem.IsChecked = Mubox.Configuration.MuboxConfigSection.Default.MouseBufferMilliseconds == time;
+            menuItem.IsChecked = Mubox.Configuration.MuboxConfigSection.Default.ClickBufferMilliseconds == time;
             menuItem.Click += (sender, e) =>
             {
-                Mubox.Configuration.MuboxConfigSection.Default.MouseBufferMilliseconds = time;
+                Mubox.Configuration.MuboxConfigSection.Default.ClickBufferMilliseconds = time;
                 Mubox.Configuration.MuboxConfigSection.Default.Save();
             };
             menuItem.Header = time == 0.0 ? "Disabled" : ((int)time).ToString() + "ms";

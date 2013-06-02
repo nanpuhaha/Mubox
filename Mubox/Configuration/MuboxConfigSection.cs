@@ -54,7 +54,7 @@ namespace Mubox.Configuration
         }
 
         [ConfigurationProperty("MouseBufferMilliseconds", IsRequired = false, DefaultValue = 500.0)]
-        public double MouseBufferMilliseconds
+        public double ClickBufferMilliseconds
         {
             get { return (double)base["MouseBufferMilliseconds"]; }
             set { base["MouseBufferMilliseconds"] = value; }
