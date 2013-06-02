@@ -23,5 +23,14 @@ namespace Mubox.Extensibility
                 Handler(sender, args);
             }
         }
+
+        public override object InitializeLifetimeService()
+        {
+            var lease = (System.Runtime.Remoting.Lifetime.ILease)base.InitializeLifetimeService();
+            lease.InitialLeaseTime = TimeSpan.FromHours(1);
+            lease.RenewOnCallTime = TimeSpan.FromHours(1);
+            lease.SponsorshipTimeout = TimeSpan.FromHours(1);
+            return lease;
+        }
     }
 }
