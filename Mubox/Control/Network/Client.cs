@@ -274,7 +274,6 @@ namespace Mubox.Control.Network
             // translate message and track MK changes
             WinAPI.WM wm = WinAPI.WM.USER;
             bool isButtonUpEvent = false;
-            ushort wheelDelta = 0;
 
             // strip 'absolute' flag from mask and process result
             switch ((mouseInput.Flags | WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE) ^ WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE)
@@ -313,7 +312,6 @@ namespace Mubox.Control.Network
                     wm = WinAPI.WM.XBUTTONDOWN;
                     {
                         var xbutton = WinAPI.MACROS.GET_XBUTTON_WPARAM(mouseInput.MouseData);
-                        wheelDelta = (ushort)xbutton;
                         switch (xbutton)
                         {
                             case WinAPI.MACROS.XBUTTONS.XBUTTON1:
@@ -333,7 +331,6 @@ namespace Mubox.Control.Network
                     isButtonUpEvent = true;
                     {
                         var xbutton = WinAPI.MACROS.GET_XBUTTON_WPARAM(mouseInput.MouseData);
-                        wheelDelta = (ushort)xbutton;
                         switch (xbutton)
                         {
                             case WinAPI.MACROS.XBUTTONS.XBUTTON1:
@@ -349,15 +346,13 @@ namespace Mubox.Control.Network
                     }
                     break;
                 case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_WHEEL:
-                    wheelDelta = WinAPI.MACROS.HIWORD(mouseInput.MouseData);
+                case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_HWHEEL:
                     wm = WinAPI.WM.MOUSEWHEEL;
                     break;
                 default:
                     wm = mouseInput.WM;
                     break;
             }
-
-            mouseInput.MouseData = WinAPI.MACROS.MAKEWPARAM((ushort)CurrentMK, wheelDelta);
 
             // no target window? can't use
             if (WindowHandle == IntPtr.Zero)
