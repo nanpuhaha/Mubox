@@ -113,8 +113,8 @@ namespace Mubox.Control.Network
             catch (Exception ex)
             {
                 IsListening = false;
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                //Debug.WriteLine(ex.Message);
+                //Debug.WriteLine(ex.StackTrace);
             }
         }
 
