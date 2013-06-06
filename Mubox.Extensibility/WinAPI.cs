@@ -2393,6 +2393,7 @@ namespace Mubox
                 MOUSEEVENTF_XDOWN = 0x0080,
                 MOUSEEVENTF_XUP = 0x0100,
                 MOUSEEVENTF_WHEEL = 0x0800,
+                MOUSEEVENTF_HWHEEL = 0x1000,
                 MOUSEEVENTF_VIRTUALDESK = 0x4000,
                 MOUSEEVENTF_ABSOLUTE = 0x8000
             }
