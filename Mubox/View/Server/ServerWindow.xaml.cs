@@ -211,13 +211,8 @@ namespace Mubox.View.Server
                             {
                                 if (mouseButtonInfo.IsDoubleClick)
                                 {
-                                    ("** DOUBLE-CLICK - UP **").Log();
                                     mouseButtonInfo.IsDoubleClick = false;
                                     mouseButtonInfo.LastDoubleClickTimestamp = dateTimeNow;
-                                }
-                                else
-                                {
-                                    ("** CLICK - UP **").Log();
                                 }
                                 mouseButtonInfo.IsClick = false;
                                 mouseButtonInfo.LastClickTimestamp = dateTimeNow;
