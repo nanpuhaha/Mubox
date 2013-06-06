@@ -127,8 +127,8 @@ namespace Mubox.Control.Network
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                //Debug.WriteLine(ex.Message);
+                //Debug.WriteLine(ex.StackTrace);
             }
         }
 
@@ -767,7 +767,7 @@ namespace Mubox.Control.Network
                 WinAPI.Windows.SendMessage(_windowHandle, WinAPI.WM.MOUSEMOVE, new UIntPtr((uint)CurrentMK), new UIntPtr(clientRelativeCoordinates));
                 WinAPI.Windows.SendMessage(_windowHandle, WinAPI.WM.MOUSEACTIVATE, _windowHandle, new UIntPtr(WinAPI.MACROS.MAKELPARAM((ushort)wm, (ushort)WinAPI.HitTestValues.HTCLIENT)));
                 WinAPI.Windows.SendMessage(_windowHandle, wm, new UIntPtr(mouseData), new UIntPtr(clientRelativeCoordinates));
-                Debug.WriteLine("OnMouseEvent SendMessage(" + _windowHandle.ToString() + ", " + wm + ", " + mouseData + ", " + clientRelativeCoordinates + ", " + pointX + ", " + pointY + ", " + lPointX + ", " + lPointY + ", (" + CurrentMK + "), " + isButtonUpEvent);
+                //Debug.WriteLine("OnMouseEvent SendMessage(" + _windowHandle.ToString() + ", " + wm + ", " + mouseData + ", " + clientRelativeCoordinates + ", " + pointX + ", " + pointY + ", " + lPointX + ", " + lPointY + ", (" + CurrentMK + "), " + isButtonUpEvent);
                 //Win32.Cursor.ReleaseCapture();
             }
         }
