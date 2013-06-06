@@ -43,12 +43,12 @@
         <Button Style="{DynamicResource MuboxButtonStyle}" Height="19" HorizontalAlignment="Right" Margin="0,0,63,9" x:Name="buttonStartServer" VerticalAlignment="Bottom" Width="45" Click="buttonStartServer_Click" Content="Start" ToolTip="Click this Button to Start or Stop accepting Client connections" Visibility="Hidden"/>
         <TextBox FontSize="10" Margin="0,0,114,9" x:Name="textListenPort" Text="17520" Height="19" VerticalAlignment="Bottom" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                  ToolTip="This is the Port Number that the Server allows Clients to connect to" TextChanged="textListenPort_TextChanged" HorizontalAlignment="Right" Width="48" Visibility="Hidden" />
-        <Canvas Margin="-1,-4,338,171" RenderTransformOrigin="0.5,0.5">
+        <Canvas Margin="-5,-4,342,171" RenderTransformOrigin="0.5,0.5">
             <Canvas.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
                     <SkewTransform/>
-                    <RotateTransform Angle="-7.573"/>
+                    <RotateTransform Angle="-9"/>
                     <TranslateTransform/>
                 </TransformGroup>
             </Canvas.RenderTransform>
