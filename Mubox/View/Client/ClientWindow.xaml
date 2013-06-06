@@ -7,6 +7,7 @@
         ResizeMode="CanMinimize" ShowInTaskbar="True"
         Loaded="Window_Loaded" WindowStyle="SingleBorderWindow" WindowStartupLocation="CenterScreen" Topmost="True" xmlns:my="clr-namespace:Mubox.View.Controls">
     <Grid>
+        <Button Margin="0,0,12,19" Name="buttonLaunchApplication" ToolTip="Launches a Copy of WoW and Auto-Selects it for Window Activation" Click="buttonLaunchApplication_Click" HorizontalAlignment="Right" Width="75" Height="23" VerticalAlignment="Bottom">Launch</Button>
         <Grid Margin="12,0,93,12" Name="grid1" Height="55" VerticalAlignment="Bottom">
             <Border BorderBrush="Black" Background="Gainsboro" CornerRadius="3">
                 <TextBlock TextWrapping="WrapWithOverflow"  Padding="0" Margin="0" x:Name="textStatus" />
@@ -93,6 +94,5 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <Button Margin="0,0,12,19" Name="buttonLaunchApplication" ToolTip="Launches a Copy of WoW and Auto-Selects it for Window Activation" Click="buttonLaunchApplication_Click" HorizontalAlignment="Right" Width="75" Height="23" VerticalAlignment="Bottom">Launch</Button>
     </Grid>
 </Window>
