@@ -102,8 +102,8 @@ namespace Mubox.Control.Network
                 }
                 catch (Exception lex)
                 {
-                    Debug.WriteLine(lex.Message);
-                    Debug.WriteLine(lex.StackTrace);
+                    //Debug.WriteLine(lex.Message);
+                    //Debug.WriteLine(lex.StackTrace);
                 }
                 finally
                 {
