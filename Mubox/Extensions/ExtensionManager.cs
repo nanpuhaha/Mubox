@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Mubox.Extensibility;
 
 namespace Mubox.Extensions
 {
@@ -139,16 +140,41 @@ namespace Mubox.Extensions
         void Server_ClientAccepted(object sender, Control.Network.Server.ServerEventArgs e)
         {
             e.Client.IsAttachedChanged += Client_IsAttachedChanged;
-            var client = new Extensibility.MuboxClientBridge
+            var name = "";
+            e.Client.Dispatcher.Invoke((Action)delegate()
             {
-                Name = "",
+                name = e.Client.DisplayName;
+            });
+            var client = new Extensibility.MuboxClientBridge(
+                (ke) => {
+                    e.Client.Dispatch(new Model.Input.KeyboardInput
+                    {
+                        CAS = ke.CAS,
+                        VK = (uint)ke.VK,
+                        WM = ke.WM,                        
+                    });
+                },
+                (me) => {
+                    e.Client.Dispatch(new Model.Input.MouseInput
+                    {
+                        // MouseData                        
+                        Flags = me.Flags,
+                        IsAbsolute = me.IsAbsolute,
+                        Time = me.Time,
+                        WM = me.WM,
+                        Point = new System.Windows.Point
+                        {
+                            X = me.X,
+                            Y = me.Y,
+                        },
+                    });
+                })
+            {
+                Name = name,
             };
             e.Client.DisplayNameChanged += (dnc_s, dnc_e) =>
             {
-                //System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                //{
-                    client.Name = (dnc_s as Mubox.Model.Client.ClientBase).DisplayName;
-                //});
+                client.Name = (dnc_s as Mubox.Model.Client.ClientBase).DisplayName;
             };
             _clients.Add(client);
             _extensions.Values.ToList()

@@ -39,5 +39,17 @@ namespace Mubox.Extensibility
         /// <para>Raised when Mubox 'detaches' from a game process, i.e. Game Exited</para>
         /// </summary>
         event EventHandler<ClientEventArgs> Detached;
+
+        /// <summary>
+        /// <para>Allows an extension to generate Keyboard Input events.</para>
+        /// </summary>
+        /// <param name="e">Input.KeyboardEventArgs</param>
+        void KeyboardEvent(Input.KeyboardEventArgs e);
+
+        /// <summary>
+        /// <para>Allows an extension to generate Mouse Input events.</para>
+        /// </summary>
+        /// <param name="e">Input.KeyboardEventArgs</param>
+        void MouseEvent(Input.MouseEventArgs e);
     }
 }

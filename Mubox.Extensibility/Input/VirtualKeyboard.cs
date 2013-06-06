@@ -26,5 +26,15 @@ namespace Mubox.Extensibility.Input
                 InputReceived(sender, e);
             }
         }
+
+        public void SendInput(KeyboardEventArgs e)
+        {
+            _muboxClientBridge.KeyboardEvent(e);
+        }
+
+        public void SendInput(MouseEventArgs e)
+        {
+            _muboxClientBridge.MouseEvent(e);
+        }
     }
 }

@@ -9,8 +9,12 @@ namespace Mubox.Extensibility
     public class MuboxClientBridge
         : MarshalByRefObject, IMuboxClient
     {
-        public MuboxClientBridge()
+        public MuboxClientBridge(
+            Action<Input.KeyboardEventArgs> onKeyboardEventRequest,
+            Action<Input.MouseEventArgs> onMouseEventRequest)
         {
+            _raiseKeyboardEvent = onKeyboardEventRequest;
+            _raiseMouseEvent = onMouseEventRequest;
             Keyboard = new Input.VirtualKeyboard(this);
             Mouse = new Input.VirtualMouse(this);
         }
@@ -53,6 +57,25 @@ namespace Mubox.Extensibility
             lease.RenewOnCallTime = TimeSpan.FromHours(1);
             lease.SponsorshipTimeout = TimeSpan.FromHours(1);
             return lease;
+        }
+
+        public Action<Input.KeyboardEventArgs> _raiseKeyboardEvent;
+        public Action<Input.MouseEventArgs> _raiseMouseEvent;
+
+        public void KeyboardEvent(Input.KeyboardEventArgs e)
+        {
+            if (_raiseKeyboardEvent != null)
+            {
+                _raiseKeyboardEvent(e);
+            }
+        }
+
+        public void MouseEvent(Input.MouseEventArgs e)
+        {
+            if (_raiseMouseEvent != null)
+            {
+                _raiseMouseEvent(e);
+            }
         }
     }
 }
