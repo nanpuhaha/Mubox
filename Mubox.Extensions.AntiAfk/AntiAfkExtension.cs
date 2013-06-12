@@ -25,6 +25,7 @@ namespace Mubox.Extensions.AntiAfk
         {
             "AntiAfk::OnLoad".Log();
             _mubox = mubox;
+            (_mubox as MarshalByRefObject).GetLifetimeService();
 
             _onActiveClientChanged = new ProxyEventHandler<ClientEventArgs>(_mubox_ActiveClientChanged);
             _mubox.ActiveClientChanged += _onActiveClientChanged.Proxy;
@@ -60,7 +61,7 @@ namespace Mubox.Extensions.AntiAfk
 
         public void Keyboard_InputReceived(object sender, Extensibility.Input.KeyboardEventArgs e)
         {
-            _lastInputTimestamp = DateTime.UtcNow.Ticks;
+             _lastInputTimestamp = DateTime.UtcNow.Ticks;
         }
 
         public void Mouse_InputReceived(object sender, Extensibility.Input.MouseEventArgs e)
@@ -93,51 +94,33 @@ namespace Mubox.Extensions.AntiAfk
             {
                 while (!_exitYet)
                 {
-                    Thread.Sleep(90 * 1000); // TODO: make configurable
-                    if (_lastInputTimestamp < DateTime.UtcNow.AddSeconds(-60).Ticks)
+                    var waitTimeSeconds = 120.0; // TODO: make configurable
+                    Thread.Sleep((int)(waitTimeSeconds * 1000));
+                    if (_lastInputTimestamp < DateTime.UtcNow.AddSeconds(-2 * (waitTimeSeconds / 3.0)).Ticks)
                     {
                         "Mubox AntiAfk - Keeping you there.".Log();
-                        foreach (var client in _mubox.Clients)
+                        foreach (var client in _mubox.Clients) 
                         {
                             // TODO: make anti-afk 'method' configurable - the following is most broadly compatible for when you're actually not using a particular client - it may still create side effects for some games
                             // TODO: choose 'anti afk strategy' based on game profile?
-                            client.KeyboardEvent(new Extensibility.Input.KeyboardEventArgs
-                            {
-                                CAS = WinAPI.CAS.CONTROL,
-                                WM = WinAPI.WM.KEYDOWN,
-                            });
-                            Thread.Sleep(50);
-                            client.KeyboardEvent(new Extensibility.Input.KeyboardEventArgs
-                            {
-                                CAS = WinAPI.CAS.CONTROL,
-                                WM = WinAPI.WM.KEYUP,
-                            });
-                            Thread.Sleep(50);
+
+                            //client.KeyboardEvent(new Extensibility.Input.KeyboardEventArgs
+                            //{
+                            //    CAS = WinAPI.CAS.CONTROL,
+                            //    WM = WinAPI.WM.KEYDOWN,
+                            //});
+                            //Thread.Sleep(50);
+                            //client.KeyboardEvent(new Extensibility.Input.KeyboardEventArgs
+                            //{
+                            //    CAS = WinAPI.CAS.CONTROL,
+                            //    WM = WinAPI.WM.KEYUP,
+                            //});
+                            //Thread.Sleep(50);
+
                             // more invasive approach, 'tap' forward, then 'tap' backward (ideally fast enough nobody really sees it - not ideal)
-                            client.KeyboardEvent(new Extensibility.Input.KeyboardEventArgs
-                            {
-                                VK = WinAPI.VK.W,
-                                WM = WinAPI.WM.KEYDOWN,
-                            });
-                            Thread.Sleep(10);
-                            client.KeyboardEvent(new Extensibility.Input.KeyboardEventArgs
-                            {
-                                VK = WinAPI.VK.W,
-                                WM = WinAPI.WM.KEYUP,
-                            });
-                            Thread.Sleep(10);
-                            client.KeyboardEvent(new Extensibility.Input.KeyboardEventArgs
-                            {
-                                VK = WinAPI.VK.S,
-                                WM = WinAPI.WM.KEYDOWN,
-                            });
-                            Thread.Sleep(10);
-                            client.KeyboardEvent(new Extensibility.Input.KeyboardEventArgs
-                            {
-                                VK = WinAPI.VK.S,
-                                WM = WinAPI.WM.KEYUP,
-                            });
-                            Thread.Sleep(1000);
+                            client.KeyPress(WinAPI.VK.W);
+                            Thread.Sleep(100);
+                            client.KeyPress(WinAPI.VK.S);
                         }
                     }
                 }
@@ -148,11 +131,13 @@ namespace Mubox.Extensions.AntiAfk
             }
         }
 
-        void OnWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        public override object InitializeLifetimeService()
         {
-            // prevent closing unless OnUnload() has been called
-            e.Cancel = !_exitYet;
-            ("AntiAfk::OnUnload Cancelled=" + e.Cancel).Log();
-        }    
+            var lease = (System.Runtime.Remoting.Lifetime.ILease)base.InitializeLifetimeService();
+            lease.InitialLeaseTime = TimeSpan.FromHours(12);
+            lease.RenewOnCallTime = TimeSpan.FromHours(12);
+            lease.SponsorshipTimeout = TimeSpan.FromHours(12);
+            return lease;
+        }
     }
 }
