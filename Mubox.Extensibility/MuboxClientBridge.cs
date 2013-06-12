@@ -10,11 +10,11 @@ namespace Mubox.Extensibility
         : MarshalByRefObject, IMuboxClient
     {
         public MuboxClientBridge(
-            Action<Input.KeyboardEventArgs> onKeyboardEventRequest,
-            Action<Input.MouseEventArgs> onMouseEventRequest)
+            Action<WinAPI.VK> onDoKeyPress,
+            Action<Input.MouseEventArgs> onDoMouseClick)
         {
-            _raiseKeyboardEvent = onKeyboardEventRequest;
-            _raiseMouseEvent = onMouseEventRequest;
+            _doKeyPress = onDoKeyPress;
+            _doMouseClick = onDoMouseClick;
             Keyboard = new Input.VirtualKeyboard(this);
             Mouse = new Input.VirtualMouse(this);
         }
@@ -53,28 +53,28 @@ namespace Mubox.Extensibility
         public override object InitializeLifetimeService()
         {
             var lease = (System.Runtime.Remoting.Lifetime.ILease)base.InitializeLifetimeService();
-            lease.InitialLeaseTime = TimeSpan.FromHours(1);
-            lease.RenewOnCallTime = TimeSpan.FromHours(1);
-            lease.SponsorshipTimeout = TimeSpan.FromHours(1);
+            lease.InitialLeaseTime = TimeSpan.FromHours(12);
+            lease.RenewOnCallTime = TimeSpan.FromHours(12);
+            lease.SponsorshipTimeout = TimeSpan.FromHours(12);
             return lease;
         }
 
-        public Action<Input.KeyboardEventArgs> _raiseKeyboardEvent;
-        public Action<Input.MouseEventArgs> _raiseMouseEvent;
+        public Action<WinAPI.VK> _doKeyPress;
+        public Action<Input.MouseEventArgs> _doMouseClick;
 
-        public void KeyboardEvent(Input.KeyboardEventArgs e)
+        public void KeyPress(WinAPI.VK key)
         {
-            if (_raiseKeyboardEvent != null)
+            if (_doKeyPress != null)
             {
-                _raiseKeyboardEvent(e);
+                _doKeyPress(key);
             }
         }
 
         public void MouseEvent(Input.MouseEventArgs e)
         {
-            if (_raiseMouseEvent != null)
+            if (_doMouseClick != null)
             {
-                _raiseMouseEvent(e);
+                _doMouseClick(e);
             }
         }
     }

@@ -27,14 +27,23 @@ namespace Mubox.Extensibility.Input
             }
         }
 
-        public void SendInput(KeyboardEventArgs e)
+        public void SendInput(WinAPI.VK key)
         {
-            _muboxClientBridge.KeyboardEvent(e);
+            _muboxClientBridge.KeyPress(key);
         }
 
         public void SendInput(MouseEventArgs e)
         {
             _muboxClientBridge.MouseEvent(e);
+        }
+
+        public override object InitializeLifetimeService()
+        {
+            var lease = (System.Runtime.Remoting.Lifetime.ILease)base.InitializeLifetimeService();
+            lease.InitialLeaseTime = TimeSpan.FromHours(12);
+            lease.RenewOnCallTime = TimeSpan.FromHours(12);
+            lease.SponsorshipTimeout = TimeSpan.FromHours(12);
+            return lease;
         }
     }
 }

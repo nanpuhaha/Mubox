@@ -44,7 +44,7 @@ namespace Mubox.Extensibility
         /// <para>Allows an extension to generate Keyboard Input events.</para>
         /// </summary>
         /// <param name="e">Input.KeyboardEventArgs</param>
-        void KeyboardEvent(Input.KeyboardEventArgs e);
+        void KeyPress(WinAPI.VK key);
 
         /// <summary>
         /// <para>Allows an extension to generate Mouse Input events.</para>
