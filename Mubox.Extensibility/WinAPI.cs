@@ -2231,6 +2231,9 @@ namespace Mubox
 
             [DllImport("user32.dll")]
             internal static extern uint MapVirtualKey(uint uCode, MAPVK uMapType);
+            
+            [DllImport("user32.dll")]
+            internal static extern uint MapVirtualKeyEx(uint uCode, MAPVK uMapType, IntPtr dwhkl);
 
             public enum MAPVK : uint
             {
