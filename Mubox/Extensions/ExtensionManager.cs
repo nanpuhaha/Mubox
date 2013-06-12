@@ -146,13 +146,9 @@ namespace Mubox.Extensions
                 name = e.Client.DisplayName;
             });
             var client = new Extensibility.MuboxClientBridge(
-                (ke) => {
-                    e.Client.Dispatch(new Model.Input.KeyboardInput
-                    {
-                        CAS = ke.CAS,
-                        VK = (uint)ke.VK,
-                        WM = ke.WM,                        
-                    });
+                (key) =>
+                {
+                    e.Client.Dispatch((ushort)key);
                 },
                 (me) => {
                     e.Client.Dispatch(new Model.Input.MouseInput
@@ -186,9 +182,14 @@ namespace Mubox.Extensions
 
         void Server_ClientRemoved(object sender, Control.Network.Server.ServerEventArgs e)
         {
+            var name = "";
+            e.Client.Dispatcher.Invoke((Action)delegate()
+            {
+                name = e.Client.DisplayName;
+            });
             e.Client.IsAttachedChanged -= Client_IsAttachedChanged;
             var client = _clients
-                .Where(c => c.Name.Equals(e.Client.DisplayName))
+                .Where(c => c.Name.Equals(name))
                 .FirstOrDefault();
             if (client != null)
             {
