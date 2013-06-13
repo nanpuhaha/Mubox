@@ -12,7 +12,7 @@ using System.Collections.Concurrent;
 namespace Mubox.Extensibility
 {
     public class Loader
-        : MarshalByRefObject
+        : MarshalByRefObject, IServiceProvider
     {
         private Assembly _assembly;
         private IExtension _extension;
@@ -43,6 +43,7 @@ namespace Mubox.Extensibility
                     InitializeDispatchRuntime(mubox, name);
                     return;
                 }
+                mubox.AddServiceProvider(this); // TODO: need to attempt to remove this when loader is unloading
             }
             catch (Exception ex)
             {
@@ -167,6 +168,22 @@ namespace Mubox.Extensibility
             lease.RenewOnCallTime = TimeSpan.FromHours(12);
             lease.SponsorshipTimeout = TimeSpan.FromHours(12);
             return lease;
+        }
+
+        public object GetService(Type serviceType)
+        {
+            if (_extension != null)
+            {
+                try
+                {
+                    return _extension.GetService(serviceType);
+                }
+                catch (Exception ex)
+                {
+                    ex.Log();
+                }
+            }
+            return null;
         }
     }
 }

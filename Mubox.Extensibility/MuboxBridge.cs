@@ -11,7 +11,7 @@ namespace Mubox.Extensibility
     /// <para>One instance of this object exists for each extension.</para>
     /// </summary>
     public class MuboxBridge
-        : MarshalByRefObject, IMubox
+        : MarshalByRefObject, IMubox, IServiceProvider
     {
         public MuboxBridge()
         {
@@ -49,6 +49,40 @@ namespace Mubox.Extensibility
             lease.RenewOnCallTime = TimeSpan.FromHours(12);
             lease.SponsorshipTimeout = TimeSpan.FromHours(12);
             return lease;
+        }
+
+        private List<IServiceProvider> _serviceProvider = new List<IServiceProvider>();
+
+        public void AddServiceProvider(IServiceProvider provider)
+        {
+            _serviceProvider.Add(provider);
+        }
+
+        public void RemoveServiceProvider(IServiceProvider provider)
+        {
+            _serviceProvider.Remove(provider);
+        }
+
+        public object GetService(Type serviceType)
+        {
+            if (_serviceProvider != null)
+            {
+                foreach (var provider in _serviceProvider)
+                {
+                    try
+                    {
+                        var result = provider.GetService(serviceType);
+                        if (result != null)
+                        {
+                            return result;
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+            return null;
         }
     }
 }

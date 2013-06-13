@@ -65,7 +65,9 @@
       <Name>Mubox.Extensibility</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
   <ItemGroup>
     <Page Include="Views\ConsoleView.xaml">
       <SubType>Designer</SubType>

@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Mubox.Extensibility
 {
+
     public interface IExtension
+        : IServiceProvider
     {
         /// <summary>
         /// <para>Called when an Extension is first Loaded, this is the earliest point an Extension is allowed to communicate with Mubox</para>

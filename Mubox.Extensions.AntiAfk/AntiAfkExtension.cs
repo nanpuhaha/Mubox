@@ -133,5 +133,10 @@ namespace Mubox.Extensions.AntiAfk
             lease.SponsorshipTimeout = TimeSpan.FromHours(12);
             return lease;
         }
+
+        public object GetService(Type serviceType)
+        {
+            return null;
+        }
     }
 }

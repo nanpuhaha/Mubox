@@ -112,7 +112,8 @@ namespace Mubox.Extensions.Console
                 _viewModel = new ConsoleViewModel();
                 _view = new Mubox.Extensions.Console.Views.ConsoleView();
                 _presenter = new System.Windows.Window();
-                _presenter.Title = (AppDomain.CurrentDomain.FriendlyName ?? "Default").Replace('.', ' ');
+                //_presenter.Title = (AppDomain.CurrentDomain.FriendlyName ?? "Default").Replace('.', ' ');
+                _presenter.Title = "Mubox Console";
                 _presenter.Topmost = true;
                 _presenter.WindowStyle = WindowStyle.SingleBorderWindow;
                 /* transparent window
@@ -154,6 +155,11 @@ namespace Mubox.Extensions.Console
             lease.RenewOnCallTime = TimeSpan.FromHours(12);
             lease.SponsorshipTimeout = TimeSpan.FromHours(12);
             return lease;
+        }
+
+        public object GetService(Type serviceType)
+        {
+            return null;
         }
     }
 }

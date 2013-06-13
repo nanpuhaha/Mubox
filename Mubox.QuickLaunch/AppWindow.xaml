@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Mubox" Height="480" Width="900" HorizontalContentAlignment="Left" VerticalContentAlignment="Stretch" Icon="/Mubox.QuickLaunch;component/Mubox2013.ico"
         Loaded="OnLoaded"
-        Top="8" Left="128" WindowStartupLocation="Manual" Topmost="False">
+        Top="8" Left="128" WindowStartupLocation="Manual" Topmost="False" ShowInTaskbar="False" WindowState="Minimized">
     <Window.Resources>
         <Image x:Key="imageMenuHelpIcon" Stretch="UniformToFill" Height="16" Width="16" Source="/Mubox.QuickLaunch;component/Content/Images/Help.png" />
         <Image x:Key="imageShortcutIcon" Stretch="UniformToFill" Height="16" Width="16" Source="/Mubox.QuickLaunch;component/Content/Images/GotoShortcutsHS.png" />

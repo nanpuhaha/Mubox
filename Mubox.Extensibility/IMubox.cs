@@ -10,6 +10,7 @@ namespace Mubox.Extensibility
     /// <para>Provides access to Mubox</para>
     /// </summary>
     public interface IMubox
+        : IServiceProvider
     {
         IMuboxClient ActiveClient { get; }
 
@@ -33,5 +34,9 @@ namespace Mubox.Extensibility
         /// <para>Raised when 'the Active Client' changes.</para>
         /// </summary>
         event EventHandler<ClientEventArgs> ActiveClientChanged;
+
+        void AddServiceProvider(IServiceProvider provider);
+
+        void RemoveServiceProvider(IServiceProvider provider);
     }
 }

@@ -23,12 +23,13 @@ namespace Mubox.QuickLaunch
         {
             InitializeComponent();
             timerDetectActivationChange.Tick += new EventHandler(timerDetectActivationChange_Tick);
-            timerDetectActivationChange.Interval = TimeSpan.FromMilliseconds(500);
+            timerDetectActivationChange.Interval = TimeSpan.FromMilliseconds(100);
             timerDetectActivationChange.Start();
         }
 
         private void timerDetectActivationChange_Tick(object sender, EventArgs e)
         {
+            Hide();
             IntPtr lastActiveWindow = Mubox.Control.Network.Client.LastActivatedClientWindowHandle;
             IntPtr foregroundWindow = WinAPI.Windows.CurrentForegroundWindow;
             if ((foregroundWindow == IntPtr.Zero) || (foregroundWindow == lastActiveWindow))
@@ -183,6 +184,7 @@ namespace Mubox.QuickLaunch
                     Close();
                 });
             sysTrayMenu.IsOpen = true;
+            sysTrayMenu.Focus();
         }
 
         private void ShowNavigationWindow()
@@ -210,7 +212,7 @@ namespace Mubox.QuickLaunch
                 try
                 {
                     //TryAgainSource = uri;
-                    frameContentPage.Navigate(uri);
+                    frameContentPage.Navigate(L_uri);
                 }
                 catch
                 {
@@ -234,7 +236,7 @@ namespace Mubox.QuickLaunch
                 {
                     if (e.Uri.ToString().Contains("about:"))
                     {
-                        ShowErrorPage(null);
+                        //ShowErrorPage(null);
                     }
                 }
             }
