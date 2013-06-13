@@ -27,12 +27,12 @@ namespace Mubox.Extensibility.Input
             }
         }
 
-        public void SendInput(WinAPI.VK key)
+        public void KeyPress(WinAPI.VK key)
         {
             _muboxClientBridge.KeyPress(key);
         }
 
-        public void SendInput(MouseEventArgs e)
+        public void MouseEvent(MouseEventArgs e)
         {
             _muboxClientBridge.MouseEvent(e);
         }

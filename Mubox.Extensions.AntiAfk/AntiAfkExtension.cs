@@ -86,6 +86,15 @@ namespace Mubox.Extensions.AntiAfk
             _thread.Start();
         }
 
+        private static WinAPI.VK[] _antiAfkKeyRotation = new[]
+            {
+                WinAPI.VK.W,
+                WinAPI.VK.S,
+                WinAPI.VK.Q,
+                WinAPI.VK.E,
+            };
+        private static int _antiAfkKeyRotationCurrent = 0;
+        
         private void AntiAFkExtensionAppThread(object obj)
         {
             Thread.CurrentThread.SetApartmentState(ApartmentState.STA);
@@ -96,31 +105,16 @@ namespace Mubox.Extensions.AntiAfk
                 {
                     var waitTimeSeconds = 120.0; // TODO: make configurable
                     Thread.Sleep((int)(waitTimeSeconds * 1000));
+
+                    var key = _antiAfkKeyRotation[_antiAfkKeyRotationCurrent];
+                    _antiAfkKeyRotationCurrent = (_antiAfkKeyRotationCurrent + 1) % _antiAfkKeyRotation.Length;
+
                     if (_lastInputTimestamp < DateTime.UtcNow.AddSeconds(-2 * (waitTimeSeconds / 3.0)).Ticks)
                     {
                         "Mubox AntiAfk - Keeping you there.".Log();
                         foreach (var client in _mubox.Clients) 
                         {
-                            // TODO: make anti-afk 'method' configurable - the following is most broadly compatible for when you're actually not using a particular client - it may still create side effects for some games
-                            // TODO: choose 'anti afk strategy' based on game profile?
-
-                            //client.KeyboardEvent(new Extensibility.Input.KeyboardEventArgs
-                            //{
-                            //    CAS = WinAPI.CAS.CONTROL,
-                            //    WM = WinAPI.WM.KEYDOWN,
-                            //});
-                            //Thread.Sleep(50);
-                            //client.KeyboardEvent(new Extensibility.Input.KeyboardEventArgs
-                            //{
-                            //    CAS = WinAPI.CAS.CONTROL,
-                            //    WM = WinAPI.WM.KEYUP,
-                            //});
-                            //Thread.Sleep(50);
-
-                            // more invasive approach, 'tap' forward, then 'tap' backward (ideally fast enough nobody really sees it - not ideal)
-                            client.KeyPress(WinAPI.VK.W);
-                            Thread.Sleep(100);
-                            client.KeyPress(WinAPI.VK.S);
+                            client.KeyPress(key);
                         }
                     }
                 }

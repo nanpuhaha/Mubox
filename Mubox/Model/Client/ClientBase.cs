@@ -256,7 +256,7 @@ namespace Mubox.Model.Client
         {
             var scan = WinAPI.SendInputApi.MapVirtualKeyEx((uint)vk, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC, System.Windows.Forms.InputLanguage.CurrentInputLanguage.Handle);
             Dispatch(new KeyboardInput { WM = Mubox.WinAPI.WM.KEYDOWN, VK = vk, Time = WinAPI.SendInputApi.GetTickCount(), Scan = scan });
-            System.Threading.Thread.Sleep(100);
+            System.Threading.Thread.Sleep(0x4d);
             Dispatch(new KeyboardInput { WM = Mubox.WinAPI.WM.KEYUP, VK = vk, Time = WinAPI.SendInputApi.GetTickCount(), Scan = scan, Flags = WinAPI.WindowHook.LLKHF.UP });
         }
 
