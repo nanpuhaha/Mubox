@@ -88,10 +88,10 @@ namespace Mubox.Extensions.AntiAfk
 
         private static WinAPI.VK[] _antiAfkKeyRotation = new[]
             {
-                WinAPI.VK.W,
-                WinAPI.VK.S,
                 WinAPI.VK.Q,
                 WinAPI.VK.E,
+                WinAPI.VK.E,
+                WinAPI.VK.Q,
             };
         private static int _antiAfkKeyRotationCurrent = 0;
         
