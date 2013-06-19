@@ -4,6 +4,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mubox", "Mubox\Mubox.csproj", "{D1F5FEEC-7438-46F3-8DAA-641CED5D8939}"
 	ProjectSection(ProjectDependencies) = postProject
 		{300DF516-7474-4F14-AFC0-B17099BF3460} = {300DF516-7474-4F14-AFC0-B17099BF3460}
+		{B9F2AEE4-2FBA-4987-99CA-1639AC853C95} = {B9F2AEE4-2FBA-4987-99CA-1639AC853C95}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mubox.QuickLaunch", "Mubox.QuickLaunch\Mubox.QuickLaunch.csproj", "{6776AAE8-F646-46FB-BA3F-11DE575CF0A3}"

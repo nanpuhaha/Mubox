@@ -106,8 +106,8 @@ namespace Mubox.Extensions.AntiAfk
                     var waitTimeSeconds = 120.0; // TODO: make configurable
                     Thread.Sleep((int)(waitTimeSeconds * 1000));
 
-                    var key = _antiAfkKeyRotation[_antiAfkKeyRotationCurrent];
-                    _antiAfkKeyRotationCurrent = (_antiAfkKeyRotationCurrent + 1) % _antiAfkKeyRotation.Length;
+                    var key = _antiAfkKeyRotation[_antiAfkKeyRotationCurrent % _antiAfkKeyRotation.Length];
+                    _antiAfkKeyRotationCurrent++;
 
                     if (_lastInputTimestamp < DateTime.UtcNow.AddSeconds(-2 * (waitTimeSeconds / 3.0)).Ticks)
                     {

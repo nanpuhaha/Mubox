@@ -74,6 +74,7 @@ namespace Mubox.Extensibility
                         var result = provider.GetService(serviceType);
                         if (result != null)
                         {
+                            // services should be proxied, or will need to implement custom leases
                             return result;
                         }
                     }

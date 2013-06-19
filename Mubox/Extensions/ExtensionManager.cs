@@ -231,79 +231,78 @@ namespace Mubox.Extensions
             throw new NotImplementedException();
         }
 
-        internal bool OnKeyboardInputReceived(object sender, Model.Input.KeyboardInput e)
+        internal void OnKeyboardInputReceived(object sender, Model.Input.KeyboardInput e)
         {
-            e.Handled = false;
+            Task.Factory.StartNew(delegate()
+            {
+                // translate input
+                var client = GetClientByHandle(e.WindowHandle) ?? GetActiveClient();
 
-            // translate input
-            var client = GetClientByHandle(e.WindowHandle) ?? GetActiveClient();
-
-            // dispatch to extensions
-            _extensions.Values.ToList()
-                .ForEach(ext =>
-                {
-                    try
+                // dispatch to each extension
+                _extensions.Values.ToList()
+                    .ForEach(ext =>
                     {
-                        var L_e = new Extensibility.Input.KeyboardEventArgs
+                        try
                         {
-                            Client = client,
-                            Handled = e.Handled,
-                            CAS = e.CAS,
-                            VK = (Mubox.WinAPI.VK)e.VK,
-                            WM = e.WM,
-                        };
-                        ext.Bridge.Keyboard.OnInputReceived(client, L_e);
-                        e.Handled = e.Handled || L_e.Handled;
-                    }
-                    catch (Exception ex)
-                    {
-                        Extensibility.TraceExtensions.Log(ex);
-                    }
-                });
-
-            // return true if no further processing should be performed, i.e. swallow the input
-            return e.Handled;
+                            var L_e = new Extensibility.Input.KeyboardEventArgs
+                            {
+                                Client = client,
+                                Handled = e.Handled,
+                                CAS = e.CAS,
+                                VK = (Mubox.WinAPI.VK)e.VK,
+                                WM = e.WM,
+                            };
+                            ext.Bridge.Keyboard.OnInputReceived(client, L_e);
+                            e.Handled = e.Handled || L_e.Handled;
+                        }
+                        catch (Exception ex)
+                        {
+                            Extensibility.TraceExtensions.Log(ex);
+                        }
+                    });
+            }, TaskCreationOptions.PreferFairness);
         }
 
-        internal bool OnMouseInputReceived(object sender, Model.Input.MouseInput e)
+        internal void OnMouseInputReceived(object sender, Model.Input.MouseInput e)
         {
             // do not forward mouse-move events to extensions (they are unecessary, and it wastes cpu)
+            // TODO: consider dispatching on a 'tile-snapped' basis, if 'tile under cursor' would change, dispatch a single update
             if (e.WM == WinAPI.WM.MOUSEMOVE)
             {
-                return e.Handled;
+                return;
             }
 
-            // translate input
-            var client = GetClientByHandle(e.WindowHandle) ?? GetActiveClient();
+            Task.Factory.StartNew(delegate()
+            {
+                // translate input
+                var client = GetClientByHandle(e.WindowHandle) ?? GetActiveClient();
 
-            // dispatch to extensions
-            _extensions.Values.ToList()
-                .ForEach(ext =>
-                {
-                    try
+                // dispatch to extensions
+                _extensions.Values.ToList()
+                    .ForEach(ext =>
                     {
-                        var L_e = new Extensibility.Input.MouseEventArgs
+                        try
                         {
-                            Client = client,
-                            Handled = e.Handled,
-                            Time = e.Time,
-                            IsAbsolute = e.IsAbsolute,
-                            X = e.Point.X,
-                            Y = e.Point.Y,
-                            WM = e.WM,
-                            Flags = e.Flags,
-                        };
-                        ext.Bridge.Mouse.OnInputReceived(client, L_e);
-                        e.Handled = e.Handled || L_e.Handled;
-                    }
-                    catch (Exception ex)
-                    {
-                        Extensibility.TraceExtensions.Log(ex);
-                    }
-                });
-
-            // return true if no further processing should be performed, i.e. swallow the input
-            return e.Handled;
+                            var L_e = new Extensibility.Input.MouseEventArgs
+                            {
+                                Client = client,
+                                Handled = e.Handled,
+                                Time = e.Time,
+                                IsAbsolute = e.IsAbsolute,
+                                X = e.Point.X,
+                                Y = e.Point.Y,
+                                WM = e.WM,
+                                Flags = e.Flags,
+                            };
+                            ext.Bridge.Mouse.OnInputReceived(client, L_e);
+                            e.Handled = e.Handled || L_e.Handled;
+                        }
+                        catch (Exception ex)
+                        {
+                            Extensibility.TraceExtensions.Log(ex);
+                        }
+                    });
+            }, TaskCreationOptions.PreferFairness);
         }
     }
 }

@@ -98,11 +98,12 @@ namespace Mubox.View.Server
                 return;
             }
 
-            if (Mubox.Extensions.ExtensionManager.Instance.OnMouseInputReceived(sender, e))
-            {
-                e.Handled = false;
-                return;
-            }
+            Mubox.Extensions.ExtensionManager.Instance.OnMouseInputReceived(sender, e);
+            //if (Mubox.Extensions.ExtensionManager.Instance.OnMouseInputReceived(sender, e))
+            //{
+            //    e.Handled = false;
+            //    return;
+            //}
 
             ClientBase activeClient = ActiveClient;
 
@@ -674,10 +675,11 @@ namespace Mubox.View.Server
                 return;
             }
 
-            if (Mubox.Extensions.ExtensionManager.Instance.OnKeyboardInputReceived(sender, e))
-            {
-                return;
-            }
+            Mubox.Extensions.ExtensionManager.Instance.OnKeyboardInputReceived(sender, e);
+            //if (Mubox.Extensions.ExtensionManager.Instance.OnKeyboardInputReceived(sender, e))
+            //{
+            //    return;
+            //}
 
             ClientBase activeClient = this.ActiveClient;
 
