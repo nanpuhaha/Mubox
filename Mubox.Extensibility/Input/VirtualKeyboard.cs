@@ -39,7 +39,7 @@ namespace Mubox.Extensibility.Input
 
         public override object InitializeLifetimeService()
         {
-            return this.InitializeDefaultLease();
+            return base.InitializeLifetimeService().InitializeLease();
         }
     }
 }

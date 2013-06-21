@@ -163,7 +163,7 @@ namespace Mubox.Extensibility
 
         public override object InitializeLifetimeService()
         {
-            return this.InitializeDefaultLease();
+            return base.InitializeLifetimeService().InitializeLease();
         }
 
         public object GetService(Type serviceType)

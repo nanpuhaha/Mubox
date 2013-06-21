@@ -9,10 +9,8 @@ namespace System
 {
     public static class LeaseExtensions
     {
-        public static object InitializeDefaultLease<T>(this T mbro)
-            where T : MarshalByRefObject
+        public static object InitializeLease(this object obj)
         {
-            var obj = mbro.InitializeLifetimeService();
             var lease = obj as ILease;
             if (lease != null)
             {

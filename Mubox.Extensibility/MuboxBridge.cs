@@ -44,7 +44,7 @@ namespace Mubox.Extensibility
 
         public override object InitializeLifetimeService()
         {
-            return this.InitializeDefaultLease();
+            return base.InitializeLifetimeService().InitializeLease();
         }
 
         private List<IServiceProvider> _serviceProvider = new List<IServiceProvider>();
