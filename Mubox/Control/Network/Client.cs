@@ -56,6 +56,7 @@ namespace Mubox.Control.Network
         private IntPtr _windowHandle;
 
         private static object inputQueueLock = new object();
+
         public IntPtr WindowInputQueue { get; set; }
 
         public static IntPtr MyInputQueue { get; set; }
@@ -243,7 +244,7 @@ namespace Mubox.Control.Network
                     }
                 }
 
-                #endregion
+                #endregion process action queue
             }
             catch (SocketException ex)
             {
@@ -281,33 +282,40 @@ namespace Mubox.Control.Network
                 case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_MOVE:
                     wm = WinAPI.WM.MOUSEMOVE;
                     break;
+
                 case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_LEFTDOWN:
                     wm = WinAPI.WM.LBUTTONDOWN;
                     CurrentMK |= WinAPI.Windows.MK.MK_LBUTTON;
                     break;
+
                 case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_LEFTUP:
                     wm = WinAPI.WM.LBUTTONUP;
                     isButtonUpEvent = true;
                     CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_LBUTTON) ^ WinAPI.Windows.MK.MK_LBUTTON;
                     break;
+
                 case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_RIGHTDOWN:
                     wm = WinAPI.WM.RBUTTONDOWN;
                     CurrentMK |= WinAPI.Windows.MK.MK_RBUTTON;
                     break;
+
                 case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_RIGHTUP:
                     wm = WinAPI.WM.RBUTTONUP;
                     CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_RBUTTON) ^ WinAPI.Windows.MK.MK_RBUTTON;
                     isButtonUpEvent = true;
                     break;
+
                 case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_MIDDLEDOWN:
                     wm = WinAPI.WM.MBUTTONDOWN;
                     CurrentMK |= WinAPI.Windows.MK.MK_MBUTTON;
                     break;
+
                 case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_MIDDLEUP:
                     wm = WinAPI.WM.MBUTTONUP;
                     CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_MBUTTON) ^ WinAPI.Windows.MK.MK_MBUTTON;
                     isButtonUpEvent = true;
                     break;
+
                 case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_XDOWN:
                     wm = WinAPI.WM.XBUTTONDOWN;
                     {
@@ -317,15 +325,18 @@ namespace Mubox.Control.Network
                             case WinAPI.MACROS.XBUTTONS.XBUTTON1:
                                 CurrentMK |= WinAPI.Windows.MK.MK_XBUTTON1;
                                 break;
+
                             case WinAPI.MACROS.XBUTTONS.XBUTTON2:
                                 CurrentMK |= WinAPI.Windows.MK.MK_XBUTTON2;
                                 break;
+
                             default:
                                 Debug.WriteLine("UnsupportedButtonDown in MouseData(" + xbutton + ") for " + this.DisplayName);
                                 break;
                         }
                     }
                     break;
+
                 case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_XUP:
                     wm = WinAPI.WM.XBUTTONUP;
                     isButtonUpEvent = true;
@@ -336,19 +347,23 @@ namespace Mubox.Control.Network
                             case WinAPI.MACROS.XBUTTONS.XBUTTON1:
                                 CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_XBUTTON1) ^ WinAPI.Windows.MK.MK_XBUTTON1;
                                 break;
+
                             case WinAPI.MACROS.XBUTTONS.XBUTTON2:
                                 CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_XBUTTON2) ^ WinAPI.Windows.MK.MK_XBUTTON2;
                                 break;
+
                             default:
                                 Debug.WriteLine("UnsupportedButtonUp in MouseData(" + xbutton + ") for " + this.DisplayName);
                                 break;
                         }
                     }
                     break;
+
                 case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_WHEEL:
                 case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_HWHEEL:
                     wm = WinAPI.WM.MOUSEWHEEL;
                     break;
+
                 default:
                     wm = mouseInput.WM;
                     break;
@@ -408,21 +423,25 @@ namespace Mubox.Control.Network
         private void OnKeyboardInputReceived(Model.Input.KeyboardInput keyboardInput)
         {
             // coerce specialized left/right shift-state to generalized shift-state
+            /*
             switch ((WinAPI.VK)keyboardInput.VK)
             {
                 case WinAPI.VK.LeftShift:
                 case WinAPI.VK.RightShift:
                     keyboardInput.VK = (uint)WinAPI.VK.Shift;
                     break;
+
                 case WinAPI.VK.LeftMenu:
                 case WinAPI.VK.RightMenu:
                     keyboardInput.VK = (uint)WinAPI.VK.Menu;
                     break;
+
                 case WinAPI.VK.LeftControl:
                 case WinAPI.VK.RightControl:
                     keyboardInput.VK = (uint)WinAPI.VK.Control;
                     break;
             }
+             */
 
             // prevent windows key-repeat
             if (IsRepeatKey(keyboardInput.VK, keyboardInput.Scan, keyboardInput.Flags, keyboardInput.Time))
@@ -445,6 +464,7 @@ namespace Mubox.Control.Network
                         CurrentMK |= WinAPI.Windows.MK.MK_CONTROL;
                     }
                     break;
+
                 case WinAPI.VK.Shift:
                 case WinAPI.VK.LeftShift:
                 case WinAPI.VK.RightShift:
@@ -500,9 +520,11 @@ namespace Mubox.Control.Network
                 case "AC":
                     OnActivateClient();
                     break;
+
                 case "DA":
                     OnDeactivateClient();
                     break;
+
                 case "PING":
                     try
                     {
@@ -520,6 +542,7 @@ namespace Mubox.Control.Network
                         Debug.WriteLine(ex.StackTrace);
                     }
                     break;
+
                 case "DC":
                     try
                     {
@@ -531,6 +554,7 @@ namespace Mubox.Control.Network
                         Debug.WriteLine(ex.StackTrace);
                     }
                     break;
+
                 default:
                     Debug.WriteLine("UnknownCommand '" + (commandInput.Text ?? "") + "' for " + this.DisplayName);
                     break;
@@ -644,7 +668,7 @@ namespace Mubox.Control.Network
             {
                 if (keyIsPressed)
                 {
-                    return true;
+                    return false;
                 }
                 else
                 {
@@ -655,7 +679,7 @@ namespace Mubox.Control.Network
             {
                 if (!keyIsPressed)
                 {
-                    return true;
+                    return false;
                 }
                 else
                 {
@@ -665,7 +689,7 @@ namespace Mubox.Control.Network
             return false;
         }
 
-        #endregion
+        #endregion client-side 'IsRepeatKey' behavior
 
         private void OnKeyboardEventViaViq(uint vk, WinAPI.WindowHook.LLKHF flags, uint scan, uint time, WinAPI.CAS cas)
         {
@@ -706,7 +730,7 @@ namespace Mubox.Control.Network
                 }
             }
 
-            WinAPI.SetKeyboardState(this.pressedKeys);
+            // what needs this? WinAPI.SetKeyboardState(this.pressedKeys);
 
             // TODO: SendMessage / PostMessage bypass VIQ, technically only reason these process is because the foreground window is being waited+verified before proceeding (a requirement for VIQ to function to begin with)
             // TODO: need to interface at a lower level (e.g. SendInput
@@ -883,6 +907,7 @@ namespace Mubox.Control.Network
         }
 
         public event EventHandler<EventArgs> Connected;
+
         public event EventHandler<EventArgs> Disconnected;
 
         private void OnConnected()

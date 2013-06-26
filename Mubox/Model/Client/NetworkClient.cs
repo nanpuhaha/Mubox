@@ -326,14 +326,12 @@ namespace Mubox.Model.Client
                     socket.EndSend(ar);
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 if (socket != null && socket == ClientSocket)
                 {
                     Detach();
                 }
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
             }
         }
 
@@ -380,10 +378,8 @@ namespace Mubox.Model.Client
             {
                 Send(e);
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
                 Control.Network.Server.RemoveClient(this);
             }
         }

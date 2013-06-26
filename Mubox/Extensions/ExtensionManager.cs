@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Mubox.Extensibility;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Mubox.Extensibility;
 
 namespace Mubox.Extensions
 {
@@ -45,9 +45,6 @@ namespace Mubox.Extensions
             // TODO: to support multiple teams, this event handler & related will need to be refactored
             Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam.ActiveClientChanged += ActiveTeam_ActiveClientChanged;
 
-
-
-
             var extensionsPath = Path.Combine(Environment.CurrentDirectory, "Extensions");
             var files = System.IO.Directory.EnumerateFiles(extensionsPath, "*.dll");
             foreach (var file in files)
@@ -73,15 +70,18 @@ namespace Mubox.Extensions
             }
         }
 
-        void ActiveTeam_ActiveClientChanged(object sender, EventArgs e)
+        private void ActiveTeam_ActiveClientChanged(object sender, EventArgs e)
         {
-            var client = GetActiveClient();
-            _extensions.Values
-                .ToList()
-                .ForEach(ext =>
-                    {
-                        (ext.Bridge as Extensibility.MuboxBridge).OnActiveClientChanged(client);
-                    });
+            Task.Factory.StartNew(delegate()
+            {
+                var client = GetActiveClient();
+                _extensions.Values
+                    .ToList()
+                    .ForEach(ext =>
+                        {
+                            (ext.Bridge as Extensibility.MuboxBridge).OnActiveClientChanged(client);
+                        });
+            }, TaskCreationOptions.PreferFairness);
         }
 
         private Extensibility.MuboxClientBridge GetActiveClient()
@@ -137,93 +137,103 @@ namespace Mubox.Extensions
             }
         }
 
-        void Server_ClientAccepted(object sender, Control.Network.Server.ServerEventArgs e)
+        private void Server_ClientAccepted(object sender, Control.Network.Server.ServerEventArgs e)
         {
-            e.Client.IsAttachedChanged += Client_IsAttachedChanged;
-            var name = "";
-            e.Client.Dispatcher.Invoke((Action)delegate()
+            Task.Factory.StartNew(delegate()
             {
-                name = e.Client.DisplayName;
-            });
-            var client = new Extensibility.MuboxClientBridge(
-                (key) =>
+                e.Client.IsAttachedChanged += Client_IsAttachedChanged;
+                var name = "";
+                e.Client.Dispatcher.Invoke((Action)delegate()
                 {
-                    e.Client.Dispatch((ushort)key);
-                },
-                (me) => {
-                    e.Client.Dispatch(new Model.Input.MouseInput
-                    {
-                        // MouseData                        
-                        Flags = me.Flags,
-                        IsAbsolute = me.IsAbsolute,
-                        Time = me.Time,
-                        WM = me.WM,
-                        Point = new System.Windows.Point
-                        {
-                            X = me.X,
-                            Y = me.Y,
-                        },
-                    });
-                })
-            {
-                Name = name,
-            };
-            e.Client.DisplayNameChanged += (dnc_s, dnc_e) =>
-            {
-                client.Name = (dnc_s as Mubox.Model.Client.ClientBase).DisplayName;
-            };
-            _clients.Add(client);
-            _extensions.Values.ToList()
-                .ForEach(ext =>
-                {
-                    ext.Bridge.Clients.Add(client);
+                    name = e.Client.DisplayName;
                 });
-        }
-
-        void Server_ClientRemoved(object sender, Control.Network.Server.ServerEventArgs e)
-        {
-            var name = "";
-            e.Client.Dispatcher.Invoke((Action)delegate()
-            {
-                name = e.Client.DisplayName;
-            });
-            e.Client.IsAttachedChanged -= Client_IsAttachedChanged;
-            var client = _clients
-                .Where(c => c.Name.Equals(name))
-                .FirstOrDefault();
-            if (client != null)
-            {
-                _clients.Remove(client);
+                var client = new Extensibility.MuboxClientBridge(
+                    (key) =>
+                    {
+                        e.Client.Dispatch((ushort)key);
+                    },
+                    (me) =>
+                    {
+                        e.Client.Dispatch(new Model.Input.MouseInput
+                        {
+                            // MouseData
+                            Flags = me.Flags,
+                            IsAbsolute = me.IsAbsolute,
+                            Time = me.Time,
+                            WM = me.WM,
+                            Point = new System.Windows.Point
+                            {
+                                X = me.X,
+                                Y = me.Y,
+                            },
+                        });
+                    })
+                {
+                    Name = name,
+                };
+                e.Client.DisplayNameChanged += (dnc_s, dnc_e) =>
+                {
+                    client.Name = (dnc_s as Mubox.Model.Client.ClientBase).DisplayName;
+                };
+                _clients.Add(client);
                 _extensions.Values.ToList()
                     .ForEach(ext =>
                     {
-                        ext.Bridge.Clients.Remove(client);
+                        ext.Bridge.Clients.Add(client);
                     });
-            }
+            }, TaskCreationOptions.PreferFairness);
         }
 
-        void Client_IsAttachedChanged(object sender, EventArgs e)
+        private void Server_ClientRemoved(object sender, Control.Network.Server.ServerEventArgs e)
         {
-            var based = sender as Mubox.Model.Client.ClientBase;
-            var basedName = default(string);
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                {
-                    basedName = based.DisplayName;
-                });
-            var client = _clients
-                .Where(c => c.Name.Equals(basedName))
-                .FirstOrDefault();
-            if (client != null)
+            Task.Factory.StartNew(delegate()
             {
-                if (based.IsAttached)
+                var name = "";
+                e.Client.Dispatcher.Invoke((Action)delegate()
                 {
-                    client.OnAttached();
-                }
-                else
+                    name = e.Client.DisplayName;
+                });
+                e.Client.IsAttachedChanged -= Client_IsAttachedChanged;
+                var client = _clients
+                    .Where(c => c.Name.Equals(name))
+                    .FirstOrDefault();
+                if (client != null)
                 {
-                    client.OnDetached();
+                    _clients.Remove(client);
+                    _extensions.Values.ToList()
+                        .ForEach(ext =>
+                        {
+                            ext.Bridge.Clients.Remove(client);
+                        });
                 }
-            }
+            }, TaskCreationOptions.PreferFairness);
+        }
+
+        private void Client_IsAttachedChanged(object sender, EventArgs e)
+        {
+            Task.Factory.StartNew(delegate()
+            {
+                var based = sender as Mubox.Model.Client.ClientBase;
+                var basedName = default(string);
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        basedName = based.DisplayName;
+                    });
+                var client = _clients
+                    .Where(c => c.Name.Equals(basedName))
+                    .FirstOrDefault();
+                if (client != null)
+                {
+                    if (based.IsAttached)
+                    {
+                        client.OnAttached();
+                    }
+                    else
+                    {
+                        client.OnDetached();
+                    }
+                }
+            }, TaskCreationOptions.PreferFairness);
         }
 
         public void StartAll()

@@ -51,25 +51,25 @@ namespace Mubox.View.Server
             Dictionary<WinAPI.WM, ButtonState> buttons = new Dictionary<WinAPI.WM, ButtonState>();
             foreach (var group in new WinAPI.WM[][]
                 {
-                    new WinAPI.WM[] 
+                    new WinAPI.WM[]
                     {
                         WinAPI.WM.LBUTTONDOWN,
                         WinAPI.WM.LBUTTONDBLCLK,
                         WinAPI.WM.LBUTTONUP,
                     },
-                    new WinAPI.WM[] 
+                    new WinAPI.WM[]
                     {
                         WinAPI.WM.MBUTTONDOWN,
                         WinAPI.WM.MBUTTONDBLCLK,
                         WinAPI.WM.MBUTTONUP,
                     },
-                    new WinAPI.WM[] 
+                    new WinAPI.WM[]
                     {
                         WinAPI.WM.RBUTTONDOWN,
                         WinAPI.WM.RBUTTONDBLCLK,
                         WinAPI.WM.RBUTTONUP,
                     },
-                    new WinAPI.WM[] 
+                    new WinAPI.WM[]
                     {
                         WinAPI.WM.XBUTTONDOWN,
                         WinAPI.WM.XBUTTONDBLCLK,
@@ -150,7 +150,8 @@ namespace Mubox.View.Server
                     this.RelativeMovement_LastY = Mouse_AbsoluteMovement_Screen_ResolutionY;
             }
 
-            #endregion
+            #endregion Mouse_RelativeMovement
+
             #region 'Mouse Buffering' Option
 
             ButtonState mouseButtonInfo = null;
@@ -179,12 +180,15 @@ namespace Mubox.View.Server
                                     case WinAPI.WM.LBUTTONDOWN:
                                         e.WM = WinAPI.WM.LBUTTONDBLCLK;
                                         break;
+
                                     case WinAPI.WM.RBUTTONDOWN:
                                         e.WM = WinAPI.WM.RBUTTONDBLCLK;
                                         break;
+
                                     case WinAPI.WM.MBUTTONDOWN:
                                         e.WM = WinAPI.WM.MBUTTONDBLCLK;
                                         break;
+
                                     case WinAPI.WM.XBUTTONDOWN:
                                         e.WM = WinAPI.WM.XBUTTONDBLCLK;
                                         break;
@@ -193,12 +197,14 @@ namespace Mubox.View.Server
                             mouseButtonInfo.LastDownTimestamp = dateTimeNow;
                         }
                         break;
+
                     case WinAPI.WM.LBUTTONDBLCLK:
                     case WinAPI.WM.MBUTTONDBLCLK:
                     case WinAPI.WM.RBUTTONDBLCLK:
                     case WinAPI.WM.XBUTTONDBLCLK:
                         mouseButtonInfo.IsDoubleClick = true;
                         break;
+
                     case WinAPI.WM.LBUTTONUP:
                     case WinAPI.WM.RBUTTONUP:
                     case WinAPI.WM.MBUTTONUP:
@@ -226,7 +232,7 @@ namespace Mubox.View.Server
                 e.IsDoubleClickEvent = mouseButtonInfo.IsDoubleClick;
             }
 
-            #endregion
+            #endregion 'Mouse Buffering' Option
 
             // send to client
             if (Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled && (activeClient != null))
@@ -662,12 +668,24 @@ namespace Mubox.View.Server
             }
 
             Func<KeyboardInput, bool> action = null;
-            if (Keyboard_ActionMap[(WinAPI.VK)e.VK].TryGetValue(e.WM, out action))
+            var keyAction = Keyboard_ActionMap[(WinAPI.VK)e.VK];
+            if (keyAction != null)
             {
-                if (action(e) || e.Handled)
+                if (keyAction.TryGetValue(e.WM, out action))
                 {
-                    return;
+                    if (action(e) || e.Handled)
+                    {
+                        return;
+                    }
                 }
+                //else
+                //{
+                //    Console.WriteLine("???? MISSING WM ACTION IN MESSAGE MAP - vk=" + (WinAPI.VK)e.VK + " wm=" + e.WM);
+                //}
+            }
+            else
+            {
+                Console.WriteLine("???? MISSING KEY ACTION IN KEY MAP - vk=" + (WinAPI.VK)e.VK + " wm=" + e.WM);
             }
 
             if (!Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled)
@@ -676,10 +694,6 @@ namespace Mubox.View.Server
             }
 
             Mubox.Extensions.ExtensionManager.Instance.OnKeyboardInputReceived(sender, e);
-            //if (Mubox.Extensions.ExtensionManager.Instance.OnKeyboardInputReceived(sender, e))
-            //{
-            //    return;
-            //}
 
             ClientBase activeClient = this.ActiveClient;
 
@@ -868,7 +882,7 @@ namespace Mubox.View.Server
             set { SetValue(ClientWindowProviderProperty, value); }
         }
 
-        #endregion
+        #endregion ClientWindowProvider
 
         private void Server_ClientAccepted(object sender, Mubox.Control.Network.Server.ServerEventArgs e)
         {
