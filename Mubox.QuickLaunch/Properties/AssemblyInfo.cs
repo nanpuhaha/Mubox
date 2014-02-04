@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Shaun Wilson")]
 [assembly: AssemblyProduct("Mubox")]
-[assembly: AssemblyCopyright("Copyright © Shaun Wilson 2009-2013")]
+[assembly: AssemblyCopyright("Copyright © Shaun Wilson 2009-2014")]
 [assembly: AssemblyTrademark("Mubox")]
 [assembly: AssemblyCulture("")]
 

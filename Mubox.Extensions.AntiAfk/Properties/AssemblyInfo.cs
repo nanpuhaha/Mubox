@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Mubox.Extensions.AntiAfk")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Mubox Anti-AFK Extension")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Shaun Wilson")]
 [assembly: AssemblyProduct("Mubox.Extensions.AntiAfk")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
+[assembly: AssemblyCopyright("Copyright © Shaun Wilson 2009-2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
