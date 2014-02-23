@@ -369,7 +369,7 @@ namespace Mubox.View
                     clientSettings.CanLaunch = true;
                     Mubox.Configuration.MuboxConfigSection.Save();
 
-                    ClientState clientState = new ClientState(clientSettings);
+                    ClientState clientState = new ClientState(clientSettings, profile);
                     Mubox.View.Client.ClientWindow clientWindow = new Mubox.View.Client.ClientWindow(clientState);
                     clientWindow.Show();
                 }
@@ -428,7 +428,7 @@ namespace Mubox.View
                 {
                     if (Mubox.View.Client.ClientWindowCollection.Instance.Count((dlg) => dlg.ClientState.Settings.Name.ToUpper().Equals(character.Name.ToUpper(), StringComparison.InvariantCultureIgnoreCase)) == 0)
                     {
-                        Mubox.View.Client.ClientWindow clientWindow = new Mubox.View.Client.ClientWindow(new Mubox.Model.ClientState(character));
+                        Mubox.View.Client.ClientWindow clientWindow = new Mubox.View.Client.ClientWindow(new Mubox.Model.ClientState(character, profile));
                         clientWindow.Show();
                     }
                 }
@@ -482,13 +482,13 @@ namespace Mubox.View
             }
         }
 
-        private MenuItem QuickLaunchMenu_CreateClientItem(string clientName)
+        private MenuItem QuickLaunchMenu_CreateClientItem(string clientName, Mubox.Configuration.ProfileSettings profile)
         {
             RoutedEventHandler clientStartEventHandler = (sender, e) =>
             {
                 var clientSettings = Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Clients.GetOrCreateNew(clientName);
                 Mubox.Configuration.MuboxConfigSection.Save();
-                ClientState clientState = new ClientState(clientSettings);
+                ClientState clientState = new ClientState(clientSettings, profile);
                 Mubox.View.Client.ClientWindow clientWindow = new Mubox.View.Client.ClientWindow(clientState);
                 clientWindow.Show();
             };

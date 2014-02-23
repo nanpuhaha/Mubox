@@ -9,6 +9,8 @@ namespace Mubox.Model
     public class ClientState : IDisposable
     {
         public WinAPI.SandboxApi.Sandbox Sandbox { get; set; }
+
+        public Mubox.Configuration.ProfileSettings Profile { get; set; }
         
         private ClientState()
         {
@@ -18,10 +20,11 @@ namespace Mubox.Model
             Timer.Start();
         }
 
-        public ClientState(Mubox.Configuration.ClientSettings settings)
+        public ClientState(Mubox.Configuration.ClientSettings settings, Mubox.Configuration.ProfileSettings profile)
             : this()
         {
             Settings = settings;
+            Profile = profile;
         }
 
         public Configuration.ClientSettings Settings { get; private set; }
