@@ -55,6 +55,31 @@ namespace Mubox.View
                     }
                 }
 
+                // New Game Profile
+                quickLaunchMenuItems.Add(new Separator());
+                menuItem = new MenuItem();
+                menuItem.Click += (sender, e) =>
+                {
+                    try
+                    {
+                        string profileName = Mubox.View.PromptForClientNameDialog.PromptForClientName();
+                        // TODO try and enforce "unique" profile names
+
+                        var profileSettings = Mubox.Configuration.MuboxConfigSection.Default.Profiles.GetOrCreateNew(profileName);
+                        Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile = profileSettings;
+                        Mubox.Configuration.MuboxConfigSection.Save();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                        Debug.WriteLine(ex.StackTrace);
+                    }
+                };
+                menuItem.Header = "_Configure New Game Profile...";
+                menuItem.Icon = Resources["imageSettingsIcon"];
+                quickLaunchMenuItems.Add(menuItem);
+
+
                 // Launch Mubox Server
                 quickLaunchMenuItems.Add(new Separator());
                 if (Mubox.View.Server.ServerWindow.Instance == null)
@@ -385,6 +410,7 @@ namespace Mubox.View
             lMenuItem.Click += (s, e) =>
                 {
                     Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile = profile;
+                    Mubox.Configuration.MuboxConfigSection.Save();
                 };
             quickLaunchClientShortcuts.Insert(0, lMenuItem);
 
