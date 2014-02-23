@@ -448,6 +448,19 @@ namespace Mubox.View.Server
             CollectionViewSource view = this.FindResource("ClientListViewSource") as CollectionViewSource;
             if (view != null)
             {
+                view.View.Filter = (item) =>
+                    {
+                        ClientBase client = item as ClientBase;
+                        if (client == null)
+                        {
+                            return true;
+                        }
+                        if (client.ProfileName == MuboxConfigSection.Default.Profiles.ActiveProfile.Name)
+                        {
+                            return true;
+                        }
+                        return false;
+                    };
                 view.View.Refresh();
             }
         }
@@ -477,11 +490,12 @@ namespace Mubox.View.Server
             // toggle input capture
             actionMap[WinAPI.VK.ScrollLock][WinAPI.WM.KEYDOWN] = (e) =>
             {
+                RefreshClientView();
                 WinAPI.Beep(
                     Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled
                         ? (uint)0x77FF
                         : (uint)0x7077,
-                    (uint)100);
+                    (uint)200);
                 return false;
             };
             actionMap[WinAPI.VK.ScrollLock][WinAPI.WM.KEYUP] = (e) =>
@@ -492,16 +506,17 @@ namespace Mubox.View.Server
                     Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled
                         ? (uint)0x77FF
                         : (uint)0x7077,
-                    (uint)100);
+                    (uint)200);
                 return false;
             };
             actionMap[WinAPI.VK.Pause][WinAPI.WM.KEYDOWN] = (e) =>
             {
+                RefreshClientView();
                 WinAPI.Beep(
                     Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled
                         ? (uint)0x77FF
                         : (uint)0x7077,
-                    (uint)100);
+                    (uint)200);
                 return false;
             };
             actionMap[WinAPI.VK.Pause][WinAPI.WM.KEYUP] = (e) =>
@@ -512,7 +527,7 @@ namespace Mubox.View.Server
                     Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled
                         ? (uint)0x77FF
                         : (uint)0x7077,
-                    (uint)100);
+                    (uint)200);
                 return false;
             };
 
@@ -914,13 +929,21 @@ namespace Mubox.View.Server
                 NetworkClient networkClient = sender as NetworkClient;
                 if (networkClient != null && !string.IsNullOrEmpty(networkClient.DisplayName))
                 {
-                    Mubox.Configuration.ClientSettings settings = Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Clients.GetOrCreateNew(networkClient.DisplayName);
-                    if (settings != null)
+                    foreach (var L_profile in Mubox.Configuration.MuboxConfigSection.Default.Profiles.Cast<ProfileSettings>())
                     {
-                        Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.ActiveClient = settings;
+                        if (L_profile.Name == networkClient.ProfileName)
+                        {
+                            // TODO: this will have problems if two different profiles have a client with the same name
+                            Mubox.Configuration.ClientSettings settings = L_profile.Clients.GetExisting(networkClient.DisplayName);
+                            if (settings != null)
+                            {
+                                L_profile.ActiveClient = settings;
+                                Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile = L_profile;
+                                break;
+                            }
+                        }
                     }
                 }
-
                 this.Hide();
             });
         }
