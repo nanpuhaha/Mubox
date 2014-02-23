@@ -4906,13 +4906,13 @@ namespace Mubox
             }
 
             // NOTE: may have a problem with cleaning these up
-            public static WinAPI.SandboxApi.Sandbox SafeCreateSandbox(string clientName, string password)
+            public static WinAPI.SandboxApi.Sandbox SafeCreateSandbox(string username, string password)
             {
                 var sandbox = new Sandbox
                 {
-                    UserName = "Mbx" + (clientName.Length > 20
-                        ? clientName.Substring(0, 20)
-                        : clientName),
+                    UserName = /*"Mbx" + */ (username.Length > 20
+                        ? username.Substring(0, 20)
+                        : username),
                     Password = password,
                 };
 

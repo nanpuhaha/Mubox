@@ -728,7 +728,7 @@ namespace Mubox.View.Client
                     {
                         var key = ClientState.Settings.SandboxKey;
                         var name = ClientState.NetworkClient.DisplayName;
-                        ClientState.Sandbox = WinAPI.SandboxApi.SafeCreateSandbox(name, key);
+                        ClientState.Sandbox = WinAPI.SandboxApi.SafeCreateSandbox(ClientState.Profile.Name + name, key);
                         ClientState.Settings.SandboxKey = key;
                         Mubox.Configuration.MuboxConfigSection.Save();
                     }
