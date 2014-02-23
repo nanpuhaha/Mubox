@@ -45,7 +45,10 @@ namespace Mubox.Extensions
 
             // TODO: to support multiple profiles, this event handler & related will need to be refactored
             // TODO: additionally, we may want to raise an event to extensions when the active profile changes
-            Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.ActiveClientChanged += ActiveProfile_ActiveClientChanged;
+            foreach (var L_profile in Mubox.Configuration.MuboxConfigSection.Default.Profiles.Cast<Mubox.Configuration.ProfileSettings>())
+            {
+                L_profile.ActiveClientChanged += ActiveClientChanged;
+            }
 
             var extensionsPath = Path.Combine(Environment.CurrentDirectory, "Extensions");
             var files = System.IO.Directory.EnumerateFiles(extensionsPath, "*.dll");
@@ -72,7 +75,7 @@ namespace Mubox.Extensions
             }
         }
 
-        private void ActiveProfile_ActiveClientChanged(object sender, EventArgs e)
+        private void ActiveClientChanged(object sender, EventArgs e)
         {
             Task.Factory.StartNew(delegate()
             {
@@ -88,7 +91,9 @@ namespace Mubox.Extensions
 
         private Extensibility.MuboxClientBridge GetActiveClient()
         {
-            var clientSettings = Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.ActiveClient;
+            var clientSettings = Mubox.Configuration.MuboxConfigSection.Default
+                .Profiles.ActiveProfile
+                .ActiveClient;
             return clientSettings == null
                 ? null
                 : GetClientByName(clientSettings.Name);
@@ -96,8 +101,10 @@ namespace Mubox.Extensions
 
         private Extensibility.MuboxClientBridge GetClientByHandle(IntPtr handle)
         {
+            // TODO: not guaranteed that target handle is for a client in active profile, must check all profiles instead
             var clientSettings = Mubox.Configuration.MuboxConfigSection.Default
-                .Profiles.ActiveProfile.Clients.OfType<Mubox.Configuration.ClientSettings>()
+                .Profiles.ActiveProfile
+                .Clients.OfType<Mubox.Configuration.ClientSettings>()
                 .Where(client => client.WindowHandle == handle)
                 .FirstOrDefault();
             return clientSettings == null
