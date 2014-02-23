@@ -711,8 +711,12 @@ namespace Mubox.View.Server
                         if (clients.Length > 0)
                         {
                             int clientIndex = roundRobinTable[(int)e.VK];
+                            if (e.Flags.HasFlag(WinAPI.WindowHook.LLKHF.UP))
+                            {
+                                // we only update round-robin target on key-up, otherwise two different clients receive keydown vs. keyup events
+                                roundRobinTable[(int)e.VK] = (byte)clientIndex + 1;
+                            }
                             ClientBase client = clients[clientIndex % clients.Length];
-                            roundRobinTable[(int)e.VK] = (byte)clientIndex + 1;
                             InputToClient(e, client);
                             return;
                         }
@@ -733,6 +737,9 @@ namespace Mubox.View.Server
 
         private static void InputToClient(KeyboardInput e, ClientBase client)
         {
+#if DEBUG
+            ("InputToClient(" + Convert.ToString(client) + ") " + Convert.ToString(e)).Log();
+#endif
             // this method basically applies CAS settings and calls ForwardEventToClient
             byte cas = 0;
             var clientSettings = Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam.ActiveClient;
