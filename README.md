@@ -31,7 +31,7 @@ Further, contributors retain all rights to intellectual property unique to their
 
 For official support you can contact contributors via Facebook:
 
-https://www.facebook.com/groups/121558081022/
+https://www.facebook.com/groups/mubox/
 
 If you hate Facebook you can try e-mailing mubox@mrshaunwilson.com, however, it may be several months before yoru message is seen.
 
