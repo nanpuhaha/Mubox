@@ -39,12 +39,11 @@ namespace Mubox.Configuration
 
         protected override void Init()
         {
-            Teams = new TeamSettingsCollection();
-            Keys = new KeySettingCollection();
+            Profiles = new ProfileSettingsCollection();
             base.Init();
         }
 
-        public void Save()
+        public static void Save()
         {
             // persist to disk
             Configuration.Save(ConfigurationSaveMode.Modified);
@@ -95,36 +94,6 @@ namespace Mubox.Configuration
             set { base["AutoStartServer"] = value; }
         }
 
-        [ConfigurationProperty("Teams")]
-        public TeamSettingsCollection Teams
-        {
-            get { return (TeamSettingsCollection)base["Teams"]; }
-            set { base["Teams"] = value; }
-        }
-
-        [ConfigurationProperty("EnableMulticast", IsRequired = false, DefaultValue = false)]
-        public bool EnableMulticast
-        {
-            get { return (bool)base["EnableMulticast"]; }
-            set
-            {
-                if (!EnableMulticast && value)
-                {
-                    if (Keys.Count == 0)
-                    {
-                        string defaultActiveClientOnlyKeys = "W,S,A,D,OEM2,Divide,E,Return,OEM5,Escape,Tab,Tilde";
-                        Debug.WriteLine("Creating Default 'Active Client Only' Keys: " + defaultActiveClientOnlyKeys);
-                        foreach (string vkString in defaultActiveClientOnlyKeys.Split(','))
-                        {
-                            Keys.CreateNew((WinAPI.VK)Enum.Parse(typeof(WinAPI.VK), vkString, true)).ActiveClientOnly = true;
-                        }
-                        Save();
-                    }
-                }
-                base["EnableMulticast"] = value;
-            }
-        }
-
         #region AutoRunOnQuickLaunch
 
         [ConfigurationProperty("AutoLaunchGame", IsRequired = false, DefaultValue = default(bool))]
@@ -144,12 +113,6 @@ namespace Mubox.Configuration
         public event EventHandler<EventArgs> AutoLaunchGameChanged;
 
         #endregion AutoRunOnQuickLaunch
-        [ConfigurationProperty("Keys")]
-        public KeySettingCollection Keys
-        {
-            get { return (KeySettingCollection)base["Keys"]; }
-            set { base["Keys"] = value; }
-        }
 
         [ConfigurationProperty("DisableRepeatKeyFiltering", IsRequired = false, DefaultValue = default(bool))]
         public bool DisableRepeatKeyFiltering
@@ -172,6 +135,13 @@ namespace Mubox.Configuration
         {
             get { return (string)base["OpenFileDialogInitialDirectory"]; }
             set { base["OpenFileDialogInitialDirectory"] = value; }
+        }
+
+        [ConfigurationProperty("Profiles")]
+        public ProfileSettingsCollection Profiles
+        {
+            get { return (ProfileSettingsCollection)base["Profiles"]; }
+            set { base["Profiles"] = value; }
         }
 
         #region INotifyPropertyChanged Members

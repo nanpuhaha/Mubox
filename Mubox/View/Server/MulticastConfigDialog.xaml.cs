@@ -15,7 +15,7 @@ namespace Mubox.View.Server
             InitializeComponent();
             try
             {
-                checkEnableMulticast.IsChecked = Mubox.Configuration.MuboxConfigSection.Default.EnableMulticast;
+                checkEnableMulticast.IsChecked = Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.EnableMulticast;
             }
             catch (Exception ex)
             {
@@ -55,7 +55,7 @@ namespace Mubox.View.Server
         private static void staticDialogInstance_Loaded(object sender, RoutedEventArgs e)
         {
             staticDialogInstance.vkBoardActiveClientOnly.InitializeButtonState(
-                Mubox.Configuration.MuboxConfigSection.Default.Keys,
+                Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Keys,
                 (keySetting) => keySetting.ActiveClientOnly,
                 (keySetting) =>
                 {
@@ -65,7 +65,7 @@ namespace Mubox.View.Server
                 },
                 (keySetting) => keySetting.ActiveClientOnly = false);
             staticDialogInstance.vkBoardRoundRobin.InitializeButtonState(
-                Mubox.Configuration.MuboxConfigSection.Default.Keys,
+                Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Keys,
                 (keySetting) => keySetting.RoundRobinKey,
                 (keySetting) =>
                 {
@@ -75,7 +75,7 @@ namespace Mubox.View.Server
                 },
                 (keySetting) => keySetting.RoundRobinKey = false);
             staticDialogInstance.vkBoardSendToDesktop.InitializeButtonState(
-                Mubox.Configuration.MuboxConfigSection.Default.Keys,
+                Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Keys,
                 (keySetting) => keySetting.SendToDesktop,
                 (keySetting) =>
                 {
@@ -93,8 +93,8 @@ namespace Mubox.View.Server
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
-            Mubox.Configuration.MuboxConfigSection.Default.EnableMulticast = checkEnableMulticast.IsChecked.GetValueOrDefault(false); // TODO databind instead
-            Mubox.Configuration.MuboxConfigSection.Default.Save();
+            Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.EnableMulticast = checkEnableMulticast.IsChecked.GetValueOrDefault(false); // TODO databind instead
+            Mubox.Configuration.MuboxConfigSection.Save();
             base.OnClosing(e);
         }
 

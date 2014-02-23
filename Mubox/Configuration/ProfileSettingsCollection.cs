@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Mubox.Configuration
 {
-    [ConfigurationCollection(typeof(TeamSettings))]
-    public class TeamSettingsCollection
+    [ConfigurationCollection(typeof(ProfileSettings))]
+    public class ProfileSettingsCollection
         : ConfigurationElementCollection, INotifyPropertyChanged
     {
         [ConfigurationProperty("Default", IsRequired = true, IsKey = false)]
@@ -15,7 +19,7 @@ namespace Mubox.Configuration
             set { if (!Default.Equals(value, StringComparison.InvariantCultureIgnoreCase)) { base["Default"] = value; this.OnPropertyChanged(o => o.Default); } }
         }
 
-        public TeamSettings ActiveTeam
+        public ProfileSettings ActiveProfile
         {
             get
             {
@@ -30,38 +34,29 @@ namespace Mubox.Configuration
 
         protected override ConfigurationElement CreateNewElement()
         {
-            return (new TeamSettings()) as ConfigurationElement;
+            return (new ProfileSettings()) as ConfigurationElement;
         }
 
         protected override object GetElementKey(ConfigurationElement element)
         {
-            return (element as TeamSettings).Name;
+            return (element as ProfileSettings).Name;
         }
 
-        internal TeamSettings CreateNew(string name)
+        public void Remove(string name)
         {
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentException("Invalid Name", "name");
-            }
-            var element = CreateNewElement();
-            var settings = element as TeamSettings;
-            settings.Name = name;
-            base.BaseAdd(element);
-            Default = name;
-            return settings;
+            base.BaseRemove(name);
         }
 
-        public TeamSettings GetOrCreateNew(string name)
+        public ProfileSettings GetOrCreateNew(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
                 name = "Default";
             }
-            var settings = default(Configuration.TeamSettings);
-            foreach (var o in Mubox.Configuration.MuboxConfigSection.Default.Teams)
+            var settings = default(Configuration.ProfileSettings);
+            foreach (var o in Mubox.Configuration.MuboxConfigSection.Default.Profiles)
             {
-                settings = o as Configuration.TeamSettings;
+                settings = o as Configuration.ProfileSettings;
                 if (settings != null)
                 {
                     if (settings.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
@@ -73,9 +68,18 @@ namespace Mubox.Configuration
             return CreateNew(name);
         }
 
-        public void Remove(string name)
+        internal ProfileSettings CreateNew(string name)
         {
-            base.BaseRemove(name);
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Invalid Name", "name");
+            }
+            var element = CreateNewElement();
+            var settings = element as ProfileSettings;
+            settings.Name = name;
+            base.BaseAdd(element);
+            Default = name;
+            return settings;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

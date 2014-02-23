@@ -107,8 +107,8 @@
     <Compile Include="Configuration\KeySetting.cs" />
     <Compile Include="Configuration\KeySettingCollection.cs" />
     <Compile Include="Configuration\MuboxConfigSection.cs" />
-    <Compile Include="Configuration\TeamSettings.cs" />
-    <Compile Include="Configuration\TeamSettingsCollection.cs" />
+    <Compile Include="Configuration\ProfileSettings.cs" />
+    <Compile Include="Configuration\ProfileSettingsCollection.cs" />
     <Compile Include="Control\FileReplicationManager.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Extensions\ExtensionManager.cs" />

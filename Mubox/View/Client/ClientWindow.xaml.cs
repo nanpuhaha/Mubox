@@ -337,7 +337,7 @@ namespace Mubox.View.Client
                     if (ClientState.Settings.PerformConnectOnLoad)
                     {
                         ClientState.Settings.PerformConnectOnLoad = false;
-                        Mubox.Configuration.MuboxConfigSection.Default.Save();
+                        Mubox.Configuration.MuboxConfigSection.Save();
                         if (Mubox.Configuration.MuboxConfigSection.Default.AutoLaunchGame)
                         {
                             if (buttonLaunchApplication.IsEnabled)
@@ -493,7 +493,7 @@ namespace Mubox.View.Client
         private void buttonInstallMuboxer_Click(object sender, RoutedEventArgs e)
         {
             ClientState.Settings.InstallWoWAddOn = true;
-            Mubox.Configuration.MuboxConfigSection.Default.Save();
+            Mubox.Configuration.MuboxConfigSection.Save();
             try
             {
                 ResolveAddOnInstallPath();
@@ -730,7 +730,7 @@ namespace Mubox.View.Client
                         var name = ClientState.NetworkClient.DisplayName;
                         ClientState.Sandbox = WinAPI.SandboxApi.SafeCreateSandbox(name, key);
                         ClientState.Settings.SandboxKey = key;
-                        Mubox.Configuration.MuboxConfigSection.Default.Save();
+                        Mubox.Configuration.MuboxConfigSection.Save();
                     }
 
                     lock (_global_process_launch_lock)
@@ -1022,7 +1022,7 @@ namespace Mubox.View.Client
                 file = ClientState.Settings.Files.CreateNew(openFileDialog.FileName);
             }
             file.Destination = saveFileDialog.FileName;
-            Mubox.Configuration.MuboxConfigSection.Default.Save();
+            Mubox.Configuration.MuboxConfigSection.Save();
 
             // TODO "add file" should WARN if user selects an input file that is greater than 50MB in size
         }
@@ -1116,7 +1116,7 @@ namespace Mubox.View.Client
                 }
                 keySetting.EnableNoModActiveClient = checkNoModActiveClient.IsChecked.GetValueOrDefault(default(bool));
             }
-            Mubox.Configuration.MuboxConfigSection.Default.Save();
+            Mubox.Configuration.MuboxConfigSection.Save();
             InitializeFtlButtonStates();
         }
 
@@ -1131,7 +1131,7 @@ namespace Mubox.View.Client
                 keySetting.OutputModifiers = (WinAPI.CAS)0;
                 keySetting.EnableNoModActiveClient = false;
             }
-            Mubox.Configuration.MuboxConfigSection.Default.Save();
+            Mubox.Configuration.MuboxConfigSection.Save();
             InitializeFtlButtonStates();
         }
     }

@@ -207,7 +207,7 @@ namespace Mubox.Model
 
         private void _networkClient_ClientActivated(object sender, EventArgs e)
         {
-            Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam.ActiveClient = Settings;
+            Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.ActiveClient = Settings;
         }
 
         public override string ToString()
@@ -253,7 +253,7 @@ namespace Mubox.Model
                 {
                     this.Settings.WindowPosition = new Point(windowRect.Left, windowRect.Top);
                     this.Settings.WindowSize = new Size(windowRect.Right - windowRect.Left, windowRect.Bottom - windowRect.Top);
-                    Mubox.Configuration.MuboxConfigSection.Default.Save();
+                    Mubox.Configuration.MuboxConfigSection.Save();
                 }
             }
         }

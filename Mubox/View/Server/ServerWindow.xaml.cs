@@ -697,14 +697,14 @@ namespace Mubox.View.Server
 
             ClientBase activeClient = this.ActiveClient;
 
-            if (Mubox.Configuration.MuboxConfigSection.Default.EnableMulticast && !ActiveClientOnly(e))
+            if (Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.EnableMulticast && !ActiveClientOnly(e))
             {
                 e.Handled = true;
 
                 ClientBase[] clients = GetCachedClients();
 
                 KeySetting globalKeySetting;
-                if (MuboxConfigSection.Default.Keys.TryGetKeySetting((WinAPI.VK)e.VK, out globalKeySetting))
+                if (MuboxConfigSection.Default.Profiles.ActiveProfile.Keys.TryGetKeySetting((WinAPI.VK)e.VK, out globalKeySetting))
                 {
                     if (globalKeySetting.RoundRobinKey)
                     {
@@ -742,7 +742,7 @@ namespace Mubox.View.Server
 #endif
             // this method basically applies CAS settings and calls ForwardEventToClient
             byte cas = 0;
-            var clientSettings = Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam.ActiveClient;
+            var clientSettings = Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.ActiveClient;
             if (clientSettings != null)
             {
                 if (clientSettings.Name.Equals(client.DisplayName, StringComparison.InvariantCultureIgnoreCase))
@@ -766,7 +766,7 @@ namespace Mubox.View.Server
         {
             // TODO optimize !!! iterating 'all keys' looking for a match is a waste of CPU, perhaps a bitmap of Win32.VK makes sense, but it needs to be synchronized against the config (perhaps on Save)
             bool activeClientOnly = false;
-            foreach (var item in Mubox.Configuration.MuboxConfigSection.Default.Keys.Cast<Mubox.Configuration.KeySetting>())
+            foreach (var item in Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Keys.Cast<Mubox.Configuration.KeySetting>())
             {
                 if (item.ActiveClientOnly && (WinAPI.VK)e.VK == item.InputKey)
                 {
@@ -798,10 +798,10 @@ namespace Mubox.View.Server
         //{
         //    if (SetMulticastOneTime)
         //    {
-        //        if (!Mubox.Configuration.MuboxConfigSection.Default.EnableMulticast)
+        //        if (!Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.EnableMulticast)
         //        {
-        //            Mubox.Configuration.MuboxConfigSection.Default.EnableMulticast = true;
-        //            Mubox.Configuration.MuboxConfigSection.Default.Save();
+        //            Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.EnableMulticast = true;
+        //            Mubox.Configuration.MuboxConfigSection.Save();
         //        }
         //        SetMulticastOneTime = false;
         //    }
@@ -914,10 +914,10 @@ namespace Mubox.View.Server
                 NetworkClient networkClient = sender as NetworkClient;
                 if (networkClient != null && !string.IsNullOrEmpty(networkClient.DisplayName))
                 {
-                    Mubox.Configuration.ClientSettings settings = Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam.Clients.GetOrCreateNew(networkClient.DisplayName);
+                    Mubox.Configuration.ClientSettings settings = Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Clients.GetOrCreateNew(networkClient.DisplayName);
                     if (settings != null)
                     {
-                        Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam.ActiveClient = settings;
+                        Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.ActiveClient = settings;
                     }
                 }
 
@@ -1070,7 +1070,7 @@ namespace Mubox.View.Server
                 {
                     Mubox.Configuration.MuboxConfigSection.Default.PreferredTheme = "Default";
                 }
-                Mubox.Configuration.MuboxConfigSection.Default.Save();
+                Mubox.Configuration.MuboxConfigSection.Save();
             };
             comboThemeSelector.ItemsSource = themesList;
             comboThemeSelector.DisplayMemberPath = "Name";

@@ -46,9 +46,9 @@ namespace Mubox.View
 
                 MenuItem menuItem = null;
 
-                foreach (var team in Mubox.Configuration.MuboxConfigSection.Default.Teams.OfType<Mubox.Configuration.TeamSettings>())
+                foreach (var team in Mubox.Configuration.MuboxConfigSection.Default.Profiles.OfType<Mubox.Configuration.ProfileSettings>())
                 {
-                    menuItem = CreateTeamShortcutMenu(team);
+                    menuItem = CreateProfileShortcutMenu(team);
                     if (menuItem != null)
                     {
                         quickLaunchMenuItems.Add(menuItem);
@@ -65,9 +65,9 @@ namespace Mubox.View
                         string clientName = Mubox.View.PromptForClientNameDialog.PromptForClientName();
                         // TODO try and enforce "unique" client names, e.g. if we already have a ClientX running, don't allow a second ClientX without warning.
 
-                        var clientSettings = Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam.Clients.GetOrCreateNew(clientName);
+                        var clientSettings = Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Clients.GetOrCreateNew(clientName);
                         clientSettings.CanLaunch = true;
-                        Mubox.Configuration.MuboxConfigSection.Default.Save();
+                        Mubox.Configuration.MuboxConfigSection.Save();
 
                         ClientState clientState = new ClientState(clientSettings);
                         Mubox.View.Client.ClientWindow clientWindow = new Mubox.View.Client.ClientWindow(clientState);
@@ -104,7 +104,7 @@ namespace Mubox.View
                     menuItem.Click += (sender, e) =>
                     {
                         Mubox.Configuration.MuboxConfigSection.Default.DisableAltTabHook = !Mubox.Configuration.MuboxConfigSection.Default.DisableAltTabHook;
-                        Mubox.Configuration.MuboxConfigSection.Default.Save();
+                        Mubox.Configuration.MuboxConfigSection.Save();
                     };
                     menuItem.Header = "Disable \"Client Switching\" Feature";
                     menuItem.ToolTip = "Enable this option to use the default Windows Task Switcher instead of the Mubox Server UI, this only affects Client Switching.";
@@ -117,7 +117,7 @@ namespace Mubox.View
                     menuItem.Click += (sender, e) =>
                     {
                         Mubox.Configuration.MuboxConfigSection.Default.ReverseClientSwitching = !Mubox.Configuration.MuboxConfigSection.Default.ReverseClientSwitching;
-                        Mubox.Configuration.MuboxConfigSection.Default.Save();
+                        Mubox.Configuration.MuboxConfigSection.Save();
                     };
                     menuItem.Header = "Reverse Client Switching";
                     menuItem.ToolTip = "Enable this option to reverse the order that Client Switcher will switch between clients.";
@@ -167,11 +167,11 @@ namespace Mubox.View
                         // "Enable Multicast"
                         menuItem = new MenuItem();
                         menuItem.IsCheckable = true;
-                        menuItem.IsChecked = Mubox.Configuration.MuboxConfigSection.Default.EnableMulticast;
+                        menuItem.IsChecked = Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.EnableMulticast;
                         menuItem.Click += (sender, e) =>
                         {
-                            Mubox.Configuration.MuboxConfigSection.Default.EnableMulticast = !Mubox.Configuration.MuboxConfigSection.Default.EnableMulticast;
-                            Mubox.Configuration.MuboxConfigSection.Default.Save();
+                            Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.EnableMulticast = !Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.EnableMulticast;
+                            Mubox.Configuration.MuboxConfigSection.Save();
                         };
                         menuItem.Header = "Enable Multicast";
                         menuItem.ToolTip = "'Keyboard Multicast' replicates your Key Presses to all Clients.";
@@ -185,7 +185,7 @@ namespace Mubox.View
                         menuItem.Click += (sender, e) =>
                         {
                             Mubox.Configuration.MuboxConfigSection.Default.EnableMouseCapture = !Mubox.Configuration.MuboxConfigSection.Default.EnableMouseCapture;
-                            Mubox.Configuration.MuboxConfigSection.Default.Save();
+                            Mubox.Configuration.MuboxConfigSection.Save();
                         };
                         menuItem.Header = "Enable Mouse Capture";
                         menuItem.ToolTip = "Disable Mouse Capture if you use a third-party application for the Mouse.";
@@ -204,7 +204,7 @@ namespace Mubox.View
                                 menuItem.Click += (sender, e) =>
                                 {
                                     Mubox.Configuration.MuboxConfigSection.Default.MouseCloneMode = MouseCloneModeType.Disabled;
-                                    Mubox.Configuration.MuboxConfigSection.Default.Save();
+                                    Mubox.Configuration.MuboxConfigSection.Save();
                                 };
                                 menuItem.Header = "Disabled";
                                 menuItem.ToolTip = "Use this option to Disable the Mouse Clone feature.";
@@ -217,7 +217,7 @@ namespace Mubox.View
                                 menuItem.Click += (sender, e) =>
                                 {
                                     Mubox.Configuration.MuboxConfigSection.Default.MouseCloneMode = Mubox.Model.MouseCloneModeType.Toggled;
-                                    Mubox.Configuration.MuboxConfigSection.Default.Save();
+                                    Mubox.Configuration.MuboxConfigSection.Save();
                                 };
                                 menuItem.Header = "Toggled";
                                 menuItem.ToolTip = "Mouse Clone is Active while CAPS LOCK is ON, and Inactive while CAPS LOCK is OFF.";
@@ -230,7 +230,7 @@ namespace Mubox.View
                                 menuItem.Click += (sender, e) =>
                                 {
                                     Mubox.Configuration.MuboxConfigSection.Default.MouseCloneMode = Mubox.Model.MouseCloneModeType.Pressed;
-                                    Mubox.Configuration.MuboxConfigSection.Default.Save();
+                                    Mubox.Configuration.MuboxConfigSection.Save();
                                 };
                                 menuItem.Header = "Pressed";
                                 menuItem.ToolTip = "Mouse Clone is Active while CAPS LOCK Key is pressed, and Inactive while CAPS LOCK Key is released.";
@@ -268,7 +268,7 @@ namespace Mubox.View
                     menuItem.Click += (sender, e) =>
                     {
                         Mubox.Configuration.MuboxConfigSection.Default.AutoStartServer = !Mubox.Configuration.MuboxConfigSection.Default.AutoStartServer;
-                        Mubox.Configuration.MuboxConfigSection.Default.Save();
+                        Mubox.Configuration.MuboxConfigSection.Save();
                     };
                     menuItem.Header = "Auto Start Server";
                     quickLaunchMenuItems.Add(menuItem);
@@ -328,13 +328,13 @@ namespace Mubox.View
             }
         }
 
-        private MenuItem CreateTeamShortcutMenu(Configuration.TeamSettings team)
+        private MenuItem CreateProfileShortcutMenu(Configuration.ProfileSettings profile)
         {
             var menuItem = default(MenuItem);
 
             // Shortcuts Menu Item
             List<object> quickLaunchClientShortcuts = new List<object>();
-            Mubox.Configuration.ClientSettingsCollection clients = team.Clients;
+            Mubox.Configuration.ClientSettingsCollection clients = profile.Clients;
 
             menuItem = new MenuItem();
             menuItem.Header = "Start All";
@@ -342,7 +342,7 @@ namespace Mubox.View
             {
                 // TODO: need to create a team selector (not launcher), maybe just a 'Teams' menu, need to allow team selection by hotkey, allow hotkey definition from a sub-menu e.g. MENU={"Select","Set/Clear HotKey.."}
                 // TODO: allow characters to be shared between multiple Teams, two teams should not 'Launch' the same 'Character' more than once. Characters will be known uniquely only by 'Name'
-                LaunchTeam(team);
+                LaunchProfileClients(profile);
             };
             quickLaunchClientShortcuts.Add(menuItem);
 
@@ -353,7 +353,7 @@ namespace Mubox.View
             menuItem.Click += (sender, e) =>
             {
                 Mubox.Configuration.MuboxConfigSection.Default.AutoLaunchGame = !Mubox.Configuration.MuboxConfigSection.Default.AutoLaunchGame;
-                Mubox.Configuration.MuboxConfigSection.Default.Save();
+                Mubox.Configuration.MuboxConfigSection.Save();
             };
             menuItem.Header = "Auto-Launch Game on Client Start";
             menuItem.ToolTip =
@@ -377,44 +377,44 @@ namespace Mubox.View
             }
 
             menuItem = new MenuItem();
-            menuItem.Header = team.Name;
+            menuItem.Header = profile.Name;
             menuItem.Icon = Resources["imageShortcutIcon"];
                         
             if (quickLaunchClientShortcuts.Count > 3)
             {
                 menuItem = new MenuItem();
-                menuItem.Header = team.Name;
+                menuItem.Header = profile.Name;
                 menuItem.Icon = Resources["imageShortcutIcon"];
                 menuItem.ItemsSource = quickLaunchClientShortcuts;
 
                 var lMenuItem = new MenuItem();
                 lMenuItem.IsCheckable = true;
-                lMenuItem.IsChecked = (Mubox.Configuration.MuboxConfigSection.Default.Teams.Default.Equals(team.Name));
+                lMenuItem.IsChecked = (Mubox.Configuration.MuboxConfigSection.Default.Profiles.Default.Equals(profile.Name));
                 lMenuItem.Header = "Select Team"; // TODO: need hotkey support
                 lMenuItem.Click += (s, e) =>
                     {
-                        Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam = team;
+                        Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile = profile;
                     };
                 quickLaunchClientShortcuts.Insert(0, lMenuItem);
             }
             else
             {
                 menuItem.IsCheckable = true;
-                menuItem.IsChecked = (Mubox.Configuration.MuboxConfigSection.Default.Teams.Default.Equals(team.Name));
+                menuItem.IsChecked = (Mubox.Configuration.MuboxConfigSection.Default.Profiles.Default.Equals(profile.Name));
                 menuItem.Click += (sender, e) =>
                 {
-                    Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam = team;
+                    Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile = profile;
                 };
             }
 
             return menuItem;
         }
 
-        private static void LaunchTeam(Mubox.Configuration.TeamSettings team)
+        private static void LaunchProfileClients(Mubox.Configuration.ProfileSettings profile)
         {
-            Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam = team;
+            Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile = profile;
             
-            foreach (var o in team.Clients)
+            foreach (var o in profile.Clients)
             {
                 var character = o as Mubox.Configuration.ClientSettings;
                 if (character.CanLaunch)
@@ -436,7 +436,7 @@ namespace Mubox.View
             menuItem.Click += (sender, e) =>
             {
                 Mubox.Configuration.MuboxConfigSection.Default.ClickBufferMilliseconds = time;
-                Mubox.Configuration.MuboxConfigSection.Default.Save();
+                Mubox.Configuration.MuboxConfigSection.Save();
             };
             menuItem.Header = time == 0.0 ? "Disabled" : ((int)time).ToString() + "ms";
             menuItem.ToolTip = "Use this option to set the Click Buffer to " + menuItem.Header;
@@ -479,8 +479,8 @@ namespace Mubox.View
         {
             RoutedEventHandler clientStartEventHandler = (sender, e) =>
             {
-                var clientSettings = Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam.Clients.GetOrCreateNew(clientName);
-                Mubox.Configuration.MuboxConfigSection.Default.Save();
+                var clientSettings = Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Clients.GetOrCreateNew(clientName);
+                Mubox.Configuration.MuboxConfigSection.Save();
                 ClientState clientState = new ClientState(clientSettings);
                 Mubox.View.Client.ClientWindow clientWindow = new Mubox.View.Client.ClientWindow(clientState);
                 clientWindow.Show();
@@ -488,8 +488,8 @@ namespace Mubox.View
 
             RoutedEventHandler clientDeleteEventHandler = (sender, e) =>
             {
-                Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam.Clients.Remove(clientName);
-                Mubox.Configuration.MuboxConfigSection.Default.Save();
+                Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Clients.Remove(clientName);
+                Mubox.Configuration.MuboxConfigSection.Save();
             };
 
             MenuItem clientMenuItem = new MenuItem();

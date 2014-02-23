@@ -155,7 +155,7 @@ namespace Mubox.Control.Input
 
             // and ignore "global desktop keys"
             Mubox.Configuration.KeySetting globalKeySetting = null;
-            if (Mubox.Configuration.MuboxConfigSection.Default.Keys.TryGetKeySetting((WinAPI.VK)hookStruct.vkCode, out globalKeySetting) && (globalKeySetting.SendToDesktop))
+            if (Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Keys.TryGetKeySetting((WinAPI.VK)hookStruct.vkCode, out globalKeySetting) && (globalKeySetting.SendToDesktop))
             {
                 return false;
             }
@@ -178,9 +178,9 @@ namespace Mubox.Control.Input
                 KeyboardInput keyboardInputEventArgs = KeyboardInput.CreateFrom(wParam, hookStruct);
                 {
                     Mubox.Configuration.KeySetting keySetting = globalKeySetting;
-                            if (Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam != null)
+                    if (Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile != null)
                     {
-                        Mubox.Configuration.ClientSettings activeClient = Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam.ActiveClient;
+                        Mubox.Configuration.ClientSettings activeClient = Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.ActiveClient;
                         if (activeClient != null)
                         {
                             activeClient.Keys.TryGetKeySetting((WinAPI.VK)keyboardInputEventArgs.VK, out keySetting);

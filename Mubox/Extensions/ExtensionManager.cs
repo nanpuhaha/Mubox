@@ -44,7 +44,7 @@ namespace Mubox.Extensions
             Mubox.Control.Network.Server.ClientRemoved += Server_ClientRemoved;
 
             // TODO: to support multiple teams, this event handler & related will need to be refactored
-            Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam.ActiveClientChanged += ActiveTeam_ActiveClientChanged;
+            Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.ActiveClientChanged += ActiveTeam_ActiveClientChanged;
 
             var extensionsPath = Path.Combine(Environment.CurrentDirectory, "Extensions");
             var files = System.IO.Directory.EnumerateFiles(extensionsPath, "*.dll");
@@ -87,7 +87,7 @@ namespace Mubox.Extensions
 
         private Extensibility.MuboxClientBridge GetActiveClient()
         {
-            var clientSettings = Mubox.Configuration.MuboxConfigSection.Default.Teams.ActiveTeam.ActiveClient;
+            var clientSettings = Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.ActiveClient;
             return clientSettings == null
                 ? null
                 : GetClientByName(clientSettings.Name);
@@ -96,7 +96,7 @@ namespace Mubox.Extensions
         private Extensibility.MuboxClientBridge GetClientByHandle(IntPtr handle)
         {
             var clientSettings = Mubox.Configuration.MuboxConfigSection.Default
-                .Teams.ActiveTeam.Clients.OfType<Mubox.Configuration.ClientSettings>()
+                .Profiles.ActiveProfile.Clients.OfType<Mubox.Configuration.ClientSettings>()
                 .Where(client => client.WindowHandle == handle)
                 .FirstOrDefault();
             return clientSettings == null
