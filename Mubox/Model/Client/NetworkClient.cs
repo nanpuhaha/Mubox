@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Net.Sockets;
 using Mubox.Control;
 using Mubox.Model.Input;
+using System.Linq;
 
 namespace Mubox.Model.Client
 {
@@ -263,6 +264,16 @@ namespace Mubox.Model.Client
                         this.Address = ((System.Net.IPEndPoint)ClientSocket.RemoteEndPoint).Address.ToString();
                     }
                     this.DisplayName = parameters[1];
+                    foreach (var L_profile in Mubox.Configuration.MuboxConfigSection.Default.Profiles.Cast<Mubox.Configuration.ProfileSettings>())
+                    {
+                        // TODO: this will have problems if two different profiles have a client with the same name, network clients need to identify themselves better - e.g. when a name is sent, we should include a profile name - the downside is that profiles will need to be configured on remote machines as well as local machines
+                        Mubox.Configuration.ClientSettings settings = L_profile.Clients.GetExisting(DisplayName);
+                        if (settings != null)
+                        {
+                            ProfileName = L_profile.Name;
+                            break;
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -337,8 +348,8 @@ namespace Mubox.Model.Client
 
         #endregion
 
-        public NetworkClient(Socket socket)
-            : base()
+        public NetworkClient(Socket socket, string profileName)
+            : base(profileName)
         {
             this.ClientSocket = socket;
         }

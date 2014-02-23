@@ -11,14 +11,20 @@ namespace Mubox.Model.Client
     public class ClientBase
         : DependencyObject
     {
-        protected ClientBase()
+        protected ClientBase(string profileName)
         {
             ClientId = Guid.NewGuid();
+            ProfileName = profileName;
         }
 
         #region ClientId
 
         public Guid ClientId { get; set; }
+
+        #endregion
+        #region ProfileName
+
+        public string ProfileName { get; set; }
 
         #endregion
         #region Address

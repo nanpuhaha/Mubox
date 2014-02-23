@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using Mubox.Model.Client;
+using System.Linq;
 
 namespace Mubox.Control.Network
 {
@@ -82,7 +83,7 @@ namespace Mubox.Control.Network
                         {
                             try
                             {
-                                client = new NetworkClient(socket);
+                                client = new NetworkClient(socket, Guid.NewGuid().ToString());
                             }
                             catch (Exception ex)
                             {
