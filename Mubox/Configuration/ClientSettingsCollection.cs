@@ -31,24 +31,26 @@ namespace Mubox.Configuration
             return settings;
         }
 
-        public ClientSettings GetOrCreateNew(string characterName)
+        public ClientSettings GetExisting(string characterName)
         {
-            foreach (var characterSettings in this.OfType<ClientSettings>())
+            foreach (var clientSettings in this.OfType<ClientSettings>())
             {
-                if (characterSettings != null)
+                if (clientSettings.Name.Equals(characterName, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (characterSettings.Name.Equals(characterName, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return characterSettings;
-                    }
+                    return clientSettings;
                 }
             }
-            return CreateNew(characterName);
+            return null;
         }
 
-        public void Remove(string name)
+        public bool Remove(string name)
         {
-            base.BaseRemove(name);
+            if (GetExisting(name) != null)
+            {
+                base.BaseRemove(name);
+                return true;
+            }
+            return false;
         }
     }
 }
