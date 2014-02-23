@@ -362,10 +362,28 @@ namespace Mubox.View
             {
                 try
                 {
-                    string clientName = Mubox.View.PromptForClientNameDialog.PromptForClientName();
-                    // TODO try and enforce "unique" client names, e.g. if we already have a ClientX running, don't allow a second ClientX without warning.
+                    // HACK: try and enforce unique client names - this is a temporary hack to avoid known issues in other parts of the codebase
+                    // TODO: normally this would only be enforced within the context of a single profile (for obvious reasons)
+                    var clientName = default(string);
+                    while (true)
+                    {
+                        clientName = Mubox.View.PromptForClientNameDialog.PromptForClientName();
+                        if (string.IsNullOrEmpty(clientName))
+                        {
+                            return;
+                        }
+                        foreach (var L_profile in Mubox.Configuration.MuboxConfigSection.Default.Profiles.Cast<Mubox.Configuration.ProfileSettings>())
+                        {
+                            if (L_profile.Clients.GetExisting(clientName) != null)
+                            {
+                                MessageBox.Show("Name '" + clientName + "' is already in use, choose another.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                continue;
+                            }
+                        }
+                        break;
+                    }
 
-                    var clientSettings = profile.Clients.GetOrCreateNew(clientName);
+                    var clientSettings = profile.Clients.CreateNew(clientName);
                     clientSettings.CanLaunch = true;
                     Mubox.Configuration.MuboxConfigSection.Save();
 
@@ -385,9 +403,9 @@ namespace Mubox.View
 
 
             quickLaunchClientShortcuts.Add(new Separator());
-            foreach (var o in clients)
+            foreach (var client in clients.Cast<Mubox.Configuration.ClientSettings>())
             {
-                var client = o as Mubox.Configuration.ClientSettings;
+                // NOTE: a !CanLaunch client is one we know about, but likely exists on a remote computer. we do not (yet) support remote launch, and so these entries are hidden even though they may appear in the config file.
                 if (!client.CanLaunch || (Mubox.View.Client.ClientWindowCollection.Instance.Count((dlg) => dlg.ClientState.Settings.Name.ToUpper() == client.Name.ToUpper()) != 0))
                 {
                     continue;
@@ -420,7 +438,7 @@ namespace Mubox.View
         private static void LaunchProfileClients(Mubox.Configuration.ProfileSettings profile)
         {
             Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile = profile;
-            
+
             foreach (var o in profile.Clients)
             {
                 var character = o as Mubox.Configuration.ClientSettings;
@@ -486,17 +504,26 @@ namespace Mubox.View
         {
             RoutedEventHandler clientStartEventHandler = (sender, e) =>
             {
-                var clientSettings = Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Clients.GetOrCreateNew(clientName);
-                Mubox.Configuration.MuboxConfigSection.Save();
-                ClientState clientState = new ClientState(clientSettings, profile);
-                Mubox.View.Client.ClientWindow clientWindow = new Mubox.View.Client.ClientWindow(clientState);
-                clientWindow.Show();
+                var clientSettings = profile.Clients.GetExisting(clientName);
+                if (clientSettings != null)
+                {
+                    Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile = profile;
+                    Mubox.Configuration.MuboxConfigSection.Save();
+                    ClientState clientState = new ClientState(clientSettings, profile);
+                    Mubox.View.Client.ClientWindow clientWindow = new Mubox.View.Client.ClientWindow(clientState);
+                    clientWindow.Show();
+                }
             };
 
             RoutedEventHandler clientDeleteEventHandler = (sender, e) =>
             {
-                Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Clients.Remove(clientName);
-                Mubox.Configuration.MuboxConfigSection.Save();
+                // TODO: add confirmation dialog to avoid accidental deletions
+                if (profile.Clients.Remove(clientName))
+                {
+                    // TODO: we need to clean up the sandbox account as well
+                    Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile = profile;
+                    Mubox.Configuration.MuboxConfigSection.Save();
+                }
             };
 
             MenuItem clientMenuItem = new MenuItem();
