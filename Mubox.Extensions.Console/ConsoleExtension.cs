@@ -17,7 +17,7 @@ namespace Mubox.Extensions.Console
     /// <para>This mainly exists for Extension Debugging within Mubox, it also makes a nice sample project.</para>
     /// </summary>
     public class ConsoleExtension
-        : MarshalByRefObject, IExtension
+        : MarshalByRefObject, IExtension, IConsoleService
     {
         IMubox _mubox;
 
@@ -49,11 +49,15 @@ namespace Mubox.Extensions.Console
 
             _exitYet = false;
 
+            //_mubox.AddServiceProvider(this);
+
             Show();
         }
 
         public void OnUnload()
         {
+            //_mubox.RemoveServiceProvider(this);
+
             "Console::OnUnload".Log();
 
             _mubox.ActiveClientChanged -= _onActiveClientChanged.Proxy;
@@ -159,7 +163,17 @@ namespace Mubox.Extensions.Console
 
         public object GetService(Type serviceType)
         {
+            if (serviceType == typeof(IConsoleService))
+            {
+                return this;
+            }
+
             return null;
+        }
+
+        public void WriteLine(string category, string message)
+        {
+            _viewModel.AddMessageInternal(category, message);
         }
     }
 }

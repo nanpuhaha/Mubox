@@ -35,8 +35,8 @@ namespace Mubox.Extensibility
         /// </summary>
         event EventHandler<ClientEventArgs> ActiveClientChanged;
 
-        void AddServiceProvider(IServiceProvider provider);
+        //void AddServiceProvider(IServiceProvider provider);
 
-        void RemoveServiceProvider(IServiceProvider provider);
+        //void RemoveServiceProvider(IServiceProvider provider);
     }
 }

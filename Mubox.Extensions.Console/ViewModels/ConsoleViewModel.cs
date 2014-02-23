@@ -34,7 +34,7 @@ namespace Mubox.Extensions.Console.ViewModels
                 };
             _dispatcher.InvokeAsync(() =>
             {
-                if (Messages.Count > 127)
+                while (Messages.Count > 127)
                 {
                     Messages.RemoveAt(0);
                 }

@@ -21,6 +21,24 @@ namespace Mubox.Extensions.AntiAfk
         private ProxyEventHandler<Extensibility.Input.KeyboardEventArgs> _onKeyboardInputReceived;
         private ProxyEventHandler<Extensibility.Input.MouseEventArgs> _onMouseInputReceived;
 
+        private void ConsoleWrite(string category, string message)
+        {
+            try
+            {
+                if (_mubox != null)
+                {
+                    var console = _mubox.GetService(typeof(IConsoleService)) as IConsoleService;
+                    if (console != null)
+                    {
+                        console.WriteLine(category, message);
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
         public void OnLoad(IMubox mubox)
         {
             "AntiAfk::OnLoad".Log();
@@ -98,7 +116,7 @@ namespace Mubox.Extensions.AntiAfk
         private void AntiAFkExtensionAppThread(object obj)
         {
             Thread.CurrentThread.SetApartmentState(ApartmentState.STA);
-            "AntiAfk Extension App Thread Started".Log();
+            ConsoleWrite("AntiAfk", "Started.");
             try
             {
                 while (!_exitYet)
@@ -111,7 +129,7 @@ namespace Mubox.Extensions.AntiAfk
 
                     if (_lastInputTimestamp < DateTime.UtcNow.AddSeconds(-2 * (waitTimeSeconds / 3.0)).Ticks)
                     {
-                        "Mubox AntiAfk - Keeping you there.".Log();
+                        ConsoleWrite("AntiAfk", "Keeping you there.");
                         foreach (var client in _mubox.Clients) 
                         {
                             client.KeyPress(key);
@@ -121,7 +139,7 @@ namespace Mubox.Extensions.AntiAfk
             }
             finally
             {
-                "AntiAfk Extension App Thread Exiting".Log();
+                ConsoleWrite("AntiAfk", "Stopped.");
             }
         }
 

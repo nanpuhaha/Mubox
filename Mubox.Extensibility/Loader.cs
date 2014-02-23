@@ -43,7 +43,7 @@ namespace Mubox.Extensibility
                     InitializeDispatchRuntime(mubox, name);
                     return;
                 }
-                mubox.AddServiceProvider(this); // TODO: need to attempt to remove this when loader is unloading
+                //mubox.AddServiceProvider(this); // TODO: need to attempt to remove this when loader is unloading
             }
             catch (Exception ex)
             {
@@ -174,10 +174,7 @@ namespace Mubox.Extensibility
                 {
                     return _extension.GetService(serviceType);
                 }
-                catch (Exception ex)
-                {
-                    ex.Log();
-                }
+                catch { }
             }
             return null;
         }

@@ -13,6 +13,8 @@ namespace Mubox.Extensibility
     {
         internal static Trace Instance { get; set; }
 
+        internal static IServiceProvider ServiceProvider { get; set; }
+
         static Trace()
         {
             Instance = new Trace();
@@ -67,7 +69,26 @@ namespace Mubox.Extensibility
     {
         public static void Log(this string message, TraceEventType traceEventType = TraceEventType.Verbose)
         {
+            ConsoleWrite(Convert.ToString(traceEventType), message);
             Trace.Instance.Log(message, traceEventType);
+        }
+
+        private static void ConsoleWrite(string category, string message)
+        {
+            try
+            {
+                if (Trace.ServiceProvider != null)
+                {
+                    var console = Trace.ServiceProvider.GetService(typeof(IConsoleService)) as IConsoleService;
+                    if (console != null)
+                    {
+                        console.WriteLine(category, message);
+                    }
+                }
+            }
+            catch
+            {
+            }
         }
 
         public static void Log(this Exception ex, TraceEventType traceEventType = TraceEventType.Error)

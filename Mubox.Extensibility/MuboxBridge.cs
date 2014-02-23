@@ -9,12 +9,18 @@ namespace Mubox.Extensibility
     /// <summary>
     /// <para>This object allows an Extension to interact with Mubox</para>
     /// <para>One instance of this object exists for each extension.</para>
+    /// <para>The instance lives on the Mubox side, not on the Extension side.</para>
     /// </summary>
     public class MuboxBridge
         : MarshalByRefObject, IMubox, IServiceProvider
     {
-        public MuboxBridge()
+        // allows an extensions to get services from other extensions managed by Mubox
+        private IServiceProvider _serviceProvider;
+
+        public MuboxBridge(IServiceProvider serviceProvider)
         {
+            _serviceProvider = serviceProvider;
+            Trace.ServiceProvider = serviceProvider; // gives Trace extensions indirect access to Console Extension
             Clients = new List<IMuboxClient>();
             Keyboard = new Input.VirtualKeyboard(null);
             Mouse = new Input.VirtualMouse(null);
@@ -47,39 +53,9 @@ namespace Mubox.Extensibility
             return base.InitializeLifetimeService().InitializeLease();
         }
 
-        private List<IServiceProvider> _serviceProvider = new List<IServiceProvider>();
-
-        public void AddServiceProvider(IServiceProvider provider)
-        {
-            _serviceProvider.Add(provider);
-        }
-
-        public void RemoveServiceProvider(IServiceProvider provider)
-        {
-            _serviceProvider.Remove(provider);
-        }
-
         public object GetService(Type serviceType)
         {
-            if (_serviceProvider != null)
-            {
-                foreach (var provider in _serviceProvider)
-                {
-                    try
-                    {
-                        var result = provider.GetService(serviceType);
-                        if (result != null)
-                        {
-                            // services should be proxied, or will need to implement custom leases
-                            return result;
-                        }
-                    }
-                    catch
-                    {
-                    }
-                }
-            }
-            return null;
+            return _serviceProvider.GetService(serviceType);
         }
     }
 }

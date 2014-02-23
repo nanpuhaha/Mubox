@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace Mubox.Extensions
 {
     public sealed class ExtensionManager
+        : IServiceProvider
     {
         public static Mubox.Extensions.ExtensionManager Instance { get; private set; }
 
@@ -51,7 +52,7 @@ namespace Mubox.Extensions
             {
                 var friendlyName = Path.GetFileNameWithoutExtension(file);
                 var appDomain = AppDomain.CreateDomain(friendlyName);
-                var bridge = new Extensibility.MuboxBridge();
+                var bridge = new Extensibility.MuboxBridge(this);
                 var loader = (Extensibility.Loader)appDomain
                     .CreateInstanceAndUnwrap("Mubox.Extensibility", "Mubox.Extensibility.Loader");
                 _clients.ToList()
@@ -313,6 +314,29 @@ namespace Mubox.Extensions
                         }
                     });
             }, TaskCreationOptions.PreferFairness);
+        }
+
+        public object GetService(Type serviceType)
+        {
+            // try to get the service from an extension, for example "IConsoleService" is provided by the Console Extension
+            try
+            {
+                var extensions = _extensions.Values.ToArray();
+                foreach (var extension in extensions)
+                {
+                    try
+                    {
+                        var service = extension.Loader.GetService(serviceType);
+                        if (service != null)
+                        {
+                            return service;
+                        }
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+            return null;
         }
     }
 }
