@@ -48,40 +48,12 @@ namespace Mubox.View
 
                 foreach (var profile in Mubox.Configuration.MuboxConfigSection.Default.Profiles.OfType<Mubox.Configuration.ProfileSettings>())
                 {
-                    menuItem = CreateClientsShortcutMenu(profile);
+                    menuItem = CreateProfileShortcutMenu(profile);
                     if (menuItem != null)
                     {
                         quickLaunchMenuItems.Add(menuItem);
                     }
                 }
-                quickLaunchMenuItems.Add(new Separator());
-
-                // New Mubox Client
-                menuItem = new MenuItem();
-                menuItem.Click += (sender, e) =>
-                {
-                    try
-                    {
-                        string clientName = Mubox.View.PromptForClientNameDialog.PromptForClientName();
-                        // TODO try and enforce "unique" client names, e.g. if we already have a ClientX running, don't allow a second ClientX without warning.
-
-                        var clientSettings = Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Clients.GetOrCreateNew(clientName);
-                        clientSettings.CanLaunch = true;
-                        Mubox.Configuration.MuboxConfigSection.Save();
-
-                        ClientState clientState = new ClientState(clientSettings);
-                        Mubox.View.Client.ClientWindow clientWindow = new Mubox.View.Client.ClientWindow(clientState);
-                        clientWindow.Show();
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex.Message);
-                        Debug.WriteLine(ex.StackTrace);
-                    }
-                };
-                menuItem.Header = "_Configure New Mubox Client...";
-                menuItem.Icon = Resources["imageSettingsIcon"];
-                quickLaunchMenuItems.Add(menuItem);
 
                 // Launch Mubox Server
                 quickLaunchMenuItems.Add(new Separator());
@@ -328,7 +300,7 @@ namespace Mubox.View
             }
         }
 
-        private MenuItem CreateClientsShortcutMenu(Configuration.ProfileSettings profile)
+        private MenuItem CreateProfileShortcutMenu(Configuration.ProfileSettings profile)
         {
             var menuItem = default(MenuItem);
 
@@ -359,6 +331,34 @@ namespace Mubox.View
                 "Note, the game will not run until the client successfully connects to the Server, once a Server Connection is established the Launch will continue.";
             quickLaunchClientShortcuts.Add(menuItem);
 
+            // New Mubox Client
+            menuItem = new MenuItem();
+            menuItem.Click += (sender, e) =>
+            {
+                try
+                {
+                    string clientName = Mubox.View.PromptForClientNameDialog.PromptForClientName();
+                    // TODO try and enforce "unique" client names, e.g. if we already have a ClientX running, don't allow a second ClientX without warning.
+
+                    var clientSettings = Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Clients.GetOrCreateNew(clientName);
+                    clientSettings.CanLaunch = true;
+                    Mubox.Configuration.MuboxConfigSection.Save();
+
+                    ClientState clientState = new ClientState(clientSettings);
+                    Mubox.View.Client.ClientWindow clientWindow = new Mubox.View.Client.ClientWindow(clientState);
+                    clientWindow.Show();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    Debug.WriteLine(ex.StackTrace);
+                }
+            };
+            menuItem.Header = "_Configure New Mubox Client...";
+            menuItem.Icon = Resources["imageSettingsIcon"];
+            quickLaunchClientShortcuts.Add(menuItem);
+
+
             quickLaunchClientShortcuts.Add(new Separator());
             foreach (var o in clients)
             {
@@ -376,34 +376,17 @@ namespace Mubox.View
 
             menuItem = new MenuItem();
             menuItem.Header = profile.Name;
-            menuItem.Icon = Resources["imageShortcutIcon"];
-                        
-            if (quickLaunchClientShortcuts.Count > 3)
-            {
-                menuItem = new MenuItem();
-                menuItem.Header = profile.Name;
-                menuItem.Icon = Resources["imageShortcutIcon"];
-                menuItem.ItemsSource = quickLaunchClientShortcuts;
+            menuItem.ItemsSource = quickLaunchClientShortcuts;
 
-                var lMenuItem = new MenuItem();
-                lMenuItem.IsCheckable = true;
-                lMenuItem.IsChecked = (Mubox.Configuration.MuboxConfigSection.Default.Profiles.Default.Equals(profile.Name));
-                lMenuItem.Header = "Clients";
-                lMenuItem.Click += (s, e) =>
-                    {
-                        Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile = profile;
-                    };
-                quickLaunchClientShortcuts.Insert(0, lMenuItem);
-            }
-            else
-            {
-                menuItem.IsCheckable = true;
-                menuItem.IsChecked = (Mubox.Configuration.MuboxConfigSection.Default.Profiles.Default.Equals(profile.Name));
-                menuItem.Click += (sender, e) =>
+            var lMenuItem = new MenuItem();
+            lMenuItem.IsCheckable = true;
+            lMenuItem.IsChecked = (Mubox.Configuration.MuboxConfigSection.Default.Profiles.Default.Equals(profile.Name));
+            lMenuItem.Header = "Active Profile";
+            lMenuItem.Click += (s, e) =>
                 {
                     Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile = profile;
                 };
-            }
+            quickLaunchClientShortcuts.Insert(0, lMenuItem);
 
             return menuItem;
         }
