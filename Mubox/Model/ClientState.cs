@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows;
+using System.Linq;
 
 namespace Mubox.Model
 {
@@ -210,7 +211,7 @@ namespace Mubox.Model
 
         private void _networkClient_ClientActivated(object sender, EventArgs e)
         {
-            Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.ActiveClient = Settings;
+            Profile.ActiveClient = Settings;
         }
 
         public override string ToString()
