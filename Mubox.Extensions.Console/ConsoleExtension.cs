@@ -151,9 +151,9 @@ namespace Mubox.Extensions.Console
         public override object InitializeLifetimeService()
         {
             var lease = (System.Runtime.Remoting.Lifetime.ILease)base.InitializeLifetimeService();
-            lease.InitialLeaseTime = TimeSpan.FromHours(12);
-            lease.RenewOnCallTime = TimeSpan.FromHours(12);
-            lease.SponsorshipTimeout = TimeSpan.FromHours(12);
+            lease.InitialLeaseTime = TimeSpan.FromHours(72);
+            lease.RenewOnCallTime = TimeSpan.FromHours(72);
+            lease.SponsorshipTimeout = TimeSpan.FromHours(72);
             return lease;
         }
 
