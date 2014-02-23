@@ -710,9 +710,9 @@ namespace Mubox.View.Server
                     {
                         if (clients.Length > 0)
                         {
-                            int clientIndex = roundRobinTable[(int)e.VK] + 1;
-                            ClientBase client = clients[(clientIndex + 1) % clients.Length];
-                            roundRobinTable[(int)e.VK] = (byte)clientIndex;
+                            int clientIndex = roundRobinTable[(int)e.VK];
+                            ClientBase client = clients[clientIndex % clients.Length];
+                            roundRobinTable[(int)e.VK] = (byte)clientIndex + 1;
                             InputToClient(e, client);
                             return;
                         }
