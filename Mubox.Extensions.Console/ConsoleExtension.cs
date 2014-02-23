@@ -109,11 +109,11 @@ namespace Mubox.Extensions.Console
         private void ConsoleExtensionAppThread(object obj)
         {
             Thread.CurrentThread.SetApartmentState(ApartmentState.STA);
-            "Console Extension App Thread Started".Log();
             try
             {
                 _dispatcher = Dispatcher.CurrentDispatcher;
                 _viewModel = new ConsoleViewModel();
+                "Console Extension App Thread Started".Log();
                 _view = new Mubox.Extensions.Console.Views.ConsoleView();
                 _presenter = new System.Windows.Window();
                 //_presenter.Title = (AppDomain.CurrentDomain.FriendlyName ?? "Default").Replace('.', ' ');
@@ -173,7 +173,10 @@ namespace Mubox.Extensions.Console
 
         public void WriteLine(string category, string message)
         {
-            _viewModel.AddMessageInternal(category, message);
+            if (_viewModel != null)
+            {
+                _viewModel.AddMessageInternal(category, message);
+            }
         }
     }
 }
