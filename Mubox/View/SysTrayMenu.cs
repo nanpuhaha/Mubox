@@ -395,7 +395,7 @@ namespace Mubox.View
 
                 client.PerformConnectOnLoad = true;
                 quickLaunchClientShortcuts.Add(
-                    QuickLaunchMenu_CreateClientItem(client.Name)
+                    QuickLaunchMenu_CreateClientItem(client.Name, profile)
                     );
             }
 
