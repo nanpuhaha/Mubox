@@ -151,6 +151,7 @@ namespace Mubox.Model
             if (networkClient != null)
             {
                 networkClient.DisplayName = this.Settings.Name;
+                networkClient.ProfileName = this.Profile.Name;
                 networkClient.WindowStationHandle = this.WindowStationHandle;
                 networkClient.WindowDesktopHandle = this.WindowDesktopHandle;
                 networkClient.WindowHandle = this.Settings.WindowHandle;

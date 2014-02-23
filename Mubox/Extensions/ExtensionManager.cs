@@ -43,7 +43,6 @@ namespace Mubox.Extensions
             Mubox.Control.Network.Server.ClientAccepted += Server_ClientAccepted;
             Mubox.Control.Network.Server.ClientRemoved += Server_ClientRemoved;
 
-            // TODO: to support multiple profiles, this event handler & related will need to be refactored
             // TODO: additionally, we may want to raise an event to extensions when the active profile changes
             foreach (var L_profile in Mubox.Configuration.MuboxConfigSection.Default.Profiles.Cast<Mubox.Configuration.ProfileSettings>())
             {

@@ -14,6 +14,8 @@ namespace Mubox.Control.Network
 
         public string DisplayName { get; set; }
 
+        public string ProfileName { get; set; }
+
         public IntPtr WindowStationHandle { get; set; }
 
         public IntPtr WindowDesktopHandle { get; set; }
@@ -96,8 +98,7 @@ namespace Mubox.Control.Network
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    // BOP
                 }
                 finally
                 {
@@ -128,8 +129,7 @@ namespace Mubox.Control.Network
             }
             catch (Exception ex)
             {
-                //Debug.WriteLine(ex.Message);
-                //Debug.WriteLine(ex.StackTrace);
+                // NOP
             }
         }
 
@@ -249,8 +249,10 @@ namespace Mubox.Control.Network
             catch (SocketException ex)
             {
                 Disconnect();
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+            }
+            catch (ObjectDisposedException obex)
+            {
+                Disconnect();
             }
             catch (Exception ex)
             {
@@ -921,15 +923,16 @@ namespace Mubox.Control.Network
 
         public void SendClientConfig()
         {
-            byte[] machineNameCommand = ASCIIEncoding.ASCII.GetBytes(string.Format("|NAME/{0}/{1}/{2}/{3}/{4}",
+            byte[] clientNameCommand = ASCIIEncoding.ASCII.GetBytes(string.Format("|NAME/{0}_{1}/{2}/{3}/{4}/{5}",
                 this.DisplayName,
+                this.ProfileName,
                 this.WindowStationHandle.ToString(),
                 this.WindowDesktopHandle.ToString(),
                 this.WindowHandle.ToString(),
                 "?"));
             if (this.EndPoint != null)
             {
-                this.EndPoint.Client.Send(machineNameCommand, SocketFlags.None);
+                this.EndPoint.Client.Send(clientNameCommand, SocketFlags.None);
             }
         }
 

@@ -362,8 +362,7 @@ namespace Mubox.View
             {
                 try
                 {
-                    // HACK: try and enforce unique client names - this is a temporary hack to avoid known issues in other parts of the codebase
-                    // TODO: normally this would only be enforced within the context of a single profile (for obvious reasons)
+                    // ensure client name is unique for current profile
                     var clientName = default(string);
                     while (true)
                     {
@@ -372,9 +371,9 @@ namespace Mubox.View
                         {
                             return;
                         }
-                        foreach (var L_profile in Mubox.Configuration.MuboxConfigSection.Default.Profiles.Cast<Mubox.Configuration.ProfileSettings>())
+                        //foreach (var L_profile in Mubox.Configuration.MuboxConfigSection.Default.Profiles.Cast<Mubox.Configuration.ProfileSettings>())
                         {
-                            if (L_profile.Clients.GetExisting(clientName) != null)
+                            if (profile.Clients.GetExisting(clientName) != null)
                             {
                                 MessageBox.Show("Name '" + clientName + "' is already in use, choose another.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                                 continue;

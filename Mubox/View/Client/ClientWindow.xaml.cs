@@ -277,6 +277,7 @@ namespace Mubox.View.Client
                         ClientState.NetworkClient = new Mubox.Control.Network.Client
                         {
                             DisplayName = ClientState.Settings.Name,
+                            ProfileName = ClientState.Profile.Name,
                             WindowStationHandle = ClientState.WindowStationHandle,
                             WindowDesktopHandle = ClientState.WindowDesktopHandle,
                             WindowHandle = ClientState.Settings.WindowHandle
