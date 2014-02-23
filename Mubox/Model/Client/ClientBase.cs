@@ -162,7 +162,7 @@ namespace Mubox.Model.Client
             {
                 return "NULL";
             }
-            return System.Text.RegularExpressions.Regex.Replace(text, "[^A-Za-z0-9=]*", "");
+            return System.Text.RegularExpressions.Regex.Replace(text, "[^A-Za-z0-9]*", "");
         }
 
         public static string Sanitize(byte[] data)
