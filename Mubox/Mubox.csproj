@@ -139,6 +139,9 @@
       <DependentUpon>ClientWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Client\ClientWindowCollection.cs" />
+    <Compile Include="View\Profile\PromptForProfileNameDialog.xaml.cs">
+      <DependentUpon>PromptForProfileNameDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Server\MulticastConfigDialog.xaml.cs">
       <DependentUpon>MulticastConfigDialog.xaml</DependentUpon>
     </Compile>
@@ -216,6 +219,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Content>
+    <Page Include="View\Profile\PromptForProfileNameDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\Skins\VKBoardSkins.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -331,6 +338,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Model\Gestures\" />
+    <Folder Include="Model\Profile\" />
     <Folder Include="View\Common\" />
     <Folder Include="View\Templates\" />
   </ItemGroup>
