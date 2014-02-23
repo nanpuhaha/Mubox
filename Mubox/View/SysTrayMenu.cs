@@ -340,7 +340,7 @@ namespace Mubox.View
                     string clientName = Mubox.View.PromptForClientNameDialog.PromptForClientName();
                     // TODO try and enforce "unique" client names, e.g. if we already have a ClientX running, don't allow a second ClientX without warning.
 
-                    var clientSettings = Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Clients.GetOrCreateNew(clientName);
+                    var clientSettings = profile.Clients.GetOrCreateNew(clientName);
                     clientSettings.CanLaunch = true;
                     Mubox.Configuration.MuboxConfigSection.Save();
 
