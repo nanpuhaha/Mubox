@@ -933,7 +933,6 @@ namespace Mubox.View.Server
                     {
                         if (L_profile.Name == networkClient.ProfileName)
                         {
-                            // TODO: this will have problems if two different profiles have a client with the same name
                             Mubox.Configuration.ClientSettings settings = L_profile.Clients.GetExisting(networkClient.DisplayName);
                             if (settings != null)
                             {
