@@ -24,12 +24,12 @@ Mubox is an Open Source software project release under the MS-RL license terms. 
 
 Please see LICENSE.MD for MS-RL license details.
 
-Further, contirbutors retain all rights to intellectual property unique to their contribution. Use of intellectual property that cannot be demosntrated as public domain prior to introduction in Mubox will be subject to license terms and be considered a portion of the software.
+Further, contributors retain all rights to intellectual property unique to their contribution. Use of intellectual property that cannot be demonstrated as public domain prior to introduction in Mubox will be subject to license terms and be considered a portion of the software.
 
 
 ## Support
 
-For official support you can contact developers via Facebook:
+For official support you can contact contributors via Facebook:
 
 https://www.facebook.com/groups/121558081022/
 
@@ -51,10 +51,10 @@ Mubox currently requires MSBuild and Microsoft .NET Framework 4.5, you can build
 
 		MSBuild Mubox.sln
 
-However, in practice, Mubox Developers only run Mubox from with Visual Studio. You should be able to use a free version of Visual Studio as we do not make use of any Pro, Premium or Ultimate features during development.
+However, in practice, Mubox contributors only run Mubox from with Visual Studio. You should be able to use a free version of Visual Studio as we do not make use of any Pro, Premium or Ultimate features during development.
 
 
-## Developers
+## Contributions
 
 Mubox is currently an *UNSTABLE BETA* and is available for *DEVELOPMENT AND FEEDBACK* only.
 
