@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Mubox.Extensibility;
 
 namespace Mubox.Configuration
 {
@@ -67,8 +68,8 @@ namespace Mubox.Configuration
                 {
                     if (Keys.Count == 0)
                     {
-                        string defaultActiveClientOnlyKeys = "W,S,A,D,OEM2,Divide,E,Return,OEM5,Escape,Tab,Tilde";
-                        Debug.WriteLine("Creating Default 'Active Client Only' Keys: " + defaultActiveClientOnlyKeys);
+                        string defaultActiveClientOnlyKeys = "Escape";
+                        ("Creating Default 'Active Client Only' Keys: " + defaultActiveClientOnlyKeys).Log();
                         foreach (string vkString in defaultActiveClientOnlyKeys.Split(','))
                         {
                             Keys.CreateNew((WinAPI.VK)Enum.Parse(typeof(WinAPI.VK), vkString, true)).ActiveClientOnly = true;
