@@ -46,9 +46,9 @@ namespace Mubox.View
 
                 MenuItem menuItem = null;
 
-                foreach (var team in Mubox.Configuration.MuboxConfigSection.Default.Profiles.OfType<Mubox.Configuration.ProfileSettings>())
+                foreach (var profile in Mubox.Configuration.MuboxConfigSection.Default.Profiles.OfType<Mubox.Configuration.ProfileSettings>())
                 {
-                    menuItem = CreateProfileShortcutMenu(team);
+                    menuItem = CreateClientsShortcutMenu(profile);
                     if (menuItem != null)
                     {
                         quickLaunchMenuItems.Add(menuItem);
@@ -328,7 +328,7 @@ namespace Mubox.View
             }
         }
 
-        private MenuItem CreateProfileShortcutMenu(Configuration.ProfileSettings profile)
+        private MenuItem CreateClientsShortcutMenu(Configuration.ProfileSettings profile)
         {
             var menuItem = default(MenuItem);
 
@@ -340,8 +340,6 @@ namespace Mubox.View
             menuItem.Header = "Start All";
             menuItem.Click += (sender, e) =>
             {
-                // TODO: need to create a team selector (not launcher), maybe just a 'Teams' menu, need to allow team selection by hotkey, allow hotkey definition from a sub-menu e.g. MENU={"Select","Set/Clear HotKey.."}
-                // TODO: allow characters to be shared between multiple Teams, two teams should not 'Launch' the same 'Character' more than once. Characters will be known uniquely only by 'Name'
                 LaunchProfileClients(profile);
             };
             quickLaunchClientShortcuts.Add(menuItem);
@@ -390,7 +388,7 @@ namespace Mubox.View
                 var lMenuItem = new MenuItem();
                 lMenuItem.IsCheckable = true;
                 lMenuItem.IsChecked = (Mubox.Configuration.MuboxConfigSection.Default.Profiles.Default.Equals(profile.Name));
-                lMenuItem.Header = "Select Team"; // TODO: need hotkey support
+                lMenuItem.Header = "Clients";
                 lMenuItem.Click += (s, e) =>
                     {
                         Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile = profile;

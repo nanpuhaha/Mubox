@@ -23,7 +23,7 @@ namespace Mubox.Configuration
         {
             get
             {
-                // TODO: HACK: need to implement team selection support :( this at least allows users to edit the config directly
+                // TODO: HACK: need to implement profile selection support :( this at least allows users to edit the config directly
                 return GetOrCreateNew(Default);
             }
             set

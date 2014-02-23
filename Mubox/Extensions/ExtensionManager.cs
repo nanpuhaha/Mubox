@@ -43,8 +43,9 @@ namespace Mubox.Extensions
             Mubox.Control.Network.Server.ClientAccepted += Server_ClientAccepted;
             Mubox.Control.Network.Server.ClientRemoved += Server_ClientRemoved;
 
-            // TODO: to support multiple teams, this event handler & related will need to be refactored
-            Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.ActiveClientChanged += ActiveTeam_ActiveClientChanged;
+            // TODO: to support multiple profiles, this event handler & related will need to be refactored
+            // TODO: additionally, we may want to raise an event to extensions when the active profile changes
+            Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.ActiveClientChanged += ActiveProfile_ActiveClientChanged;
 
             var extensionsPath = Path.Combine(Environment.CurrentDirectory, "Extensions");
             var files = System.IO.Directory.EnumerateFiles(extensionsPath, "*.dll");
@@ -71,7 +72,7 @@ namespace Mubox.Extensions
             }
         }
 
-        private void ActiveTeam_ActiveClientChanged(object sender, EventArgs e)
+        private void ActiveProfile_ActiveClientChanged(object sender, EventArgs e)
         {
             Task.Factory.StartNew(delegate()
             {
