@@ -32,8 +32,7 @@ namespace Mubox.Control.Input
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
             try
             {
@@ -41,8 +40,7 @@ namespace Mubox.Control.Input
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
             return new UIntPtr(1);
         }
@@ -80,7 +78,7 @@ namespace Mubox.Control.Input
                     {
                         // failed
                         isStarted = false;
-                        Debug.WriteLine("KBHOOK: Hook Failed 0x" + Marshal.GetLastWin32Error().ToString("X"));
+                        ("KBHOOK: Hook Failed 0x" + Marshal.GetLastWin32Error().ToString("X")).Log();
                     }
                 });
             }
@@ -100,15 +98,14 @@ namespace Mubox.Control.Input
                         }
                         else
                         {
-                            Debug.WriteLine("Detected Stop");
+                            ("KBHOOK Detected Stop").Log();
                             keyboardHookCheckThread = null;
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
                 finally
                 {
@@ -246,8 +243,7 @@ namespace Mubox.Control.Input
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
         }
     }

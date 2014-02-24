@@ -33,8 +33,7 @@ namespace Mubox.Control.Input
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
             try
             {
@@ -42,8 +41,7 @@ namespace Mubox.Control.Input
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
             return UIntPtr.Zero;
         }
@@ -71,7 +69,7 @@ namespace Mubox.Control.Input
             {
                 // failed
                 isStarted = false;
-                Debug.WriteLine("MSHOOK: Hook Failed winerr=0x" + Marshal.GetLastWin32Error().ToString("X"));
+                ("MSHOOK: Hook Failed winerr=0x" + Marshal.GetLastWin32Error().ToString("X")).Log();
             }
         }
 
@@ -84,7 +82,7 @@ namespace Mubox.Control.Input
             if (hHook != IntPtr.Zero)
             {
                 Mubox.WinAPI.WindowHook.UnhookWindowsHookEx(hHook);
-                Debug.WriteLine("MSHOOK: Unhook Success.");
+                ("MSHOOK: Unhook Success.").Log();
                 hHook = IntPtr.Zero;
             }
         }
@@ -114,8 +112,7 @@ namespace Mubox.Control.Input
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
             return false;
         }

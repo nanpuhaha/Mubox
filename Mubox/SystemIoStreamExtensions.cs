@@ -9,7 +9,6 @@ namespace StreamExtensions
     {
         public static void CopyTo(this Stream source, Stream destination, int bufferSize)
         {
-            Debug.WriteLine("CopyTo size=" + source.Length);
             long ts = DateTime.Now.Ticks;
             long cbTotal = 0L;
             byte[] read_buffer = new byte[bufferSize];

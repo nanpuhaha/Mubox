@@ -55,7 +55,7 @@ namespace Mubox.Model.Client
             localAddressTable.AddRange(System.Net.Dns.GetHostAddresses(Environment.MachineName).Select((a) => a.ToString()));
             foreach (string addressString in localAddressTable)
             {
-                Debug.WriteLine("Local Address: " + addressString);
+                ("Local Address: " + addressString).LogInfo();
             }
             return localAddressTable;
         }
@@ -146,7 +146,7 @@ namespace Mubox.Model.Client
             if (d != null)
             {
                 var name = clientBase.DisplayName ?? "";
-                Debug.WriteLine("SrxDisplayNameChanged for " + clientBase.ClientId.ToString() + " to " + name);
+                ("SrxDisplayNameChanged for " + clientBase.ClientId.ToString() + " to " + name).Log();
                 if (!string.IsNullOrEmpty(name))
                 {
                     if (clientBase.DisplayNameChanged != null)

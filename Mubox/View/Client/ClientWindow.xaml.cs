@@ -68,8 +68,7 @@ namespace Mubox.View.Client
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message);
-                        Debug.WriteLine(ex.StackTrace);
+                        ex.Log();
                     }
                 };
 
@@ -164,8 +163,7 @@ namespace Mubox.View.Client
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine(ex.Message);
-                            Debug.WriteLine(ex.StackTrace);
+                            ex.Log();
                         }
                         finally
                         {
@@ -181,10 +179,9 @@ namespace Mubox.View.Client
                 {
                     Close();
                 }
-                catch (Exception lex)
+                catch (Exception L_ex)
                 {
-                    Debug.WriteLine(lex.Message);
-                    Debug.WriteLine(lex.StackTrace);
+                    L_ex.Log();
                 }
             }
         }
@@ -230,8 +227,7 @@ namespace Mubox.View.Client
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
             base.OnClosing(e);
         }
@@ -261,12 +257,12 @@ namespace Mubox.View.Client
                         }
                         else
                         {
-                            Debug.WriteLine("GetWindowThreadProcessId Failed for " + this.ClientState.Settings.Name);
+                            ("GetWindowThreadProcessId Failed for " + this.ClientState.Settings.Name).LogError();
                         }
                     }
                     else
                     {
-                        Debug.WriteLine("WindowInteropHelper Failed for " + this.ClientState.Settings.Name);
+                        ("WindowInteropHelper Failed for " + this.ClientState.Settings.Name).LogError();
                     }
                 });
                 if (ClientState.NetworkClient == null)
@@ -388,8 +384,7 @@ namespace Mubox.View.Client
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
 
             try
@@ -403,8 +398,7 @@ namespace Mubox.View.Client
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
 
             try
@@ -438,8 +432,7 @@ namespace Mubox.View.Client
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
         }
 
@@ -588,8 +581,7 @@ namespace Mubox.View.Client
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
                 FileCopy(Environment.CurrentDirectory + @"\AddOns\Muboxer\" + fileName, AddOnInstallPath + @"Interface\AddOns\Muboxer\" + fileName);
             }
         }
@@ -630,8 +622,7 @@ namespace Mubox.View.Client
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
         }
 
@@ -650,8 +641,7 @@ namespace Mubox.View.Client
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
         }
 
@@ -844,8 +834,7 @@ namespace Mubox.View.Client
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
             ToggleApplicationLaunchButton();
         }

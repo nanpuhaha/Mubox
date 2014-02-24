@@ -32,14 +32,13 @@ namespace Mubox.Control
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                     IsPerformanceEnabled = false;
                 }
             }
             else
             {
-                Debug.WriteLine("PerformanceNotEnabled for Mubox");
+                ("PerformanceNotEnabled for Mubox").Log();
             }
         }
 
@@ -49,7 +48,7 @@ namespace Mubox.Control
             {
                 return;
             }
-            Debug.WriteLine("Removing Perf Counters");
+            ("Removing Perf Counters").Log();
             // destroy all perf objects
             try
             {
@@ -73,13 +72,12 @@ namespace Mubox.Control
                     System.Diagnostics.PerformanceCounterCategory.Delete("Mubox");
                 }
 
-                Debug.WriteLine("Removed Perf Counters");
+                ("Removed Perf Counters").Log();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Did Not Remove Perf Counters");
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ("Did Not Remove Perf Counters").Log();
+                ex.Log();
             }
         }
 
@@ -115,8 +113,7 @@ namespace Mubox.Control
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
                 return performance;
             }

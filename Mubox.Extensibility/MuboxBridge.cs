@@ -20,7 +20,7 @@ namespace Mubox.Extensibility
         public MuboxBridge(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            Trace.ServiceProvider = serviceProvider; // gives Trace extensions indirect access to Console Extension
+            LoggingExtensions.ServiceProvider = serviceProvider; // gives Trace extensions indirect access to Console Extension
             Clients = new List<IMuboxClient>();
             Keyboard = new Input.VirtualKeyboard(null);
             Mouse = new Input.VirtualMouse(null);

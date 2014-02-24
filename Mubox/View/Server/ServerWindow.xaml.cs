@@ -417,8 +417,6 @@ namespace Mubox.View.Server
 
         private bool isSwitchingClients;
 
-        private static bool SetMulticastOneTime = true;
-
         public void CoerceActivation(IntPtr targetClientWindowHandle)
         {
             this.Dispatcher.Invoke((Action)delegate()
@@ -437,8 +435,7 @@ namespace Mubox.View.Server
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
             });
         }
@@ -588,7 +585,7 @@ namespace Mubox.View.Server
                             {
                                 this.Show();
                                 this.Topmost = true;
-                                Debug.WriteLine("Attempted to Show Switcher");
+                                ("Attempted to Show Switcher").Log();
                             }
                         }
                         else
@@ -667,8 +664,7 @@ namespace Mubox.View.Server
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
         }
 
@@ -801,8 +797,7 @@ namespace Mubox.View.Server
             catch (Exception ex)
             {
                 Mubox.Control.Network.Server.RemoveClient(clientBase);
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
         }
 
@@ -872,8 +867,7 @@ namespace Mubox.View.Server
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
             });
         }
@@ -1047,8 +1041,7 @@ namespace Mubox.View.Server
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message);
-                        Debug.WriteLine(ex.StackTrace);
+                        ex.Log();
                     }
                 }
             }
@@ -1118,8 +1111,7 @@ namespace Mubox.View.Server
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
         }
 
@@ -1147,8 +1139,7 @@ namespace Mubox.View.Server
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
             });
         }
@@ -1161,8 +1152,7 @@ namespace Mubox.View.Server
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
         }
 

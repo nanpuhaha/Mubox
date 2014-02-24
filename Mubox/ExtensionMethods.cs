@@ -81,7 +81,7 @@ namespace Mubox
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // TODO: ex.Log()
             }

@@ -45,7 +45,7 @@ namespace Mubox.Control.Network
                             {
                                 if (WinAPI.Windows.GetWindowThreadProcessId(_windowHandle, out windowInputQueue) == 0)
                                 {
-                                    Debug.WriteLine("GWTPID Failed for set_WindowHandle(" + _windowHandle + ") ");
+                                    ("GWTPID Failed for set_WindowHandle(" + _windowHandle + ") ").Log();
                                 }
                                 WindowInputQueue = windowInputQueue;
                             }
@@ -94,7 +94,7 @@ namespace Mubox.Control.Network
                 {
                     EndPoint.Close();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // BOP
                 }
@@ -125,7 +125,7 @@ namespace Mubox.Control.Network
                     throw new SocketException((int)socketError);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // NOP
             }
@@ -144,7 +144,7 @@ namespace Mubox.Control.Network
                 Thread.MemoryBarrier();
                 if (lEndPoint == null)
                 {
-                    Debug.WriteLine("NoEndPoint for " + this.DisplayName);
+                    ("NoEndPoint for " + this.DisplayName).Log();
                     fragmentBuffer = new byte[0];
                     return;
                 }
@@ -173,7 +173,7 @@ namespace Mubox.Control.Network
                     receiveBuffer = temp;
                 }
 
-                //Debug.WriteLine("MCNC: receiveBuffer=" + System.Text.Encoding.ASCII.GetString(receiveBuffer));
+                //("MCNC: receiveBuffer=" + System.Text.Encoding.ASCII.GetString(receiveBuffer)).Log();
 
                 var stream = new System.IO.MemoryStream(receiveBuffer);
                 using (var reader = new System.IO.BinaryReader(stream))
@@ -194,10 +194,9 @@ namespace Mubox.Control.Network
                         }
                         catch (Exception ex)
                         {
-                            //Debug.WriteLine("MCNC: lastReadPosition=" + lastReadPosition + " currentPosition=" + stream.Position);
+                            //("MCNC: lastReadPosition=" + lastReadPosition + " currentPosition=" + stream.Position).Log();
 
-                            Debug.WriteLine(ex.Message);
-                            Debug.WriteLine(ex.StackTrace);
+                            ex.Log();
                             // TODO: log/debug exception types thrown here, not documented on MSDN and it's not clear how to handle a buffer underrun in ReadObject
                             // TODO: if the exception is due to an unknown type, the fragmentBuffer logic will result in a deadlock on the network (always retrying a bad object)
                             o = null;
@@ -219,7 +218,7 @@ namespace Mubox.Control.Network
 
                 if (actionQueue.Count == 0)
                 {
-                    Debug.WriteLine("NoActions for " + this.DisplayName);
+                    ("NoActions for " + this.DisplayName).Log();
                     return;
                 }
 
@@ -236,26 +235,24 @@ namespace Mubox.Control.Network
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine(ex.Message);
-                            Debug.WriteLine(ex.StackTrace);
+                            ex.Log();
                         }
                     }
                 }
 
                 #endregion process action queue
             }
-            catch (SocketException ex)
+            catch (SocketException)
             {
                 Disconnect();
             }
-            catch (ObjectDisposedException obex)
+            catch (ObjectDisposedException)
             {
                 Disconnect();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
             finally
             {
@@ -333,7 +330,7 @@ namespace Mubox.Control.Network
                                 break;
 
                             default:
-                                Debug.WriteLine("UnsupportedButtonDown in MouseData(" + xbutton + ") for " + this.DisplayName);
+                                ("UnsupportedButtonDown in MouseData(" + xbutton + ") for " + this.DisplayName).Log();
                                 break;
                         }
                     }
@@ -355,7 +352,7 @@ namespace Mubox.Control.Network
                                 break;
 
                             default:
-                                Debug.WriteLine("UnsupportedButtonUp in MouseData(" + xbutton + ") for " + this.DisplayName);
+                                ("UnsupportedButtonUp in MouseData(" + xbutton + ") for " + this.DisplayName).Log();
                                 break;
                         }
                     }
@@ -374,7 +371,7 @@ namespace Mubox.Control.Network
             // no target window? can't use
             if (WindowHandle == IntPtr.Zero)
             {
-                Debug.WriteLine("NoWindowHandle Failed OnMouseInputReceived, Input Loss for " + this.DisplayName);
+                ("NoWindowHandle Failed OnMouseInputReceived, Input Loss for " + this.DisplayName).Log();
                 return;
             }
 
@@ -392,7 +389,7 @@ namespace Mubox.Control.Network
                     IntPtr windowInputQueue = WindowInputQueue;
                     if (windowInputQueue == IntPtr.Zero)
                     {
-                        Debug.WriteLine("NoWindowInputQueue Failed OnMouseInputReceived, Input Loss for " + this.DisplayName);
+                        ("NoWindowInputQueue Failed OnMouseInputReceived, Input Loss for " + this.DisplayName).Log();
                         useTIQ = false;
                     }
                     else
@@ -402,7 +399,7 @@ namespace Mubox.Control.Network
                         IntPtr foregroundInputQueue;
                         if (!TryResolveTIQ(out foregroundInputQueue, out foregroundWindowHandle, DateTime.Now.AddMilliseconds(300).Ticks))
                         {
-                            Debug.WriteLine("TryResolveTIQ Failed OnMouseInputReceived, Input Loss for " + this.DisplayName);
+                            ("TryResolveTIQ Failed OnMouseInputReceived, Input Loss for " + this.DisplayName).Log();
                             useTIQ = false;
                         }
                         else
@@ -493,7 +490,7 @@ namespace Mubox.Control.Network
                 // no target window
                 if (windowHandle == IntPtr.Zero)
                 {
-                    Debug.WriteLine("NoWindowHandle Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName);
+                    ("NoWindowHandle Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName).Log();
                     WinAPI.SendInputApi.SendInputViaKBParams(keyboardInput.Flags, keyboardInput.Time, keyboardInput.Scan, keyboardInput.VK, keyboardInput.CAS);
                     return;
                 }
@@ -502,7 +499,7 @@ namespace Mubox.Control.Network
                 IntPtr windowInputQueue = WindowInputQueue;
                 if (windowInputQueue == IntPtr.Zero)
                 {
-                    Debug.WriteLine("NoWindowInputQueue Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName);
+                    ("NoWindowInputQueue Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName).Log();
                     WinAPI.SendInputApi.SendInputViaKBParams(keyboardInput.Flags, keyboardInput.Time, keyboardInput.Scan, keyboardInput.VK, keyboardInput.CAS);
                     return;
                 }
@@ -512,7 +509,7 @@ namespace Mubox.Control.Network
                 IntPtr foregroundInputQueue;
                 if (!TryResolveTIQ(out foregroundInputQueue, out foregroundWindowHandle, DateTime.Now.AddMilliseconds(300).Ticks))
                 {
-                    Debug.WriteLine("TryResolveTIQ Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName);
+                    ("TryResolveTIQ Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName).Log();
                     WinAPI.SendInputApi.SendInputViaKBParams(keyboardInput.Flags, keyboardInput.Time, keyboardInput.Scan, keyboardInput.VK, keyboardInput.CAS);
                     return;
                 }
@@ -543,13 +540,11 @@ namespace Mubox.Control.Network
                     catch (SocketException ex)
                     {
                         Disconnect();
-                        Debug.WriteLine(ex.Message);
-                        Debug.WriteLine(ex.StackTrace);
+                        ex.Log();
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message);
-                        Debug.WriteLine(ex.StackTrace);
+                        ex.Log();
                     }
                     break;
 
@@ -560,13 +555,12 @@ namespace Mubox.Control.Network
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message);
-                        Debug.WriteLine(ex.StackTrace);
+                        ex.Log();
                     }
                     break;
 
                 default:
-                    Debug.WriteLine("UnknownCommand '" + (commandInput.Text ?? "") + "' for " + this.DisplayName);
+                    ("UnknownCommand '" + (commandInput.Text ?? "") + "' for " + this.DisplayName).Log();
                     break;
             }
         }
@@ -626,7 +620,7 @@ namespace Mubox.Control.Network
                     detachMIQ = true;
                     if (WinAPI.Windows.AttachThreadInput(MyInputQueue, foregroundInputQueue, true))
                     {
-                        Debug.WriteLine("ATI MIQ Failed " + callingComponent + " for " + this.DisplayName);
+                        ("ATI MIQ Failed " + callingComponent + " for " + this.DisplayName).Log();
                     }
                 }
 
@@ -635,7 +629,7 @@ namespace Mubox.Control.Network
                     detachWIQ = true;
                     if (WinAPI.Windows.AttachThreadInput(foregroundInputQueue, WindowInputQueue, true))
                     {
-                        Debug.WriteLine("ATI WIQ Failed " + callingComponent + " for " + this.DisplayName);
+                        ("ATI WIQ Failed " + callingComponent + " for " + this.DisplayName).Log();
                     }
                 }
 
@@ -800,34 +794,34 @@ namespace Mubox.Control.Network
                 WinAPI.Windows.SendMessage(_windowHandle, WinAPI.WM.MOUSEACTIVATE, _windowHandle, new UIntPtr(WinAPI.MACROS.MAKELPARAM((ushort)wm, (ushort)WinAPI.HitTestValues.HTCLIENT)));
                 WinAPI.Windows.SendMessage(_windowHandle, WinAPI.WM.MOUSEMOVE, new UIntPtr((uint)CurrentMK), new UIntPtr(clientRelativeCoordinates));
                 WinAPI.Windows.SendMessage(_windowHandle, wm, new UIntPtr(mouseData), new UIntPtr(clientRelativeCoordinates));
-                //Debug.WriteLine("OnMouseEvent SendMessage(" + _windowHandle.ToString() + ", " + wm + ", " + mouseData + ", " + clientRelativeCoordinates + ", " + pointX + ", " + pointY + ", " + lPointX + ", " + lPointY + ", (" + CurrentMK + "), " + isButtonUpEvent);
+                //("OnMouseEvent SendMessage(" + _windowHandle.ToString() + ", " + wm + ", " + mouseData + ", " + clientRelativeCoordinates + ", " + pointX + ", " + pointY + ", " + lPointX + ", " + lPointY + ", (" + CurrentMK + "), " + isButtonUpEvent).Log();
                 //Win32.Cursor.ReleaseCapture();
             }
         }
 
         private void OnActivateClient()
         {
-            Debug.WriteLine("ReceivedActivateRequest for " + this.DisplayName);
+            ("ReceivedActivateRequest for " + this.DisplayName).Log();
             DateTime onActivateClientReceivedTimestamp = DateTime.Now;
             lock (_tiqLock)
             {
-                Debug.WriteLine("ActivateClientLock took " + onActivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName);
+                ("ActivateClientLock took " + onActivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName).Log();
                 onActivateClientReceivedTimestamp = DateTime.Now;
                 LastActivatedClientWindowHandle = _windowHandle;
                 long activationExpiryTime = DateTime.Now.AddMilliseconds(1000).Ticks;
                 do
                 {
-                    Debug.WriteLine("ActivateClientAttempt@" + WindowHandle + " for " + this.DisplayName);
+                    ("ActivateClientAttempt@" + WindowHandle + " for " + this.DisplayName).Log();
                     if (WindowHandle == IntPtr.Zero)
                     {
-                        Debug.WriteLine("NoWindowHandle Failed OnActivateClient for " + this.DisplayName);
+                        ("NoWindowHandle Failed OnActivateClient for " + this.DisplayName).Log();
                         return;
                     }
 
                     IntPtr windowInputQueue = WindowInputQueue;
                     if (windowInputQueue == IntPtr.Zero)
                     {
-                        Debug.WriteLine("NoWindowInputQueue Failed OnActivateClient for " + this.DisplayName);
+                        ("NoWindowInputQueue Failed OnActivateClient for " + this.DisplayName).Log();
                         return;
                     }
 
@@ -836,7 +830,7 @@ namespace Mubox.Control.Network
                     IntPtr foregroundInputQueue;
                     if (!TryResolveTIQ(out foregroundInputQueue, out foregroundWindowHandle, activationExpiryTime))
                     {
-                        Debug.WriteLine("TryResolveTIQ Failed OnActivateClient for " + this.DisplayName);
+                        ("TryResolveTIQ Failed OnActivateClient for " + this.DisplayName).Log();
                         return;
                     }
 
@@ -852,39 +846,38 @@ namespace Mubox.Control.Network
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine(ex.Message);
-                            Debug.WriteLine(ex.StackTrace);
+                            ex.Log();
                         }
                     };
                     ActionViaTIQ(action, foregroundInputQueue, "OnActivateClient");
                 } while ((DateTime.Now.Ticks < activationExpiryTime) && (_windowHandle != WinAPI.Windows.GetForegroundWindow()));
-                Debug.WriteLine("ActivateClientAction took " + onActivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName);
+                ("ActivateClientAction took " + onActivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName).Log();
             }
             NotifyClientActivated();
         }
 
         private void OnDeactivateClient()
         {
-            Debug.WriteLine("ReceivedDeactivateRequest for " + this.DisplayName);
+            ("ReceivedDeactivateRequest for " + this.DisplayName).Log();
             DateTime onDeactivateClientReceivedTimestamp = DateTime.Now;
             lock (_tiqLock)
             {
-                Debug.WriteLine("DeactivateClientLock took " + onDeactivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName);
+                ("DeactivateClientLock took " + onDeactivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName).Log();
                 onDeactivateClientReceivedTimestamp = DateTime.Now;
                 LastActivatedClientWindowHandle = _windowHandle;
                 long activationExpiryTime = DateTime.Now.AddMilliseconds(1000).Ticks;
 
-                Debug.WriteLine("DeactivateClientAttempt@" + WindowHandle + " for " + this.DisplayName);
+                ("DeactivateClientAttempt@" + WindowHandle + " for " + this.DisplayName).Log();
                 if (WindowHandle == IntPtr.Zero)
                 {
-                    Debug.WriteLine("NoWindowHandle Failed OnDeactivateClient for " + this.DisplayName);
+                    ("NoWindowHandle Failed OnDeactivateClient for " + this.DisplayName).Log();
                     return;
                 }
 
                 IntPtr windowInputQueue = WindowInputQueue;
                 if (windowInputQueue == IntPtr.Zero)
                 {
-                    Debug.WriteLine("NoWindowInputQueue Failed OnDeactivateClient for " + this.DisplayName);
+                    ("NoWindowInputQueue Failed OnDeactivateClient for " + this.DisplayName).Log();
                     return;
                 }
 
@@ -893,7 +886,7 @@ namespace Mubox.Control.Network
                 IntPtr foregroundInputQueue;
                 if (!TryResolveTIQ(out foregroundInputQueue, out foregroundWindowHandle, activationExpiryTime))
                 {
-                    Debug.WriteLine("TryResolveTIQ Failed OnDeactivateClient for " + this.DisplayName);
+                    ("TryResolveTIQ Failed OnDeactivateClient for " + this.DisplayName).Log();
                     return;
                 }
 
@@ -906,13 +899,12 @@ namespace Mubox.Control.Network
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message);
-                        Debug.WriteLine(ex.StackTrace);
+                        ex.Log();
                     }
                 };
                 ActionViaTIQ(action, foregroundInputQueue, "OnDeactivateClient");
             }
-            Debug.WriteLine("DeactivateClientAction took " + onDeactivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName);
+            ("DeactivateClientAction took " + onDeactivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName).Log();
         }
 
         public event EventHandler<EventArgs> Connected;
@@ -987,16 +979,14 @@ namespace Mubox.Control.Network
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine(ex.Message);
-                            Debug.WriteLine(ex.StackTrace);
+                            ex.Log();
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
 
             if (stats != null)
@@ -1105,7 +1095,7 @@ namespace Mubox.Control.Network
                             callback(sender, e);
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         // TODO: log
                         if (socketAsyncEventArgs != null)
@@ -1177,8 +1167,7 @@ namespace Mubox.Control.Network
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
             SendCommand("ACTV",
                 (sender, e) =>

@@ -28,9 +28,8 @@ namespace Mubox.QuickLaunch
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
-                Debug.WriteLine("CoerceCultureInfo Failed for Mubox.QuickLaunch.App");
+                ex.Log();
+                ("CoerceCultureInfo Failed for Mubox.QuickLaunch.App").LogWarn();
             }
 
             try
@@ -47,17 +46,16 @@ namespace Mubox.QuickLaunch
                 Stream clientStream = File.Open(muboxLogFilename, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
                 Mubox.Diagnostics.TraceListenerStreamWriter traceListenerStreamWriter = new Mubox.Diagnostics.TraceListenerStreamWriter(clientStream);
                 System.Diagnostics.Trace.Listeners.Add(traceListenerStreamWriter);
-                Debug.WriteLine(new string('*', 0x4d));
-                Debug.WriteLine(new string('*', 0x4d));
-                Debug.WriteLine(new string('*', 0x4d));
-                Debug.WriteLine("Logging \"" + muboxLogFilename + "\" for Mubox.QuickLaunch.App");
+                (new string('*', 0x4d)).LogInfo();
+                (new string('*', 0x4d)).LogInfo();
+                (new string('*', 0x4d)).LogInfo();
+                ("Logging \"" + muboxLogFilename + "\" for Mubox.QuickLaunch.App").Log();
                 ("Extensibility Trace Initialized").Log();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
-                Debug.WriteLine("Logging Failed for Mubox.QuickLaunch.App");
+                ex.Log();
+                ("Logging Failed for Mubox.QuickLaunch.App").LogWarn();
             }
 
             try
@@ -67,8 +65,7 @@ namespace Mubox.QuickLaunch
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
 
             try
@@ -82,8 +79,7 @@ namespace Mubox.QuickLaunch
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
         }
     }

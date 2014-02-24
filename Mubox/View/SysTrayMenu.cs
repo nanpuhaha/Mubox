@@ -32,8 +32,7 @@ namespace Mubox.View
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
 
             try
@@ -71,8 +70,7 @@ namespace Mubox.View
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message);
-                        Debug.WriteLine(ex.StackTrace);
+                        ex.Log();
                     }
                 };
                 menuItem.Header = "_Configure New Game Profile...";
@@ -305,8 +303,7 @@ namespace Mubox.View
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine(ex.Message);
-                            Debug.WriteLine(ex.StackTrace);
+                            ex.Log();
                         }
                     }
                     Mubox.View.Server.ServerWindow.Instance = null;
@@ -320,8 +317,7 @@ namespace Mubox.View
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
         }
 
@@ -392,8 +388,7 @@ namespace Mubox.View
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
             };
             menuItem.Header = "_Configure New Mubox Client...";
@@ -481,8 +476,7 @@ namespace Mubox.View
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message);
-                        Debug.WriteLine(ex.StackTrace);
+                        ex.Log();
                     }
                 }
                 Mubox.View.Server.ServerWindow.Instance = new Mubox.View.Server.ServerWindow();
@@ -494,8 +488,7 @@ namespace Mubox.View
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
         }
 

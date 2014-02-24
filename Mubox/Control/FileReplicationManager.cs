@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Mubox.Extensibility;
 
 namespace Mubox.Control
 {
@@ -24,14 +25,13 @@ namespace Mubox.Control
                             Directory.CreateDirectory(Path.GetDirectoryName(item.Destination));
                         }
                         File.Copy(item.Source, item.Destination, true);
-                        Debug.WriteLine("ReplicationSuccess for " + item);
+                        ("ReplicationSuccess for " + item).Log();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine("FileReplicationFailed for " + item);
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ("FileReplicationFailed for " + item).Log();
+                    ex.Log();
                 }
             }
         }

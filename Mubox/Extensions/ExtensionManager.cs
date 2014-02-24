@@ -39,7 +39,7 @@ namespace Mubox.Extensions
 
         public void Initialize()
         {
-            Extensibility.TraceExtensions.Log("Extension Manager Initialize");
+            ("Extension Manager Initialize").Log();
             Mubox.Control.Network.Server.ClientAccepted += Server_ClientAccepted;
             Mubox.Control.Network.Server.ClientRemoved += Server_ClientRemoved;
 
@@ -120,7 +120,7 @@ namespace Mubox.Extensions
 
         public void Shutdown()
         {
-            Extensibility.TraceExtensions.Log("Extension Manager Shutdown");
+            ("Extension Manager Shutdown").Log();
             Mubox.Control.Network.Server.ClientAccepted -= Server_ClientAccepted;
             Mubox.Control.Network.Server.ClientRemoved -= Server_ClientRemoved;
         }
@@ -275,7 +275,7 @@ namespace Mubox.Extensions
                         }
                         catch (Exception ex)
                         {
-                            Extensibility.TraceExtensions.Log(ex);
+                            ex.Log();
                         }
                     });
             }, TaskCreationOptions.PreferFairness);
@@ -317,7 +317,7 @@ namespace Mubox.Extensions
                         }
                         catch (Exception ex)
                         {
-                            Extensibility.TraceExtensions.Log(ex);
+                            ex.Log();
                         }
                     });
             }, TaskCreationOptions.PreferFairness);

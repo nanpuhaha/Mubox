@@ -32,8 +32,7 @@ namespace Mubox.View.Controls
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
         }
 
@@ -50,8 +49,7 @@ namespace Mubox.View.Controls
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
         }
 
@@ -84,8 +82,7 @@ namespace Mubox.View.Controls
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
             });
         }

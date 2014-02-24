@@ -53,8 +53,7 @@ namespace Mubox.Model
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
 
                 try
@@ -63,8 +62,7 @@ namespace Mubox.Model
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
 
                 try
@@ -73,8 +71,7 @@ namespace Mubox.Model
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
             }
             clientState_lastTimerTick = DateTime.Now;
@@ -178,8 +175,7 @@ namespace Mubox.Model
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message);
-                        Debug.WriteLine(ex.StackTrace);
+                        ex.Log();
                     }
                 }
             }
@@ -284,7 +280,7 @@ namespace Mubox.Model
             Process gameProcess = GameProcess;
             if (gameProcess == null)
             {
-                Debug.WriteLine("NoGameProcess for " + this.Settings.Name);
+                ("NoGameProcess for " + this.Settings.Name).Log();
                 return;
             }
 
@@ -294,7 +290,7 @@ namespace Mubox.Model
 
                 if (gameProcess.HasExited)
                 {
-                    Debug.WriteLine("GameProcessExited for " + this.Settings.Name);
+                    ("GameProcessExited for " + this.Settings.Name).LogInfo();
                     GameProcess = null;
                     Sandbox.Process = null;
                     Settings.WindowHandle = IntPtr.Zero;
@@ -320,7 +316,7 @@ namespace Mubox.Model
                         bool newProcessWindow = Settings.WindowHandle != newWindowHandle;
                         if (newProcessWindow)
                         {
-                            Debug.WriteLine("NewGameProcess for " + this.Settings.Name);
+                            ("NewGameProcess for " + this.Settings.Name).Log();
                             Settings.WindowHandle = newWindowHandle;
                             if (GameProcessFound != null)
                             {
@@ -334,15 +330,14 @@ namespace Mubox.Model
                     }
                     else
                     {
-                        Debug.WriteLine("GameProcessNotResponding for " + this.Settings.Name);
+                        ("GameProcessNotResponding for " + this.Settings.Name).LogWarn();
                     }
                     ManageProcessorAffinity(gameProcess);
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
         }
 
@@ -417,8 +412,7 @@ namespace Mubox.Model
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
             }
 
@@ -454,8 +448,7 @@ namespace Mubox.Model
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
                 Timer = null;
             }
@@ -475,8 +468,7 @@ namespace Mubox.Model
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
                 this.GameProcess = null;
             }
@@ -488,8 +480,7 @@ namespace Mubox.Model
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
                 this.NetworkClient = null;
             }

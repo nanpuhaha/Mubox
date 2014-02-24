@@ -32,8 +32,7 @@ namespace Mubox.Control.Network
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message);
-                        Debug.WriteLine(ex.StackTrace);
+                        ex.Log();
                     }
                 }
                 Listener = new TcpListener(IPAddress.Any, portNumber);
@@ -59,8 +58,7 @@ namespace Mubox.Control.Network
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message);
-                        Debug.WriteLine(ex.StackTrace);
+                        ex.Log();
                     }
                 }
             }
@@ -88,8 +86,7 @@ namespace Mubox.Control.Network
                             catch (Exception ex)
                             {
                                 client = null;
-                                Debug.WriteLine(ex.Message);
-                                Debug.WriteLine(ex.StackTrace);
+                                ex.Log();
                             }
                         });
 
@@ -101,21 +98,17 @@ namespace Mubox.Control.Network
                         }
                     }
                 }
-                catch (Exception lex)
+                catch (Exception)
                 {
-                    //Debug.WriteLine(lex.Message);
-                    //Debug.WriteLine(lex.StackTrace);
                 }
                 finally
                 {
                     Listener.BeginAcceptSocket(AcceptSocketCallback, null);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 IsListening = false;
-                //Debug.WriteLine(ex.Message);
-                //Debug.WriteLine(ex.StackTrace);
             }
         }
 

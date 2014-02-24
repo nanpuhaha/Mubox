@@ -82,7 +82,7 @@ namespace Mubox.Model.Client
                 }
                 commandFragment = "";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 if (socket != null && socket == ClientSocket)
                 {
@@ -143,8 +143,7 @@ namespace Mubox.Model.Client
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
             }
         }
@@ -157,8 +156,7 @@ namespace Mubox.Model.Client
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
         }
 
@@ -173,8 +171,7 @@ namespace Mubox.Model.Client
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
         }
 
@@ -189,8 +186,7 @@ namespace Mubox.Model.Client
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                     Detach();
                 }
             }, new IntPtr[] { this.WindowStationHandle, this.WindowDesktopHandle, this.WindowHandle });
@@ -220,15 +216,13 @@ namespace Mubox.Model.Client
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine(ex.Message);
-                            Debug.WriteLine(ex.StackTrace);
+                            ex.Log();
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
             });
         }
@@ -243,8 +237,7 @@ namespace Mubox.Model.Client
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
             });
         }
@@ -284,8 +277,7 @@ namespace Mubox.Model.Client
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    ex.Log();
                 }
             });
         }
@@ -461,8 +453,7 @@ namespace Mubox.Model.Client
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
                 this.Detach();
             }
         }
@@ -502,8 +493,7 @@ namespace Mubox.Model.Client
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
+                ex.Log();
             }
             finally
             {

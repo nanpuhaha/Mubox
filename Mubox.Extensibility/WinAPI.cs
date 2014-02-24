@@ -2289,7 +2289,7 @@ namespace Mubox
                 if (result == 0)
                 {
                     int err = Marshal.GetLastWin32Error();
-                    Debug.WriteLine("SendInput(ki) Blocked, 0x" + err.ToString("X"));
+                    ("SendInput(ki) Blocked, 0x" + err.ToString("X")).LogError();
                 }
 
                 if ((flags & WindowHook.LLKHF.UP) == WindowHook.LLKHF.UP)
@@ -2358,7 +2358,7 @@ namespace Mubox
                 if (result == 0)
                 {
                     int err = Marshal.GetLastWin32Error();
-                    Debug.WriteLine("SendInput(mi) Blocked, 0x" + err.ToString("X"));
+                    ("SendInput(mi) Blocked, 0x" + err.ToString("X")).Log();
                 }
             }
 
@@ -4968,7 +4968,7 @@ namespace Mubox
                     ref dnl,
                     out use);
 
-                Debug.WriteLine("err=" + Marshal.GetLastWin32Error());
+                ("err=" + Marshal.GetLastWin32Error()).Log();
                 ^ always 0
                 
                  *
@@ -5044,7 +5044,7 @@ namespace Mubox
 
                 if (!result)
                 {
-                    Debug.WriteLine("CreateProcessWithLogonW failed with err 0x" + Marshal.GetLastWin32Error().ToString("X"));
+                    ("CreateProcessWithLogonW failed with err 0x" + Marshal.GetLastWin32Error().ToString("X")).LogCritical();
                 }
 
                 sandbox.Process = result
