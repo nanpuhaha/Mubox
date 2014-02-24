@@ -126,8 +126,14 @@ namespace Mubox.Model.Client
         public string DisplayName
         {
             get { return (string)GetValue(DisplayNameProperty); }
-            set { SetValue(DisplayNameProperty, value); }
+            set
+            {
+                SetValue(DisplayNameProperty, value);
+                _displayName = value;
+            }
         }
+
+        protected string _displayName;
 
         public event EventHandler<EventArgs> DisplayNameChanged;
 

@@ -3727,7 +3727,7 @@ namespace Mubox
         #region KeyState
 
         /// <summary>
-        /// <para>Async Key State is said to be shared over all VIQs, and is thus not 'only representative' of the 'active viq'.</para>
+        /// <para>BEWARE: Async Key State is said to be shared over all TIQs, and is thus not 'only representative' of the 'active TIQ'.</para>
         /// </summary>
         /// <param name="vk"></param>
         /// <returns></returns>

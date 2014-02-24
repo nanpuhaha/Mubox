@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using Mubox.Control;
 using Mubox.Model.Input;
 using System.Linq;
+using Mubox.Extensibility;
 
 namespace Mubox.Model.Client
 {
@@ -362,6 +363,9 @@ namespace Mubox.Model.Client
 
         public override void Dispatch(MouseInput e)
         {
+#if DEBUG
+            ("Dispatch(" + _displayName + ") " + Convert.ToString(e)).Log();
+#endif
             ServerTxPerformanceIncrement("MOUSE");
             try
             {
@@ -376,6 +380,9 @@ namespace Mubox.Model.Client
 
         public override void Dispatch(KeyboardInput e)
         {
+#if DEBUG
+            ("Dispatch(" + _displayName + ") " + Convert.ToString(e)).Log();
+#endif
             ServerTxPerformanceIncrement("KB");
             try
             {
@@ -390,6 +397,9 @@ namespace Mubox.Model.Client
 
         public override void Dispatch(CommandInput e)
         {
+#if DEBUG
+            ("Dispatch(" + _displayName + ") " + Convert.ToString(e)).Log();
+#endif
             ServerTxPerformanceIncrement("CMD");
             try
             {

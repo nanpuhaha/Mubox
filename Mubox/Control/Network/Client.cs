@@ -30,7 +30,7 @@ namespace Mubox.Control.Network
             {
                 if (_windowHandle != value)
                 {
-                    lock (inputQueueLock)
+                    lock (_tiqLock)
                     {
                         _windowHandle = value;
                         if (_windowHandle == IntPtr.Zero)
@@ -56,8 +56,6 @@ namespace Mubox.Control.Network
         }
 
         private IntPtr _windowHandle;
-
-        private static object inputQueueLock = new object();
 
         public IntPtr WindowInputQueue { get; set; }
 
@@ -270,9 +268,11 @@ namespace Mubox.Control.Network
             // TODO: log
         }
 
+        private static object _tiqLock = new object();
+
         private void OnMouseInputReceived(Model.Input.MouseInput mouseInput)
         {
-            bool useVIQ = false; // DOES NOT WORK
+            bool useTIQ = true; //TODO: this needs test and reverification of semantics/rules because it does not appear to allow mouse broadcast
 
             // translate message and track MK changes
             WinAPI.WM wm = WinAPI.WM.USER;
@@ -375,31 +375,39 @@ namespace Mubox.Control.Network
             if (WindowHandle == IntPtr.Zero)
             {
                 Debug.WriteLine("NoWindowHandle Failed OnMouseInputReceived, Input Loss for " + this.DisplayName);
+                return;
             }
-            else
+
+            // denormalize coordinates to local
+            WinAPI.Windows.RECT clientRect;
+            WinAPI.Windows.GetClientRect(WindowHandle, out clientRect);
+            int lPointX = (int)(((double)clientRect.Width / (double)65536) * mouseInput.Point.X);
+            int lPointY = (int)(((double)clientRect.Height / (double)65536) * mouseInput.Point.Y);
+
+            lock (_tiqLock)
             {
-                if (useVIQ)
+                if (useTIQ)
                 {
-                    // can't resolve VIQ? can't use
+                    // can't resolve TIQ? can't use
                     IntPtr windowInputQueue = WindowInputQueue;
                     if (windowInputQueue == IntPtr.Zero)
                     {
                         Debug.WriteLine("NoWindowInputQueue Failed OnMouseInputReceived, Input Loss for " + this.DisplayName);
-                        useVIQ = false;
+                        useTIQ = false;
                     }
                     else
                     {
-                        // resolve VIQ
+                        // resolve TIQ
                         IntPtr foregroundWindowHandle;
                         IntPtr foregroundInputQueue;
-                        if (!TryResolveViq(out foregroundInputQueue, out foregroundWindowHandle, DateTime.Now.AddMilliseconds(1000).Ticks))
+                        if (!TryResolveTIQ(out foregroundInputQueue, out foregroundWindowHandle, DateTime.Now.AddMilliseconds(300).Ticks))
                         {
-                            Debug.WriteLine("TryResolveVIQ Failed OnMouseInputReceived, Input Loss for " + this.DisplayName);
-                            useVIQ = false;
+                            Debug.WriteLine("TryResolveTIQ Failed OnMouseInputReceived, Input Loss for " + this.DisplayName);
+                            useTIQ = false;
                         }
                         else
                         {
-                            ActionViaViq(() =>
+                            ActionViaTIQ(() =>
                             {
                                 WinAPI.SendInputApi.MouseActionViaSendInput(mouseInput.Flags, mouseInput.Time, (int)mouseInput.Point.X, (int)mouseInput.Point.Y, mouseInput.MouseData);
                             },
@@ -408,13 +416,8 @@ namespace Mubox.Control.Network
                     }
                 }
 
-                if (!useVIQ)
+                if (!useTIQ)
                 {
-                    // denormalize coordinates
-                    WinAPI.Windows.RECT clientRect;
-                    WinAPI.Windows.GetClientRect(WindowHandle, out clientRect);
-                    int lPointX = (int)(((double)clientRect.Width / (double)65536) * mouseInput.Point.X);
-                    int lPointY = (int)(((double)clientRect.Height / (double)65536) * mouseInput.Point.Y);
 
                     // dispatch
                     MouseActionViaSendMessage((int)mouseInput.Point.X, (int)mouseInput.Point.Y, lPointX, lPointY, wm, mouseInput.MouseData, isButtonUpEvent);
@@ -425,6 +428,7 @@ namespace Mubox.Control.Network
         private void OnKeyboardInputReceived(Model.Input.KeyboardInput keyboardInput)
         {
             // coerce specialized left/right shift-state to generalized shift-state
+            // TODO: this should be a profile-level option
             /*
             switch ((WinAPI.VK)keyboardInput.VK)
             {
@@ -446,73 +450,77 @@ namespace Mubox.Control.Network
              */
 
             // prevent windows key-repeat
+            // TODO: this should be a profile-level option
             if (IsRepeatKey(keyboardInput.VK, keyboardInput.Scan, keyboardInput.Flags, keyboardInput.Time))
             {
                 return;
             }
 
-            // maintain MK state
-            switch ((WinAPI.VK)keyboardInput.VK)
+            lock (_tiqLock)
             {
-                case WinAPI.VK.Control:
-                case WinAPI.VK.LeftControl:
-                case WinAPI.VK.RightControl:
-                    if ((keyboardInput.Flags & WinAPI.WindowHook.LLKHF.UP) == WinAPI.WindowHook.LLKHF.UP)
-                    {
-                        CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_CONTROL) ^ WinAPI.Windows.MK.MK_CONTROL;
-                    }
-                    else
-                    {
-                        CurrentMK |= WinAPI.Windows.MK.MK_CONTROL;
-                    }
-                    break;
+                // maintain MK state
+                switch ((WinAPI.VK)keyboardInput.VK)
+                {
+                    case WinAPI.VK.Control:
+                    case WinAPI.VK.LeftControl:
+                    case WinAPI.VK.RightControl:
+                        if ((keyboardInput.Flags & WinAPI.WindowHook.LLKHF.UP) == WinAPI.WindowHook.LLKHF.UP)
+                        {
+                            CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_CONTROL) ^ WinAPI.Windows.MK.MK_CONTROL;
+                        }
+                        else
+                        {
+                            CurrentMK |= WinAPI.Windows.MK.MK_CONTROL;
+                        }
+                        break;
 
-                case WinAPI.VK.Shift:
-                case WinAPI.VK.LeftShift:
-                case WinAPI.VK.RightShift:
-                    if ((keyboardInput.Flags & WinAPI.WindowHook.LLKHF.UP) == WinAPI.WindowHook.LLKHF.UP)
-                    {
-                        CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_SHIFT) ^ WinAPI.Windows.MK.MK_SHIFT;
-                    }
-                    else
-                    {
-                        CurrentMK |= WinAPI.Windows.MK.MK_CONTROL;
-                    }
-                    break;
+                    case WinAPI.VK.Shift:
+                    case WinAPI.VK.LeftShift:
+                    case WinAPI.VK.RightShift:
+                        if ((keyboardInput.Flags & WinAPI.WindowHook.LLKHF.UP) == WinAPI.WindowHook.LLKHF.UP)
+                        {
+                            CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_SHIFT) ^ WinAPI.Windows.MK.MK_SHIFT;
+                        }
+                        else
+                        {
+                            CurrentMK |= WinAPI.Windows.MK.MK_CONTROL;
+                        }
+                        break;
+                }
+
+                IntPtr windowHandle = WindowHandle;
+
+                // no target window
+                if (windowHandle == IntPtr.Zero)
+                {
+                    Debug.WriteLine("NoWindowHandle Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName);
+                    WinAPI.SendInputApi.SendInputViaKBParams(keyboardInput.Flags, keyboardInput.Time, keyboardInput.Scan, keyboardInput.VK, keyboardInput.CAS);
+                    return;
+                }
+
+                // no TIQ available
+                IntPtr windowInputQueue = WindowInputQueue;
+                if (windowInputQueue == IntPtr.Zero)
+                {
+                    Debug.WriteLine("NoWindowInputQueue Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName);
+                    WinAPI.SendInputApi.SendInputViaKBParams(keyboardInput.Flags, keyboardInput.Time, keyboardInput.Scan, keyboardInput.VK, keyboardInput.CAS);
+                    return;
+                }
+
+                // resolve TIQ
+                IntPtr foregroundWindowHandle;
+                IntPtr foregroundInputQueue;
+                if (!TryResolveTIQ(out foregroundInputQueue, out foregroundWindowHandle, DateTime.Now.AddMilliseconds(300).Ticks))
+                {
+                    Debug.WriteLine("TryResolveTIQ Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName);
+                    WinAPI.SendInputApi.SendInputViaKBParams(keyboardInput.Flags, keyboardInput.Time, keyboardInput.Scan, keyboardInput.VK, keyboardInput.CAS);
+                    return;
+                }
+
+                // use TIQ
+                Action action = () => OnKeyboardEventViaTIQ(keyboardInput.VK, keyboardInput.Flags, keyboardInput.Scan, keyboardInput.Time, keyboardInput.CAS);
+                ActionViaTIQ(action, foregroundInputQueue, "OnKeyboardInputReceived");
             }
-
-            IntPtr windowHandle = WindowHandle;
-
-            // no target window
-            if (windowHandle == IntPtr.Zero)
-            {
-                Debug.WriteLine("NoWindowHandle Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName);
-                WinAPI.SendInputApi.SendInputViaKBParams(keyboardInput.Flags, keyboardInput.Time, keyboardInput.Scan, keyboardInput.VK, keyboardInput.CAS);
-                return;
-            }
-
-            // no VIQ available
-            IntPtr windowInputQueue = WindowInputQueue;
-            if (windowInputQueue == IntPtr.Zero)
-            {
-                Debug.WriteLine("NoWindowInputQueue Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName);
-                WinAPI.SendInputApi.SendInputViaKBParams(keyboardInput.Flags, keyboardInput.Time, keyboardInput.Scan, keyboardInput.VK, keyboardInput.CAS);
-                return;
-            }
-
-            // resolve VIQ
-            IntPtr foregroundWindowHandle;
-            IntPtr foregroundInputQueue;
-            if (!TryResolveViq(out foregroundInputQueue, out foregroundWindowHandle, DateTime.Now.AddMilliseconds(1000).Ticks))
-            {
-                Debug.WriteLine("TryResolveVIQ Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName);
-                WinAPI.SendInputApi.SendInputViaKBParams(keyboardInput.Flags, keyboardInput.Time, keyboardInput.Scan, keyboardInput.VK, keyboardInput.CAS);
-                return;
-            }
-
-            // use VIQ
-            Action action = () => OnKeyboardEventViaViq(keyboardInput.VK, keyboardInput.Flags, keyboardInput.Scan, keyboardInput.Time, keyboardInput.CAS);
-            ActionViaViq(action, foregroundInputQueue, "OnKeyboardInputReceived");
         }
 
         private void OnCommandInputReceived(Model.Input.CommandInput commandInput)
@@ -589,7 +597,7 @@ namespace Mubox.Control.Network
 
         public WinAPI.Windows.MK CurrentMK { get; private set; }
 
-        public static bool TryResolveViq(out IntPtr foregroundInputQueue, out IntPtr foregroundWindowHandle, long activationExpiryTime)
+        public static bool TryResolveTIQ(out IntPtr foregroundInputQueue, out IntPtr foregroundWindowHandle, long activationExpiryTime)
         {
             foregroundWindowHandle = IntPtr.Zero;
             foregroundInputQueue = IntPtr.Zero;
@@ -606,36 +614,35 @@ namespace Mubox.Control.Network
             return foregroundInputQueue != IntPtr.Zero;
         }
 
-        private void ActionViaViq(Action action, IntPtr foregroundInputQueue, string callingComponent)
+        private void ActionViaTIQ(Action action, IntPtr foregroundInputQueue, string callingComponent)
         {
             bool detachWIQ = false;
-            //bool detachMIQ = false;
+            bool detachMIQ = false;
             IntPtr oldFocusWindowHandle = IntPtr.Zero;
             try
             {
-                lock (inputQueueLock) // TODO: profile this lock
+                if (MyInputQueue != foregroundInputQueue)
                 {
-                    //if (MyInputQueue != foregroundInputQueue)
-                    //{
-                    //    detachMIQ = true;
-                    //    if (Win32.Windows.AttachThreadInput(MyInputQueue, foregroundInputQueue, true))
-                    //    {
-                    //        Debug.WriteLine("ATI MIQ Failed " + callingComponent + " for " + this.DisplayName);
-                    //    }
-                    //}
-
-                    if (WindowInputQueue != foregroundInputQueue)
+                    detachMIQ = true;
+                    if (WinAPI.Windows.AttachThreadInput(MyInputQueue, foregroundInputQueue, true))
                     {
-                        detachWIQ = true;
-                        if (WinAPI.Windows.AttachThreadInput(foregroundInputQueue, WindowInputQueue, true))
-                        {
-                            Debug.WriteLine("ATI WIQ Failed " + callingComponent + " for " + this.DisplayName);
-                        }
+                        Debug.WriteLine("ATI MIQ Failed " + callingComponent + " for " + this.DisplayName);
                     }
-
-                    WinAPI.Windows.SetActiveWindow(WindowHandle);
-                    oldFocusWindowHandle = WinAPI.Windows.SetFocus(WindowHandle);
                 }
+
+                if (WindowInputQueue != foregroundInputQueue)
+                {
+                    detachWIQ = true;
+                    if (WinAPI.Windows.AttachThreadInput(foregroundInputQueue, WindowInputQueue, true))
+                    {
+                        Debug.WriteLine("ATI WIQ Failed " + callingComponent + " for " + this.DisplayName);
+                    }
+                }
+
+                // NOTE: this shouldn't be necessary as we've already attached to a foreground window (and we assume it is active, even though it may not be)
+                // WinAPI.Windows.SetActiveWindow(WindowHandle);
+                // TODO: not clear if it's really necessary to set focus like this, and in the case of a non-active window target will have no effect anyway
+                oldFocusWindowHandle = WinAPI.Windows.SetFocus(WindowHandle);
 
                 // send message
                 action();
@@ -652,10 +659,10 @@ namespace Mubox.Control.Network
                 {
                     WinAPI.Windows.AttachThreadInput(foregroundInputQueue, WindowInputQueue, false);
                 }
-                //if (detachMIQ)
-                //{
-                //    Win32.Windows.AttachThreadInput(MyInputQueue, foregroundInputQueue, false);
-                //}
+                if (detachMIQ)
+                {
+                    WinAPI.Windows.AttachThreadInput(MyInputQueue, foregroundInputQueue, false);
+                }
             }
         }
 
@@ -693,7 +700,7 @@ namespace Mubox.Control.Network
 
         #endregion client-side 'IsRepeatKey' behavior
 
-        private void OnKeyboardEventViaViq(uint vk, WinAPI.WindowHook.LLKHF flags, uint scan, uint time, WinAPI.CAS cas)
+        private void OnKeyboardEventViaTIQ(uint vk, WinAPI.WindowHook.LLKHF flags, uint scan, uint time, WinAPI.CAS cas)
         {
             var wParam = vk;
 
@@ -717,24 +724,24 @@ namespace Mubox.Control.Network
                 if ((cas & WinAPI.CAS.CONTROL) != 0)
                 {
                     // TODO: only if '' is not already 'down' (get async key state)
-                    OnKeyboardEventViaViq((uint)WinAPI.VK.Control, (WinAPI.WindowHook.LLKHF)0, (uint)0, time, (WinAPI.CAS)0);
+                    OnKeyboardEventViaTIQ((uint)WinAPI.VK.Control, (WinAPI.WindowHook.LLKHF)0, (uint)0, time, (WinAPI.CAS)0);
                 }
                 if ((cas & WinAPI.CAS.ALT) != 0)
                 {
                     // TODO: only if '' is not already 'down' (get async key state)
-                    OnKeyboardEventViaViq((uint)WinAPI.VK.Menu, (WinAPI.WindowHook.LLKHF)0, (uint)0, time, (WinAPI.CAS)0);
+                    OnKeyboardEventViaTIQ((uint)WinAPI.VK.Menu, (WinAPI.WindowHook.LLKHF)0, (uint)0, time, (WinAPI.CAS)0);
                     flags |= WinAPI.WindowHook.LLKHF.ALTDOWN;
                 }
                 if ((cas & WinAPI.CAS.SHIFT) != 0)
                 {
                     // TODO: only if '' is not already 'down' (get async key state)
-                    OnKeyboardEventViaViq((uint)WinAPI.VK.Shift, (WinAPI.WindowHook.LLKHF)0, (uint)0, time, (WinAPI.CAS)0);
+                    OnKeyboardEventViaTIQ((uint)WinAPI.VK.Shift, (WinAPI.WindowHook.LLKHF)0, (uint)0, time, (WinAPI.CAS)0);
                 }
             }
 
             // what needs this? WinAPI.SetKeyboardState(this.pressedKeys);
 
-            // TODO: SendMessage / PostMessage bypass VIQ, technically only reason these process is because the foreground window is being waited+verified before proceeding (a requirement for VIQ to function to begin with)
+            // TODO: SendMessage / PostMessage bypass TIQ, technically only reason these process is because the foreground window is being waited+verified before proceeding (a requirement for TIQ to function to begin with)
             // TODO: need to interface at a lower level (e.g. SendInput
             WinAPI.Windows.SendMessage(WindowHandle, wm, new UIntPtr(wParam), new UIntPtr(lParam));
 
@@ -758,17 +765,17 @@ namespace Mubox.Control.Network
                 if ((cas & WinAPI.CAS.CONTROL) != 0)
                 {
                     // TODO: only if '' is still 'down' (get async key state)
-                    OnKeyboardEventViaViq((uint)WinAPI.VK.Control, WinAPI.WindowHook.LLKHF.UP, (uint)0, WinAPI.SendInputApi.GetTickCount(), (WinAPI.CAS)0);
+                    OnKeyboardEventViaTIQ((uint)WinAPI.VK.Control, WinAPI.WindowHook.LLKHF.UP, (uint)0, WinAPI.SendInputApi.GetTickCount(), (WinAPI.CAS)0);
                 }
                 if ((cas & WinAPI.CAS.ALT) != 0)
                 {
                     // TODO: only if '' is not already 'down' (get async key state)
-                    OnKeyboardEventViaViq((uint)WinAPI.VK.Menu, WinAPI.WindowHook.LLKHF.UP, (uint)0, WinAPI.SendInputApi.GetTickCount(), (WinAPI.CAS)0);
+                    OnKeyboardEventViaTIQ((uint)WinAPI.VK.Menu, WinAPI.WindowHook.LLKHF.UP, (uint)0, WinAPI.SendInputApi.GetTickCount(), (WinAPI.CAS)0);
                 }
                 if ((cas & WinAPI.CAS.SHIFT) != 0)
                 {
                     // TODO: only if '' is not already 'down' (get async key state)
-                    OnKeyboardEventViaViq((uint)WinAPI.VK.Shift, WinAPI.WindowHook.LLKHF.UP, (uint)0, WinAPI.SendInputApi.GetTickCount(), (WinAPI.CAS)0);
+                    OnKeyboardEventViaTIQ((uint)WinAPI.VK.Shift, WinAPI.WindowHook.LLKHF.UP, (uint)0, WinAPI.SendInputApi.GetTickCount(), (WinAPI.CAS)0);
                 }
             }
         }
@@ -788,10 +795,10 @@ namespace Mubox.Control.Network
             {
                 //Win32.Cursor.SetCapture(windowHandle);
 
-                // TODO: SendMessage / PostMessage bypass VIQ, technically only reason these process is because the foreground window is being waited+verified before proceeding (a requirement for VIQ to function to begin with)
-
-                WinAPI.Windows.SendMessage(_windowHandle, WinAPI.WM.MOUSEMOVE, new UIntPtr((uint)CurrentMK), new UIntPtr(clientRelativeCoordinates));
+                // TODO: WinAPI.Windows.SendMessage(_windowHandle, WinAPI.WM.ACTIVATEAPP, _windowHandle, new UIntPtr(WinAPI.MACROS.MAKELPARAM((ushort)wm, (ushort)WinAPI.HitTestValues.HTCLIENT)));
+                // TODO: WinAPI.Windows.SendMessage(_windowHandle, WinAPI.WM.ACTIVATE, _windowHandle, new UIntPtr(WinAPI.MACROS.MAKELPARAM((ushort)wm, (ushort)WinAPI.HitTestValues.HTCLIENT)));
                 WinAPI.Windows.SendMessage(_windowHandle, WinAPI.WM.MOUSEACTIVATE, _windowHandle, new UIntPtr(WinAPI.MACROS.MAKELPARAM((ushort)wm, (ushort)WinAPI.HitTestValues.HTCLIENT)));
+                WinAPI.Windows.SendMessage(_windowHandle, WinAPI.WM.MOUSEMOVE, new UIntPtr((uint)CurrentMK), new UIntPtr(clientRelativeCoordinates));
                 WinAPI.Windows.SendMessage(_windowHandle, wm, new UIntPtr(mouseData), new UIntPtr(clientRelativeCoordinates));
                 //Debug.WriteLine("OnMouseEvent SendMessage(" + _windowHandle.ToString() + ", " + wm + ", " + mouseData + ", " + clientRelativeCoordinates + ", " + pointX + ", " + pointY + ", " + lPointX + ", " + lPointY + ", (" + CurrentMK + "), " + isButtonUpEvent);
                 //Win32.Cursor.ReleaseCapture();
@@ -802,7 +809,7 @@ namespace Mubox.Control.Network
         {
             Debug.WriteLine("ReceivedActivateRequest for " + this.DisplayName);
             DateTime onActivateClientReceivedTimestamp = DateTime.Now;
-            lock (inputQueueLock)
+            lock (_tiqLock)
             {
                 Debug.WriteLine("ActivateClientLock took " + onActivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName);
                 onActivateClientReceivedTimestamp = DateTime.Now;
@@ -824,16 +831,16 @@ namespace Mubox.Control.Network
                         return;
                     }
 
-                    // resolve VIQ
+                    // resolve TIQ
                     IntPtr foregroundWindowHandle;
                     IntPtr foregroundInputQueue;
-                    if (!TryResolveViq(out foregroundInputQueue, out foregroundWindowHandle, activationExpiryTime))
+                    if (!TryResolveTIQ(out foregroundInputQueue, out foregroundWindowHandle, activationExpiryTime))
                     {
-                        Debug.WriteLine("TryResolveVIQ Failed OnActivateClient for " + this.DisplayName);
+                        Debug.WriteLine("TryResolveTIQ Failed OnActivateClient for " + this.DisplayName);
                         return;
                     }
 
-                    // use VIQ
+                    // use TIQ
                     Action action = () =>
                     {
                         try
@@ -849,7 +856,7 @@ namespace Mubox.Control.Network
                             Debug.WriteLine(ex.StackTrace);
                         }
                     };
-                    ActionViaViq(action, foregroundInputQueue, "OnActivateClient");
+                    ActionViaTIQ(action, foregroundInputQueue, "OnActivateClient");
                 } while ((DateTime.Now.Ticks < activationExpiryTime) && (_windowHandle != WinAPI.Windows.GetForegroundWindow()));
                 Debug.WriteLine("ActivateClientAction took " + onActivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName);
             }
@@ -860,7 +867,7 @@ namespace Mubox.Control.Network
         {
             Debug.WriteLine("ReceivedDeactivateRequest for " + this.DisplayName);
             DateTime onDeactivateClientReceivedTimestamp = DateTime.Now;
-            lock (inputQueueLock)
+            lock (_tiqLock)
             {
                 Debug.WriteLine("DeactivateClientLock took " + onDeactivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName);
                 onDeactivateClientReceivedTimestamp = DateTime.Now;
@@ -881,16 +888,16 @@ namespace Mubox.Control.Network
                     return;
                 }
 
-                // resolve VIQ
+                // resolve TIQ
                 IntPtr foregroundWindowHandle;
                 IntPtr foregroundInputQueue;
-                if (!TryResolveViq(out foregroundInputQueue, out foregroundWindowHandle, activationExpiryTime))
+                if (!TryResolveTIQ(out foregroundInputQueue, out foregroundWindowHandle, activationExpiryTime))
                 {
-                    Debug.WriteLine("TryResolveVIQ Failed OnDeactivateClient for " + this.DisplayName);
+                    Debug.WriteLine("TryResolveTIQ Failed OnDeactivateClient for " + this.DisplayName);
                     return;
                 }
 
-                // use VIQ
+                // use TIQ
                 Action action = () =>
                 {
                     try
@@ -903,7 +910,7 @@ namespace Mubox.Control.Network
                         Debug.WriteLine(ex.StackTrace);
                     }
                 };
-                ActionViaViq(action, foregroundInputQueue, "OnDeactivateClient");
+                ActionViaTIQ(action, foregroundInputQueue, "OnDeactivateClient");
             }
             Debug.WriteLine("DeactivateClientAction took " + onDeactivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName);
         }

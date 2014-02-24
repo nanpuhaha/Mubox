@@ -403,16 +403,16 @@ namespace Mubox.View.Server
 
         private void ForwardMouseEvent(MouseInput e, ClientBase clientBase)
         {
-            MouseInput le = new MouseInput();
-            le.IsAbsolute = true;
-            le.MouseData = e.MouseData;
-            le.Point = L_e_Point;
-            le.Time = e.Time;
-            le.WindowDesktopHandle = clientBase.WindowDesktopHandle;
-            le.WindowStationHandle = clientBase.WindowStationHandle;
-            le.WindowHandle = clientBase.WindowHandle;
-            le.WM = e.WM;
-            clientBase.Dispatch(le);
+            MouseInput L_e = new MouseInput();
+            L_e.IsAbsolute = true;
+            L_e.MouseData = e.MouseData;
+            L_e.Point = L_e_Point;
+            L_e.Time = e.Time;
+            L_e.WindowDesktopHandle = clientBase.WindowDesktopHandle;
+            L_e.WindowStationHandle = clientBase.WindowStationHandle;
+            L_e.WindowHandle = clientBase.WindowHandle;
+            L_e.WM = e.WM;
+            clientBase.Dispatch(L_e);
         }
 
         private bool isSwitchingClients;
@@ -752,9 +752,6 @@ namespace Mubox.View.Server
 
         private static void InputToClient(KeyboardInput e, ClientBase client)
         {
-#if DEBUG
-            ("InputToClient(" + Convert.ToString(client) + ") " + Convert.ToString(e)).Log();
-#endif
             // this method basically applies CAS settings and calls ForwardEventToClient
             byte cas = 0;
             var clientSettings = Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.ActiveClient;
@@ -797,6 +794,7 @@ namespace Mubox.View.Server
             try
             {
                 e.WindowStationHandle = clientBase.WindowStationHandle;
+                e.WindowDesktopHandle = clientBase.WindowDesktopHandle;
                 e.WindowHandle = clientBase.WindowHandle;
                 clientBase.Dispatch(e);
             }
