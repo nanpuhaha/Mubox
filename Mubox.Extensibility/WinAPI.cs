@@ -4113,7 +4113,7 @@ namespace Mubox
             );
 
             [DllImport("ntdll.dll")]
-            static extern NTSTATUS NtQueryObject(
+            public static extern NTSTATUS NtQueryObject(
                 IntPtr Handle,
                 OBJECT_INFORMATION_CLASS ObjectInformationClass,
                 IntPtr ObjectInformation,
@@ -4123,7 +4123,8 @@ namespace Mubox
 
             public enum SYSTEM_INFORMATION_CLASS
             {
-                Handles = 16,
+                SystemHandleInformation = 16,
+                SystemHandleInformationEx = 32,
             }
 
             public enum OBJECT_INFORMATION_CLASS
@@ -4528,7 +4529,7 @@ namespace Mubox
             public static SYSTEM_HANDLE_INFORMATION GetSystemHandleInformation()
             {
                 var ntstatus = NTSTATUS.InfoLengthMismatch;
-                var cbbuf = 0x100;
+                var cbbuf = 0x1000;
                 var buf = Marshal.AllocHGlobal(cbbuf);
                 try
                 {
@@ -4538,7 +4539,7 @@ namespace Mubox
                         cbbuf *= 2;
                         buf = Marshal.ReAllocHGlobal(buf, new IntPtr(cbbuf));
                         ntstatus = NtQuerySystemInformation(
-                            SYSTEM_INFORMATION_CLASS.Handles,
+                            SYSTEM_INFORMATION_CLASS.SystemHandleInformation,
                             buf,
                             cbbuf,
                             out returnLength);
@@ -4571,18 +4572,18 @@ namespace Mubox
             }
 
             [DllImport("kernel32.dll")]
-            static extern IntPtr OpenMutex(
+            public static extern IntPtr OpenMutex(
                 uint dwDesiredAccess,
                 bool bInheritHandle,
                string lpName);
 
             [DllImport("kernel32.dll")]
-            static extern bool ReleaseMutex(
+            public static extern bool ReleaseMutex(
                 IntPtr hMutex);
 
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            static extern bool DuplicateHandle(
+            public static extern bool DuplicateHandle(
                 IntPtr hSourceProcessHandle,
                 IntPtr hSourceHandle,
                 IntPtr hTargetProcessHandle,
@@ -4592,12 +4593,12 @@ namespace Mubox
                 bool bInheritHandle,
                 uint dwOptions);
 
-            const UInt32 DUPLICATE_CLOSE_SOURCE = 1;
-            const UInt32 DUPLICATE_SAME_ACCESS = 2;
+            public const UInt32 DUPLICATE_CLOSE_SOURCE = 1;
+            public const UInt32 DUPLICATE_SAME_ACCESS = 2;
 
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            static extern bool CloseHandle(IntPtr hObject);
+            public static extern bool CloseHandle(IntPtr hObject);
 
             const UInt32 DELETE = 0x00010000;
             const UInt32 READ_CONTROL = 0x00020000;
@@ -4629,8 +4630,7 @@ namespace Mubox
                         entry.ProcessID == processId // guest process
                         && entry.ObjectType == 14 // TODO: are mutants always object type 14?
                         && entry.AccessMask != 0x0012019f // known issue with hanging file handles (pipes?), which we're not interested in
-                        )
-                    .ToList();
+                        );
 
                 var currentProcessHandle = Process.GetCurrentProcess().Handle;
                 foreach (var entry in entries)
