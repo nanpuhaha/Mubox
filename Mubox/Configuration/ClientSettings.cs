@@ -65,7 +65,8 @@ namespace Mubox.Configuration
         {
             get
             {
-                var secure = (string)base["SandboxKey"];
+                var registryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software", true).CreateSubKey("Mubox").CreateSubKey(Name);
+                var secure = Convert.ToString(registryKey.GetValue("Secure", ""));
                 if (string.IsNullOrEmpty(secure))
                 {
                     // if no key has been set, generate a new key
@@ -78,28 +79,26 @@ namespace Mubox.Configuration
                     var plain = MachineKey.Unprotect(
                         buf,
                         new string[] {
-                            Name,
-                            Environment.MachineName, 
-                            Environment.UserName,
-                        });
+                        Name,
+                        Environment.MachineName, 
+                        Environment.UserName,
+                    });
                     return Encoding.UTF8.GetString(plain);
                 }
             }
             set
             {
-                //if (!SandboxKey.Equals(value, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    var buf = System.Text.Encoding.UTF8.GetBytes(value);
-                    var secure = MachineKey.Protect(
-                        buf,
-                        new string[] {
-                            Name,
-                            Environment.MachineName, 
-                            Environment.UserName,
-                        });
-                    base["SandboxKey"] = Convert.ToBase64String(secure);
-                    this.OnPropertyChanged(o => o.SandboxKey);
-                }
+                var buf = System.Text.Encoding.UTF8.GetBytes(value);
+                var secure = MachineKey.Protect(
+                    buf,
+                    new string[] {
+                        Name,
+                        Environment.MachineName, 
+                        Environment.UserName,
+                    });
+                var registryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software", true).CreateSubKey("Mubox").CreateSubKey(Name);
+                registryKey.SetValue("Secure", Convert.ToBase64String(secure));
+                this.OnPropertyChanged(o => o.SandboxKey);
             }
         }
 
