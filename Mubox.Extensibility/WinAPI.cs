@@ -4621,7 +4621,7 @@ namespace Mubox
                 });
             }
 
-            private static void CloseNamedMutexes(WinAPI.SandboxApi.Sandbox sandbox, string[] mutexNames)
+            private static bool CloseNamedMutexes(WinAPI.SandboxApi.Sandbox sandbox, string[] mutexNames)
             {
                 var processId = sandbox.Process.Id;
                 var entries = GetSystemHandleInformation()
@@ -4646,11 +4646,7 @@ namespace Mubox
                         false,
                         DUPLICATE_SAME_ACCESS);
                     int err = Marshal.GetLastWin32Error();
-                    if (err != 0)
-                    {
-                        ("spid=" + sandbox.Process.Id + " epid=" + entry.ProcessID + " handle=" + handle.ToInt64().ToString("X") + " type=" + entry.ObjectType + " err=" + err).Log();
-                    }
-                    else
+                    if (err == 0)
                     {
                         if (duped && hDupe != IntPtr.Zero)
                         {
@@ -4690,6 +4686,7 @@ namespace Mubox
                                         {
                                             CloseHandle(hClose);
                                             ("Closed Remote Handle: pid=" + sandbox.Process.Id + " handle=" + handle.ToInt64().ToString("X") + " status=" + ntstatus + " type=" + entry.ObjectType + " name=" + typeName).Log();
+                                            return true;
                                         }
                                         else
                                         {
@@ -4711,6 +4708,7 @@ namespace Mubox
                         }
                     }
                 }
+                return false;
             }
 
             [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
