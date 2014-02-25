@@ -4616,21 +4616,24 @@ namespace Mubox
                 // most windows programes rely on a named mutex to limit application runs to a single instance, here are a list of mutexes to release/close
                 CloseNamedMutexes(sandbox, new string[] 
                 {
-                    "AN-Mutex-Window-Guild Wars",
+                    "AN-Mutex", 
+                    "AN-Mutex-Window-Guild Wars 2",
+                    "AN-Mutex-Install-101",
                     // TODO: move list to config
                 });
             }
 
-            private static bool CloseNamedMutexes(WinAPI.SandboxApi.Sandbox sandbox, string[] mutexNames)
+            private static void CloseNamedMutexes(WinAPI.SandboxApi.Sandbox sandbox, string[] mutexNames)
             {
                 var processId = sandbox.Process.Id;
-                var entries = GetSystemHandleInformation()
+                var result = Mubox.WinAPI.SandboxApi.GetSystemHandleInformation();
+                var entries = result
                     .Handles
                     .Where(entry =>
-                        entry.ProcessID == processId // guest process
-                        && entry.ObjectType == 14 // TODO: are mutants always object type 14?
-                        && entry.AccessMask != 0x0012019f // known issue with hanging file handles (pipes?), which we're not interested in
-                        );
+                        entry.AccessMask != 0x0012019f /* known issue with hanging file handles (pipes?), which we're not interested in */
+                        //&& entry.ProcessID == processId
+                    //&& entry.ObjectType == 14 // TODO: is this the correct object type?
+                    ).ToList();
 
                 var currentProcessHandle = Process.GetCurrentProcess().Handle;
                 foreach (var entry in entries)
@@ -4646,7 +4649,8 @@ namespace Mubox
                         false,
                         DUPLICATE_SAME_ACCESS);
                     int err = Marshal.GetLastWin32Error();
-                    if (err == 0)
+                    //("pid=" + entry.ProcessID + " handle=0x" + handle.ToInt64().ToString("X") + " type=" + entry.ObjectType + " err=0x" + err.ToString("X")).Log();
+                    //if (err == 0)
                     {
                         if (duped && hDupe != IntPtr.Zero)
                         {
@@ -4670,32 +4674,31 @@ namespace Mubox
                                 if (ntstatus == NTSTATUS.Success)
                                 {
                                     var typeName = Marshal.PtrToStringUni(buf + 4);
-                                    // if in list of mutexes, close it
-                                    if (mutexNames.Count(s => typeName.Contains(s)) > 0)
+                                    if (!string.IsNullOrEmpty(typeName))
                                     {
-                                        IntPtr hClose;
-                                        var closed = DuplicateHandle(
-                                            sandbox.Process.Handle,
-                                            handle,
-                                            currentProcessHandle,
-                                            out hClose,
-                                            0,
-                                            false,
-                                            DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE);
-                                        if (closed)
+                                        //("pid=" + entry.ProcessID + " handle=0x" + handle.ToInt64().ToString("X") + " type=" + entry.ObjectType + " name=" + typeName).Log();
+                                        // if in list of mutexes, close it
+                                        if (mutexNames.Count(s => typeName.Contains(s)) > 0)
                                         {
-                                            CloseHandle(hClose);
-                                            ("Closed Remote Handle: pid=" + sandbox.Process.Id + " handle=" + handle.ToInt64().ToString("X") + " status=" + ntstatus + " type=" + entry.ObjectType + " name=" + typeName).Log();
-                                            return true;
+                                            IntPtr hClose;
+                                            var closed = DuplicateHandle(
+                                                sandbox.Process.Handle,
+                                                handle,
+                                                currentProcessHandle,
+                                                out hClose,
+                                                0,
+                                                false,
+                                                DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE);
+                                            if (closed)
+                                            {
+                                                CloseHandle(hClose);
+                                                ("Closed Remote Handle: pid=" + sandbox.Process.Id + " handle=" + handle.ToInt64().ToString("X") + " status=" + ntstatus + " type=" + entry.ObjectType + " name=" + typeName).Log();
+                                            }
+                                            else
+                                            {
+                                                ("Failed to Closed Remote Handle: pid=" + sandbox.Process.Id + " handle=" + handle.ToInt64().ToString("X") + " status=" + ntstatus + " type=" + entry.ObjectType + " name=" + typeName).Log();
+                                            }
                                         }
-                                        else
-                                        {
-                                            ("Failed to Closed Remote Handle: pid=" + sandbox.Process.Id + " handle=" + handle.ToInt64().ToString("X") + " status=" + ntstatus + " type=" + entry.ObjectType + " name=" + typeName).Log();
-                                        }
-                                    }
-                                    else
-                                    {
-                                        ("Unknown Mutex: " + typeName).Log();
                                     }
                                 }
                             }
@@ -4708,7 +4711,6 @@ namespace Mubox
                         }
                     }
                 }
-                return false;
             }
 
             [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
