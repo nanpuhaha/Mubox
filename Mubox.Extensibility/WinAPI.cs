@@ -4629,7 +4629,8 @@ namespace Mubox
                         entry.ProcessID == processId // guest process
                         && entry.ObjectType == 14 // TODO: are mutants always object type 14?
                         && entry.AccessMask != 0x0012019f // known issue with hanging file handles (pipes?), which we're not interested in
-                        );
+                        )
+                    .ToList();
 
                 var currentProcessHandle = Process.GetCurrentProcess().Handle;
                 foreach (var entry in entries)
@@ -4647,7 +4648,7 @@ namespace Mubox
                     int err = Marshal.GetLastWin32Error();
                     if (err != 0)
                     {
-                        Console.WriteLine("spid=" + sandbox.Process.Id + " epid=" + entry.ProcessID + " handle=" + handle.ToInt64().ToString("X") + " type=" + entry.ObjectType + " err=" + err);
+                        ("spid=" + sandbox.Process.Id + " epid=" + entry.ProcessID + " handle=" + handle.ToInt64().ToString("X") + " type=" + entry.ObjectType + " err=" + err).Log();
                     }
                     else
                     {
@@ -4688,8 +4689,16 @@ namespace Mubox
                                         if (closed)
                                         {
                                             CloseHandle(hClose);
-                                            Console.WriteLine("Closed Remote Handle: pid=" + sandbox.Process.Id + " handle=" + handle.ToInt64().ToString("X") + " status=" + ntstatus + " type=" + entry.ObjectType + " name=" + typeName);
+                                            ("Closed Remote Handle: pid=" + sandbox.Process.Id + " handle=" + handle.ToInt64().ToString("X") + " status=" + ntstatus + " type=" + entry.ObjectType + " name=" + typeName).Log();
                                         }
+                                        else
+                                        {
+                                            ("Failed to Closed Remote Handle: pid=" + sandbox.Process.Id + " handle=" + handle.ToInt64().ToString("X") + " status=" + ntstatus + " type=" + entry.ObjectType + " name=" + typeName).Log();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ("Unknown Mutex: " + typeName).Log();
                                     }
                                 }
                             }
