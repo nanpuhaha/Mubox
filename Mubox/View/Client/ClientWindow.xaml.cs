@@ -732,7 +732,7 @@ namespace Mubox.View.Client
                             ClientState.Settings.ApplicationArguments,
                             ApplicationLaunchPath.Replace(applicationExeName, ""));
                         
-                        System.Threading.Thread.Sleep(250);
+                        System.Threading.Thread.Sleep(750);
 
                         WinAPI.SandboxApi.TryFixMultilaunch(
                             ClientState.Sandbox, 
