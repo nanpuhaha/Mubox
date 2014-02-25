@@ -650,102 +650,107 @@ namespace Mubox.View.Client
 
         private void PerformApplicationLaunch()
         {
-            string applicationExeName = System.IO.Path.GetFileName(ClientState.Settings.ApplicationPath);
-
-            try
+            lock (_global_process_launch_lock)
             {
-                if (System.IO.File.Exists(ApplicationLaunchPath))
+                string applicationExeName = System.IO.Path.GetFileName(ClientState.Settings.ApplicationPath);
+
+                try
                 {
-                    if (ClientState.Settings.EnableIsolation)
+                    if (System.IO.File.Exists(ApplicationLaunchPath))
                     {
-                        try
+                        if (ClientState.Settings.EnableIsolation)
                         {
-                            if (!System.IO.Directory.Exists(ClientState.Settings.IsolationPath))
+                            try
                             {
-                                System.IO.Directory.CreateDirectory(ClientState.Settings.IsolationPath);
+                                if (!System.IO.Directory.Exists(ClientState.Settings.IsolationPath))
+                                {
+                                    System.IO.Directory.CreateDirectory(ClientState.Settings.IsolationPath);
+                                }
+
+                                string adjustedIsolationPath = System.IO.Path.Combine(ClientState.Settings.IsolationPath, ClientState.Settings.Name);
+
+                                if (!System.IO.Directory.Exists(adjustedIsolationPath))
+                                {
+                                    System.IO.Directory.CreateDirectory(adjustedIsolationPath);
+                                }
+
+                                IsolateFiles(ApplicationLaunchPath.Replace(applicationExeName, ""), adjustedIsolationPath);
+
+                                ApplicationLaunchPath = System.IO.Path.Combine(adjustedIsolationPath, applicationExeName);
                             }
-
-                            string adjustedIsolationPath = System.IO.Path.Combine(ClientState.Settings.IsolationPath, ClientState.Settings.Name);
-
-                            if (!System.IO.Directory.Exists(adjustedIsolationPath))
+                            catch (Exception ex)
                             {
-                                System.IO.Directory.CreateDirectory(adjustedIsolationPath);
+                                ApplicationLaunchPath = ClientState.Settings.ApplicationPath;
+                                MessageBox.Show(ex.Message + "|" + ex.StackTrace, "Isolation Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                                return;
                             }
-
-                            IsolateFiles(ApplicationLaunchPath.Replace(applicationExeName, ""), adjustedIsolationPath);
-
-                            ApplicationLaunchPath = System.IO.Path.Combine(adjustedIsolationPath, applicationExeName);
                         }
-                        catch (Exception ex)
+
+                        if (ApplicationLaunchPath.StartsWith(@"\\"))
                         {
-                            ApplicationLaunchPath = ClientState.Settings.ApplicationPath;
-                            MessageBox.Show(ex.Message + "|" + ex.StackTrace, "Isolation Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                            MessageBox.Show("Launching from Network Share is not supported, aborting launch.", "Error, Network Share", MessageBoxButton.OK, MessageBoxImage.Error);
                             return;
                         }
-                    }
 
-                    if (ApplicationLaunchPath.StartsWith(@"\\"))
-                    {
-                        MessageBox.Show("Launching from Network Share is not supported, aborting launch.", "Error, Network Share", MessageBoxButton.OK, MessageBoxImage.Error);
+                        // TODO if this.ClientState.GameProcess != null, dispose it and synchronize on shutdown (req. for problem-free file replication)
+                        this.ClientState.GameProcess = null;
+
+                        Control.FileReplicationManager.PerformReplication(this.ClientState.Settings.Files);
+
+                        #region pre-sandbox launch code
+
+                        ToggleApplicationLaunchButton();
+                        this.Hide();
+
+                        /*
+                        ProcessStartInfo startInfo = new ProcessStartInfo(ApplicationLaunchPath);
+                        startInfo.Arguments = ClientState.Settings.ApplicationArguments;
+                        startInfo.WorkingDirectory = ApplicationLaunchPath.Replace(applicationExeName, "");
+                        startInfo.UseShellExecute = false;
+
+                        Process process = new Process();
+                        process.StartInfo = startInfo;
+                        process.Start();
+                        this.ClientState.GameProcess = process;
+                        */
+
+                        #endregion
+
+                        // new 'sandboxed' process launches
+                        if (ClientState.Sandbox == null)
+                        {
+                            var key = ClientState.Settings.SandboxKey;
+                            var name = ClientState.NetworkClient.DisplayName;
+                            ClientState.Sandbox = WinAPI.SandboxApi.SafeCreateSandbox(ClientState.Profile.Name + name, key);
+                            ClientState.Settings.SandboxKey = key;
+                            Mubox.Configuration.MuboxConfigSection.Save();
+                        }
+
+                        lock (_global_process_launch_lock)
+                        {
+                            this.ClientState.GameProcess = WinAPI.SandboxApi.LaunchProcess(
+                                ClientState.Sandbox,
+                                ApplicationLaunchPath,
+                                ClientState.Settings.ApplicationArguments,
+                                ApplicationLaunchPath.Replace(applicationExeName, ""));
+
+                            for (int i = 0; i < 10; i++)
+                            {
+                                WinAPI.SandboxApi.TryFixMultilaunch(
+                                    ClientState.Sandbox,
+                                    ApplicationLaunchPath);
+                                System.Threading.Thread.Sleep(100);
+                            }
+                        }
+                        this.Dispatcher.BeginInvoke((Action)delegate() { this.tabControl1.SelectedItem = tabProcessManagement; });
+                        clientState_SetStatusText("Application Started.");
                         return;
                     }
-
-                    // TODO if this.ClientState.GameProcess != null, dispose it and synchronize on shutdown (req. for problem-free file replication)
-                    this.ClientState.GameProcess = null;
-
-                    Control.FileReplicationManager.PerformReplication(this.ClientState.Settings.Files);
-
-                    #region pre-sandbox launch code
-
-                    ToggleApplicationLaunchButton();
-                    this.Hide();
-
-                    /*
-                    ProcessStartInfo startInfo = new ProcessStartInfo(ApplicationLaunchPath);
-                    startInfo.Arguments = ClientState.Settings.ApplicationArguments;
-                    startInfo.WorkingDirectory = ApplicationLaunchPath.Replace(applicationExeName, "");
-                    startInfo.UseShellExecute = false;
-
-                    Process process = new Process();
-                    process.StartInfo = startInfo;
-                    process.Start();
-                    this.ClientState.GameProcess = process;
-                    */
-
-                    #endregion
-
-                    // new 'sandboxed' process launches
-                    if (ClientState.Sandbox == null)
-                    {
-                        var key = ClientState.Settings.SandboxKey;
-                        var name = ClientState.NetworkClient.DisplayName;
-                        ClientState.Sandbox = WinAPI.SandboxApi.SafeCreateSandbox(ClientState.Profile.Name + name, key);
-                        ClientState.Settings.SandboxKey = key;
-                        Mubox.Configuration.MuboxConfigSection.Save();
-                    }
-
-                    lock (_global_process_launch_lock)
-                    {
-                        this.ClientState.GameProcess = WinAPI.SandboxApi.LaunchProcess(
-                            ClientState.Sandbox,
-                            ApplicationLaunchPath,
-                            ClientState.Settings.ApplicationArguments,
-                            ApplicationLaunchPath.Replace(applicationExeName, ""));
-                        
-                        System.Threading.Thread.Sleep(750);
-
-                        WinAPI.SandboxApi.TryFixMultilaunch(
-                            ClientState.Sandbox, 
-                            ApplicationLaunchPath);
-                    }
-                    this.Dispatcher.BeginInvoke((Action)delegate() { this.tabControl1.SelectedItem = tabProcessManagement; });
-                    clientState_SetStatusText("Application Started.");
-                    return;
                 }
-            }
-            finally
-            {
-                ToggleApplicationLaunchButton();
+                finally
+                {
+                    ToggleApplicationLaunchButton();
+                }
             }
         }
 
