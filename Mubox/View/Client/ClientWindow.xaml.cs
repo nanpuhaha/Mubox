@@ -250,10 +250,10 @@ namespace Mubox.View.Client
                     if (myWindowHandle != IntPtr.Zero)
                     {
                         IntPtr myInputQueueThreadProcessId = IntPtr.Zero;
-                        Mubox.WinAPI.Threads.GetWindowThreadProcessId(myWindowHandle, out myInputQueueThreadProcessId);
-                        if (myInputQueueThreadProcessId != IntPtr.Zero)
+                        IntPtr myInputQueueThreadId = Mubox.WinAPI.Threads.GetWindowThreadProcessId(myWindowHandle, out myInputQueueThreadProcessId);
+                        if (myInputQueueThreadId != IntPtr.Zero)
                         {
-                            Mubox.Control.Network.Client.MyInputQueue = myInputQueueThreadProcessId;
+                            Mubox.Control.Network.Client.MyInputQueue = myInputQueueThreadId;
                         }
                         else
                         {
