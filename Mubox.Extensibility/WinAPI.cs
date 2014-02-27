@@ -2222,10 +2222,10 @@ namespace Mubox
         public static class SendInputApi
         {
             [DllImport("user32.dll", SetLastError = true)]
-            internal static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+            internal static extern uint SendInput(int nInputs, INPUT[] pInputs, int cbSize);
 
             [DllImport("user32.dll", SetLastError = true)]
-            internal static extern uint SendInput(uint nInputs, INPUT64[] pInputs, int cbSize);
+            internal static extern uint SendInput(int nInputs, INPUT64[] pInputs, int cbSize);
 
             [DllImport("user32.dll", SetLastError = false)]
             internal static extern IntPtr GetMessageExtraInfo();
@@ -2257,15 +2257,18 @@ namespace Mubox
                 {
                     if ((cas & CAS.CONTROL) != 0)
                     {
+                        SendInputViaKBParams((WindowHook.LLKHF)0, time, (uint)0, (uint)WinAPI.VK.LeftControl, (CAS)0);
                         SendInputViaKBParams((WindowHook.LLKHF)0, time, (uint)0, (uint)WinAPI.VK.Control, (CAS)0);
                     }
                     if ((cas & CAS.ALT) != 0)
                     {
+                        SendInputViaKBParams((WindowHook.LLKHF)0, time, (uint)0, (uint)WinAPI.VK.LeftMenu, (CAS)0);
                         SendInputViaKBParams((WindowHook.LLKHF)0, time, (uint)0, (uint)WinAPI.VK.Menu, (CAS)0);
                         flags |= WindowHook.LLKHF.ALTDOWN;
                     }
                     if ((cas & CAS.SHIFT) != 0)
                     {
+                        SendInputViaKBParams((WindowHook.LLKHF)0, time, (uint)0, (uint)WinAPI.VK.LeftShift, (CAS)0);
                         SendInputViaKBParams((WindowHook.LLKHF)0, time, (uint)0, (uint)WinAPI.VK.Shift, (CAS)0);
                     }
                 }
