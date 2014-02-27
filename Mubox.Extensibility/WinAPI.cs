@@ -1140,7 +1140,7 @@ namespace Mubox
 
             [return: MarshalAs(UnmanagedType.Bool)]
             [DllImport("user32.dll", SetLastError = true)]
-            internal static extern bool SendMessageTimeout(
+            static extern bool SendMessageTimeout(
                 IntPtr hWnd,
                 WM Msg,
                 UIntPtr wParam,
@@ -1151,7 +1151,7 @@ namespace Mubox
 
             [return: MarshalAs(UnmanagedType.Bool)]
             [DllImport("user32.dll", SetLastError = true)]
-            internal static extern bool SendMessageTimeout(
+            static extern bool SendMessageTimeout(
                 IntPtr hWnd,
                 WM Msg,
                 IntPtr wParam,
@@ -1159,6 +1159,14 @@ namespace Mubox
                 SMTO_FLAGS fuFlags,
                 uint uTimeoutMilliseconds,
                 out IntPtr lpdwResult);
+
+            [return: MarshalAs(UnmanagedType.Bool)]
+            [DllImport("user32.dll", SetLastError = true)]
+            public static extern bool PostMessage(IntPtr hWnd, WM Msg, IntPtr wParam, UIntPtr lParam);
+
+            [return: MarshalAs(UnmanagedType.Bool)]
+            [DllImport("user32.dll", SetLastError = true)]
+            public static extern bool PostMessage(IntPtr hWnd, WM Msg, UIntPtr wParam, UIntPtr lParam);
 
             [Flags]
             public enum SMTO_FLAGS : uint
@@ -2330,6 +2338,9 @@ namespace Mubox
 
             internal static void MouseActionViaSendInput(MouseEventFlags flags, uint time, int relX, int relY, uint mouseData)
             {
+                // NOTE: this code yields strange behavior for mouse-wheel events and when panning a third-person view in most games
+                // NOTE: this code also does not appear to perform mouse broadcast as expected
+                // NOTE: only retaining this code for reference in the event someone can correct the misbehaviors, or in case there is ever a game that will only respect INPUT and not WM for mouse
                 uint result = 0;
                 if (IntPtr.Size == 8)
                 {

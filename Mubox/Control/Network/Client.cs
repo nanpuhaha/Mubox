@@ -406,7 +406,8 @@ namespace Mubox.Control.Network
                         {
                             ActionViaTIQ(() =>
                             {
-                                WinAPI.SendInputApi.MouseActionViaSendInput(mouseInput.Flags, mouseInput.Time, (int)mouseInput.Point.X, (int)mouseInput.Point.Y, mouseInput.MouseData);
+                                //WinAPI.SendInputApi.MouseActionViaSendInput(mouseInput.Flags, mouseInput.Time, (int)mouseInput.Point.X, (int)mouseInput.Point.Y, mouseInput.MouseData);
+                                MouseActionViaPostMessage((int)mouseInput.Point.X, (int)mouseInput.Point.Y, lPointX, lPointY, wm, mouseInput.MouseData, isButtonUpEvent);
                             },
                                 foregroundInputQueue, "OnMouseInputReceived");
                         }
@@ -798,6 +799,34 @@ namespace Mubox.Control.Network
                 //Win32.Cursor.ReleaseCapture();
             }
         }
+
+        // NOTE: the following is reference implementation from 2009, which used to be called as a 'VIQ' actionnew UIntPtr(
+        private void MouseActionViaPostMessage(int pointX, int pointY, int lPointX, int lPointY, WinAPI.WM wm, uint mouseData, bool isButtonUpEvent)
+        {
+            uint clientRelativeCoordinates = WinAPI.MACROS.MAKELPARAM(
+                (ushort)lPointX,
+                (ushort)lPointY);
+
+            //            IntPtr previousWindowCapture = Win32.Cursor.GetCapture() // COMMENTED BY CODEIT.RIGHT;
+            int hwnd = _windowHandle.ToInt32();
+            lock (OnMouseEventLock)
+            {
+                WinAPI.Cursor.SetCapture(_windowHandle);
+                try
+                {
+                    WinAPI.Windows.PostMessage(_windowHandle, WinAPI.WM.MOUSEACTIVATE, _windowHandle, new UIntPtr(WinAPI.MACROS.MAKELPARAM((ushort)wm, (ushort)WinAPI.HitTestValues.HTCLIENT)));
+                    WinAPI.Windows.PostMessage(_windowHandle, WinAPI.WM.MOUSEMOVE, new IntPtr((int)CurrentMK), new UIntPtr(clientRelativeCoordinates));
+                    WinAPI.Windows.PostMessage(_windowHandle, WinAPI.WM.SETCURSOR, _windowHandle, new UIntPtr(WinAPI.MACROS.MAKELPARAM((ushort)WinAPI.WM.MOUSEMOVE, (ushort)WinAPI.HitTestValues.HTCLIENT)));
+                    WinAPI.Windows.PostMessage(_windowHandle, wm, new UIntPtr(mouseData), new UIntPtr(clientRelativeCoordinates));
+                }
+                finally
+                {
+                    WinAPI.Cursor.ReleaseCapture();
+                }
+                ("OnMouseEvent PostMessage(" + _windowHandle.ToString() + ", " + wm + ", " + mouseData + ", " + clientRelativeCoordinates + ", " + pointX + ", " + pointY + ", " + lPointX + ", " + lPointY + ", (" + CurrentMK + "), " + isButtonUpEvent).Log();
+            }
+        }
+
 
         private void OnActivateClient()
         {
