@@ -1099,6 +1099,7 @@ namespace Mubox
             }
 
             [DllImport("user32.dll", SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
             internal static extern bool BringWindowToTop(IntPtr hWnd);
 
             [DllImport("user32.dll")]
@@ -1110,6 +1111,7 @@ namespace Mubox
             internal static extern bool SetForegroundWindow(IntPtr hWnd);
 
             [DllImport("user32.dll")]
+            [return: MarshalAs(UnmanagedType.Bool)]
             internal static extern bool AttachThreadInput(IntPtr idAttach, IntPtr idAttachTo, bool fAttach);
 
             [DllImport("user32.dll")]
