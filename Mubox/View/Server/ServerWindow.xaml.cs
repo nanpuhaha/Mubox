@@ -261,31 +261,31 @@ namespace Mubox.View.Server
                         // track mouse position
                         TrackMousePositionClientRelative(e, activeClient, clients);
 
-                        // this was experimental code, and did not address the real problem (the real problem is that mouse focus/capture is being stolen away from the target client, even when it's an only and active client)
-                        //if (mouseButtonInfo != null)
-                        //{
-                        //    var lastMouseDownTimestampExpiry = mouseButtonInfo.LastDownTimestamp.AddMilliseconds(Mubox.Configuration.MuboxConfigSection.Default.MouseBufferMilliseconds);
-                        //    if (e.CreatedTime.Ticks < lastMouseDownTimestampExpiry.Ticks) // TODO: this logic seems incorrect, this seems like a hacky attempt to hide 'mouse cursor centering' performed by games when panning views. this is the only place it is used
-                        //    {
-                        //        clients = new ClientBase[0];
-                        //    }
-                        //    e.Handled = e.Handled || (mouseButtonInfo.IsDown && lastMouseDownTimestampExpiry.Ticks > DateTime.Now.Ticks);
-                        //}
+                        //// this was experimental code, and did not address the real problem (the real problem is that mouse focus/capture is being stolen away from the target client, even when it's an only and active client)
+                        ////if (mouseButtonInfo != null)
+                        ////{
+                        ////    var lastMouseDownTimestampExpiry = mouseButtonInfo.LastDownTimestamp.AddMilliseconds(Mubox.Configuration.MuboxConfigSection.Default.MouseBufferMilliseconds);
+                        ////    if (e.CreatedTime.Ticks < lastMouseDownTimestampExpiry.Ticks) // TODO: this logic seems incorrect, this seems like a hacky attempt to hide 'mouse cursor centering' performed by games when panning views. this is the only place it is used
+                        ////    {
+                        ////        clients = new ClientBase[0];
+                        ////    }
+                        ////    e.Handled = e.Handled || (mouseButtonInfo.IsDown && lastMouseDownTimestampExpiry.Ticks > DateTime.Now.Ticks);
+                        ////}
 
-                        if (clients.Length > 0)
-                        {
-                            List<ClientBase> reducedClientsForMouseMove = new List<ClientBase>();
-                            List<string> addressExclusionTable = new List<string>(ClientBase.localAddressTable);
-                            foreach (var item in clients)
-                            {
-                                if (!addressExclusionTable.Contains(item.Address))
-                                {
-                                    reducedClientsForMouseMove.Add(item);
-                                    addressExclusionTable.Add(item.Address);
-                                }
-                            }
-                            clients = reducedClientsForMouseMove.ToArray();
-                        }
+                        //if (clients.Length > 0)
+                        //{
+                        //    List<ClientBase> reducedClientsForMouseMove = new List<ClientBase>();
+                        //    List<string> addressExclusionTable = new List<string>(ClientBase.localAddressTable);
+                        //    foreach (var item in clients)
+                        //    {
+                        //        if (!addressExclusionTable.Contains(item.Address))
+                        //        {
+                        //            reducedClientsForMouseMove.Add(item);
+                        //            addressExclusionTable.Add(item.Address);
+                        //        }
+                        //    }
+                        //    clients = reducedClientsForMouseMove.ToArray();
+                        //}
                     }
 
                     foreach (ClientBase client in clients)
