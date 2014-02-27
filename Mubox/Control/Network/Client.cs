@@ -625,7 +625,7 @@ namespace Mubox.Control.Network
                 if (MyInputQueue != foregroundInputQueue)
                 {
                     detachMIQ = true;
-                    if (WinAPI.Windows.AttachThreadInput(MyInputQueue, foregroundInputQueue, true))
+                    if (!WinAPI.Windows.AttachThreadInput(MyInputQueue, foregroundInputQueue, true))
                     {
                         ("ATI MIQ Failed " + callingComponent + " for " + this.DisplayName).Log();
                     }
@@ -634,7 +634,7 @@ namespace Mubox.Control.Network
                 if (WindowInputQueue != foregroundInputQueue)
                 {
                     detachWIQ = true;
-                    if (WinAPI.Windows.AttachThreadInput(foregroundInputQueue, WindowInputQueue, true))
+                    if (!WinAPI.Windows.AttachThreadInput(foregroundInputQueue, WindowInputQueue, true))
                     {
                         ("ATI WIQ Failed " + callingComponent + " for " + this.DisplayName).Log();
                     }
