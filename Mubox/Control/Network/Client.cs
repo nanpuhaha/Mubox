@@ -43,11 +43,16 @@ namespace Mubox.Control.Network
                         {
                             if (_windowHandle != IntPtr.Zero)
                             {
-                                if (WinAPI.Windows.GetWindowThreadProcessId(_windowHandle, out windowInputQueue) == 0)
+                                var windowProcessId = IntPtr.Zero;
+                                windowInputQueue = WinAPI.Windows.GetWindowThreadProcessId(_windowHandle, out windowProcessId);
+                                if (windowInputQueue == IntPtr.Zero)
                                 {
                                     ("GWTPID Failed for set_WindowHandle(" + _windowHandle + ") ").Log();
                                 }
-                                WindowInputQueue = windowInputQueue;
+                                else
+                                {
+                                    WindowInputQueue = windowInputQueue;
+                                }
                             }
                         }
                     }
@@ -602,7 +607,8 @@ namespace Mubox.Control.Network
                 foregroundWindowHandle = WinAPI.Windows.GetForegroundWindow();
                 if (foregroundWindowHandle != IntPtr.Zero)
                 {
-                    WinAPI.Windows.GetWindowThreadProcessId(foregroundWindowHandle, out foregroundInputQueue);
+                    var foregroundProcessId = IntPtr.Zero;
+                    foregroundInputQueue = WinAPI.Windows.GetWindowThreadProcessId(foregroundWindowHandle, out foregroundProcessId);
                 }
                 System.Threading.Thread.Sleep(wait++);
             } while ((foregroundInputQueue == IntPtr.Zero) && (DateTime.Now.Ticks <= activationExpiryTime));

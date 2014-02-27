@@ -1110,7 +1110,7 @@ namespace Mubox
             internal static extern bool SetForegroundWindow(IntPtr hWnd);
 
             [DllImport("user32.dll", SetLastError = true)]
-            internal static extern uint GetWindowThreadProcessId(IntPtr hWnd, out IntPtr lpdwProcessId);
+            internal static extern IntPtr GetWindowThreadProcessId(IntPtr hWnd, out IntPtr lpdwProcessId);
 
             [DllImport("user32.dll")]
             internal static extern bool AttachThreadInput(IntPtr idAttach, IntPtr idAttachTo, bool fAttach);
