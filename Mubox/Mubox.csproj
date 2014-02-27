@@ -120,9 +120,9 @@
     <Compile Include="Model\Client\NetworkClient.cs" />
     <Compile Include="Model\Input\InputBase.cs" />
     <Compile Include="Model\Input\KeyboardInput.cs" />
-    <Compile Include="Control\Input\KeyboardInputHook.cs" />
+    <Compile Include="Control\Input\Hooks\KeyboardInputHook.cs" />
     <Compile Include="Model\Input\MouseInput.cs" />
-    <Compile Include="Control\Input\MouseInputHook.cs" />
+    <Compile Include="Control\Input\Hooks\MouseInputHook.cs" />
     <Compile Include="Model\Input\CommandInput.cs" />
     <Compile Include="Model\Input\StationInput.cs" />
     <Compile Include="Control\Network\Client.cs" />
