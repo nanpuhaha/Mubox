@@ -110,6 +110,9 @@
     <Compile Include="Configuration\ProfileSettings.cs" />
     <Compile Include="Configuration\ProfileSettingsCollection.cs" />
     <Compile Include="Control\FileReplicationManager.cs" />
+    <Compile Include="Control\Input\InputManager.cs" />
+    <Compile Include="Control\Input\KeyboardInputAdapter.cs" />
+    <Compile Include="Control\Input\MouseInputAdapter.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Extensions\ExtensionManager.cs" />
     <Compile Include="Extensions\ExtensionState.cs" />
@@ -120,9 +123,9 @@
     <Compile Include="Model\Client\NetworkClient.cs" />
     <Compile Include="Model\Input\InputBase.cs" />
     <Compile Include="Model\Input\KeyboardInput.cs" />
-    <Compile Include="Control\Input\KeyboardInputHook.cs" />
+    <Compile Include="Control\Input\Hooks\KeyboardInputHook.cs" />
     <Compile Include="Model\Input\MouseInput.cs" />
-    <Compile Include="Control\Input\MouseInputHook.cs" />
+    <Compile Include="Control\Input\Hooks\MouseInputHook.cs" />
     <Compile Include="Model\Input\CommandInput.cs" />
     <Compile Include="Model\Input\StationInput.cs" />
     <Compile Include="Control\Network\Client.cs" />

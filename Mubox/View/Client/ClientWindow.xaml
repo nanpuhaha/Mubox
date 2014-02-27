@@ -14,7 +14,7 @@
             </Border>
         </Grid>
         <Label HorizontalAlignment="Left" Margin="17,10,0,0" Name="label3" Width="98" Height="24" VerticalAlignment="Top" TabIndex="7">Client Name</Label>
-        <TextBox IsEnabled="False" Margin="115,12,11,0" Name="textMachineName" TextChanged="textMachineName_TextChanged" TabIndex="8" Height="23" VerticalAlignment="Top" ToolTip="This will be the name of the Mubox Client in the Server UI.">DEFAULT</TextBox>
+        <TextBox IsEnabled="False" Margin="115,12,11,0" Name="textMachineName" TextChanged="textMachineName_TextChanged" TabIndex="8" Height="23" VerticalAlignment="Top" ToolTip="This will be the name of the Client in the Server UI.">DEFAULT</TextBox>
         <TabControl Name="tabControl1" Margin="12,41,12,73">
             <TabItem Header="Server Connection" Name="tabServerConnection">
                 <Grid >

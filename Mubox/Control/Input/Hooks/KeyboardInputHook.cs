@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Mubox.Model.Input;
 
-namespace Mubox.Control.Input
+namespace Mubox.Control.Input.Hooks
 {
     public static class KeyboardInputHook
     {

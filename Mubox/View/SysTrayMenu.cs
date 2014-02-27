@@ -348,7 +348,7 @@ namespace Mubox.View
             };
             menuItem.Header = "Auto-Launch Game on Client Start";
             menuItem.ToolTip =
-                "Enable this option to Automatically Launch your Game when the Mubox Client is started via the Quick Launch Menu." + Environment.NewLine +
+                "Enable this option to Automatically Launch your Game when a Client started via the Quick Launch Menu." + Environment.NewLine +
                 "Note, the game will not run until the client successfully connects to the Server, once a Server Connection is established the Launch will continue.";
             quickLaunchClientShortcuts.Add(menuItem);
 
@@ -391,7 +391,7 @@ namespace Mubox.View
                     ex.Log();
                 }
             };
-            menuItem.Header = "_Configure New Mubox Client...";
+            menuItem.Header = "_Configure New Client...";
             menuItem.Icon = Resources["imageSettingsIcon"];
             quickLaunchClientShortcuts.Add(menuItem);
 

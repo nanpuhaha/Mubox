@@ -1,4 +1,5 @@
 ﻿using Mubox.Configuration;
+using Mubox.Control.Input.Hooks;
 using Mubox.Extensibility;
 using Mubox.Model;
 using Mubox.Model.Client;
@@ -633,9 +634,9 @@ namespace Mubox.View.Server
 
             actionMap[WinAPI.VK.Capital][WinAPI.WM.KEYDOWN] = (e) =>
             {
-                // work around for mouse hook breakage under W7, e.g. resetting the mouse hook
-                Control.Input.MouseInputHook.Stop();
-                Control.Input.MouseInputHook.Start();
+                // work around for mouse hook breakage, we noticed under W7 that the mouse hook would be periodically "lost" - this allows us to fix it using the Mouse Clone hotkey "CAPS LOCK"
+                MouseInputHook.Stop();
+                MouseInputHook.Start();
                 e.Handled = false;
                 return true;
             };
@@ -1016,11 +1017,11 @@ namespace Mubox.View.Server
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
-            Mubox.Control.Input.KeyboardInputHook.KeyboardInputReceived -= KeyboardInputHook_KeyboardInputReceived;
-            Mubox.Control.Input.MouseInputHook.MouseInputReceived -= MouseInputHook_MouseInputReceived;
+            KeyboardInputHook.KeyboardInputReceived -= KeyboardInputHook_KeyboardInputReceived;
+            MouseInputHook.MouseInputReceived -= MouseInputHook_MouseInputReceived;
 
-            Mubox.Control.Input.KeyboardInputHook.Stop();
-            Mubox.Control.Input.MouseInputHook.Stop();
+            KeyboardInputHook.Stop();
+            MouseInputHook.Stop();
 
             Mubox.Control.Network.Server.Stop();
 
@@ -1128,10 +1129,10 @@ namespace Mubox.View.Server
                         return;
                     isStartedYet = true;
 
-                    Mubox.Control.Input.KeyboardInputHook.KeyboardInputReceived += KeyboardInputHook_KeyboardInputReceived;
-                    Mubox.Control.Input.MouseInputHook.MouseInputReceived += MouseInputHook_MouseInputReceived;
-                    Mubox.Control.Input.KeyboardInputHook.Start();
-                    Mubox.Control.Input.MouseInputHook.Start();
+                    KeyboardInputHook.KeyboardInputReceived += KeyboardInputHook_KeyboardInputReceived;
+                    MouseInputHook.MouseInputReceived += MouseInputHook_MouseInputReceived;
+                    KeyboardInputHook.Start();
+                    MouseInputHook.Start();
 
                     this.buttonStartServer_Click(null, null);
 

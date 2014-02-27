@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Mubox.Model.Input;
 
-namespace Mubox.Control.Input
+namespace Mubox.Control.Input.Hooks
 {
     public static class MouseInputHook
     {
@@ -82,7 +82,7 @@ namespace Mubox.Control.Input
             if (hHook != IntPtr.Zero)
             {
                 Mubox.WinAPI.WindowHook.UnhookWindowsHookEx(hHook);
-                ("MSHOOK: Unhook Success.").Log();
+                //("MSHOOK: Unhook Success.").Log();
                 hHook = IntPtr.Zero;
             }
         }
