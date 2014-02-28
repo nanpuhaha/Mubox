@@ -25,7 +25,8 @@ namespace Mubox.View.Server
     {
         public static ServerWindow Instance { get; set; }
 
-        internal double Mouse_RelativeMovement_LastX = double.MinValue, RelativeMovement_LastY = double.MinValue;
+        internal double Mouse_RelativeMovement_LastX = double.MinValue;
+        internal double Mouse_RelativeMovement_LastY = double.MinValue;
 
         internal long Mouse_AbsoluteMovement_Screen_Resolution_UpdateTimestampTicks;
         internal int Mouse_AbsoluteMovement_Screen_ResolutionX = WinAPI.SystemMetrics.GetSystemMetrics(WinAPI.SystemMetrics.SM.SM_CXSCREEN);
@@ -111,44 +112,56 @@ namespace Mubox.View.Server
             #region Mouse_RelativeMovement
 
             // one-time init
-            if (this.Mouse_RelativeMovement_LastX == double.MinValue)
+            if (e.WM == WinAPI.WM.MOUSEMOVE)
             {
-                this.Mouse_RelativeMovement_LastX = e.Point.X;
-                this.RelativeMovement_LastY = e.Point.Y;
-                return;
+                if (this.Mouse_RelativeMovement_LastX == double.MinValue)
+                {
+                    this.Mouse_RelativeMovement_LastX = e.Point.X;
+                    this.Mouse_RelativeMovement_LastY = e.Point.Y;
+                    return;
+                }
+
+                // update for resolution changes every XX seconds
+                if ((DateTime.Now.Ticks - Mouse_AbsoluteMovement_Screen_Resolution_UpdateTimestampTicks) > TimeSpan.FromSeconds(15).Ticks)
+                {
+                    Mouse_Screen_OnResolutionChanged();
+                    return;
+                }
             }
 
-            // update for resolution changes every XX seconds
-            if ((DateTime.Now.Ticks - Mouse_AbsoluteMovement_Screen_Resolution_UpdateTimestampTicks) > TimeSpan.FromSeconds(15).Ticks)
-            {
-                Mouse_Screen_OnResolutionChanged();
-            }
-
-            // track relative movement
-            // TODO: except when the mouse moves TO the center of the screen or center of client area, as wow does this to pan the screen
-            // TODO: except when the mouse moves FROM the center of the screen or center of client area TO the last location we moved BEFORE 'detecting a center screen mouse move'
-            // TODO: mouseglitch
-            int relX = (int)e.Point.X;
-            int relY = (int)e.Point.Y;
 
             var shouldCloneMouse = ShouldCloneMouse(e);
 
-            relX -= (int)this.Mouse_RelativeMovement_LastX;
-            relY -= (int)this.RelativeMovement_LastY;
+            // track relative movement
+            // TODO: except when the mouse moves TO the center of the screen or center of client area, some games do this to implement view pan
+            // TODO: except when the mouse moves FROM the center of the screen, somce games do this to implement view pan
+            int relX = (int)e.Point.X;
+            int relY = (int)e.Point.Y;
 
-            // if a mousemove, track relative change
             if (e.WM == WinAPI.WM.MOUSEMOVE)
             {
+                relX -= (int)this.Mouse_RelativeMovement_LastX;
+                relY -= (int)this.Mouse_RelativeMovement_LastY;
+
                 this.Mouse_RelativeMovement_LastX += relX;
                 if (this.Mouse_RelativeMovement_LastX <= 0)
+                {
                     this.Mouse_RelativeMovement_LastX = 0;
+                }
                 else if (this.Mouse_RelativeMovement_LastX >= Mouse_AbsoluteMovement_Screen_ResolutionX)
+                {
                     this.Mouse_RelativeMovement_LastX = Mouse_AbsoluteMovement_Screen_ResolutionX;
-                this.RelativeMovement_LastY += relY;
-                if (this.RelativeMovement_LastY <= 0)
-                    this.RelativeMovement_LastY = 0;
-                else if (this.RelativeMovement_LastY >= Mouse_AbsoluteMovement_Screen_ResolutionY)
-                    this.RelativeMovement_LastY = Mouse_AbsoluteMovement_Screen_ResolutionY;
+                }
+
+                this.Mouse_RelativeMovement_LastY += relY;
+                if (this.Mouse_RelativeMovement_LastY <= 0)
+                {
+                    this.Mouse_RelativeMovement_LastY = 0;
+                }
+                else if (this.Mouse_RelativeMovement_LastY >= Mouse_AbsoluteMovement_Screen_ResolutionY)
+                {
+                    this.Mouse_RelativeMovement_LastY = Mouse_AbsoluteMovement_Screen_ResolutionY;
+                }
             }
 
             #endregion Mouse_RelativeMovement
@@ -259,6 +272,8 @@ namespace Mubox.View.Server
 
                     if (e.WM == WinAPI.WM.MOUSEMOVE)
                     {
+                        e.Point = new Point(relX, relY);
+
                         // track mouse position
                         TrackMousePositionClientRelative(e, activeClient, clients);
 
@@ -273,20 +288,25 @@ namespace Mubox.View.Server
                         ////    e.Handled = e.Handled || (mouseButtonInfo.IsDown && lastMouseDownTimestampExpiry.Ticks > DateTime.Now.Ticks);
                         ////}
 
-                        //if (clients.Length > 0)
-                        //{
-                        //    List<ClientBase> reducedClientsForMouseMove = new List<ClientBase>();
-                        //    List<string> addressExclusionTable = new List<string>(ClientBase.localAddressTable);
-                        //    foreach (var item in clients)
-                        //    {
-                        //        if (!addressExclusionTable.Contains(item.Address))
-                        //        {
-                        //            reducedClientsForMouseMove.Add(item);
-                        //            addressExclusionTable.Add(item.Address);
-                        //        }
-                        //    }
-                        //    clients = reducedClientsForMouseMove.ToArray();
-                        //}
+                        if (clients.Length > 0)
+                        {
+                            List<ClientBase> reducedClientsForMouseMove = new List<ClientBase>();
+                            List<string> addressExclusionTable = new List<string>(ClientBase.localAddressTable);
+                            foreach (var item in clients)
+                            {
+                                if (!addressExclusionTable.Contains(item.Address))
+                                {
+                                    reducedClientsForMouseMove.Add(item);
+                                    addressExclusionTable.Add(item.Address);
+                                }
+                            }
+                            clients = reducedClientsForMouseMove.ToArray();
+                        }
+                    }
+                    else
+                    {
+                        // assuming relative coordinates, we only want coordinates to be dispatched for mousemove events, and not for button events
+                        e.Point = new Point();
                     }
 
                     foreach (ClientBase client in clients)
@@ -405,9 +425,9 @@ namespace Mubox.View.Server
         private void ForwardMouseEvent(MouseInput e, ClientBase clientBase)
         {
             MouseInput L_e = new MouseInput();
-            L_e.IsAbsolute = true;
+            //L_e.IsAbsolute = true;
             L_e.MouseData = e.MouseData;
-            L_e.Point = L_e_Point;
+            L_e.Point = e.Point;
             L_e.Time = e.Time;
             L_e.WindowDesktopHandle = clientBase.WindowDesktopHandle;
             L_e.WindowStationHandle = clientBase.WindowStationHandle;
