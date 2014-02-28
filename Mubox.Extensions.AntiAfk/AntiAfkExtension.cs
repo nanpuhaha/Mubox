@@ -104,7 +104,7 @@ namespace Mubox.Extensions.AntiAfk
             _thread.Start();
         }
 
-        private static WinAPI.VK[] _antiAfkKeyRotation = new[]
+        private static WinAPI.VK[] _antiAfkKeyRotation = new[] // TODO: make configurable
             {
                 WinAPI.VK.Q,
                 WinAPI.VK.E,
@@ -121,7 +121,7 @@ namespace Mubox.Extensions.AntiAfk
             {
                 while (!_exitYet)
                 {
-                    var waitTimeSeconds = 120.0; // TODO: make configurable
+                    var waitTimeSeconds = 10 * 60.0; // TODO: make configurable
                     Thread.Sleep((int)(waitTimeSeconds * 1000));
 
                     var key = _antiAfkKeyRotation[_antiAfkKeyRotationCurrent % _antiAfkKeyRotation.Length];

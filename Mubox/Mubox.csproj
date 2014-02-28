@@ -110,9 +110,7 @@
     <Compile Include="Configuration\ProfileSettings.cs" />
     <Compile Include="Configuration\ProfileSettingsCollection.cs" />
     <Compile Include="Control\FileReplicationManager.cs" />
-    <Compile Include="Control\Input\InputManager.cs" />
-    <Compile Include="Control\Input\KeyboardInputAdapter.cs" />
-    <Compile Include="Control\Input\MouseInputAdapter.cs" />
+    <Compile Include="Control\Input\InputQueue.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Extensions\ExtensionManager.cs" />
     <Compile Include="Extensions\ExtensionState.cs" />
