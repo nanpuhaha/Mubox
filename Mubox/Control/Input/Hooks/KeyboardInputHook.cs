@@ -144,6 +144,12 @@ namespace Mubox.Control.Input.Hooks
 
         private static bool OnKeyboardInputReceived(WinAPI.WM wParam, WinAPI.WindowHook.KBDLLHOOKSTRUCT hookStruct)
         {
+            // ignore injected input
+            if (hookStruct.flags.HasFlag(WinAPI.WindowHook.LLKHF.INJECTED))
+            {
+                return false;
+            }
+
             // fix for 'key repeat' windows feature
             if (pressedKeys.Contains((byte)(hookStruct.vkCode & 0xFF)))
             {

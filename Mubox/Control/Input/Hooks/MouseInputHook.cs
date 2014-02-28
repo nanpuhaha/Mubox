@@ -91,7 +91,8 @@ namespace Mubox.Control.Input.Hooks
 
         private static bool OnMouseInputReceived(WinAPI.WM wm, WinAPI.WindowHook.MSLLHOOKSTRUCT hookStruct)
         {
-            if (WinAPI.WindowHook.LLMHF.INJECTED == (hookStruct.flags & WinAPI.WindowHook.LLMHF.INJECTED))
+            // ignore injected input
+            if (hookStruct.flags.HasFlag(WinAPI.WindowHook.LLMHF.INJECTED))
             {
                 return false;
             }
