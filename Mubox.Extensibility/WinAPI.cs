@@ -1103,10 +1103,13 @@ namespace Mubox
             internal static extern bool BringWindowToTop(IntPtr hWnd);
 
             [DllImport("user32.dll")]
+            internal static extern IntPtr GetActiveWindow();
+
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern IntPtr SetActiveWindow(IntPtr hWnd);
 
             // For Windows Mobile, replace user32.dll with coredll.dll
-            [DllImport("user32.dll")]
+            [DllImport("user32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             internal static extern bool SetForegroundWindow(IntPtr hWnd);
 
@@ -1197,6 +1200,9 @@ namespace Mubox
 
             [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
             internal static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
+            [DllImport("user32.dll")]
+            internal static extern IntPtr GetFocus();
 
             [DllImport("user32.dll")]
             internal static extern IntPtr SetFocus(IntPtr hWnd);
@@ -2209,6 +2215,9 @@ namespace Mubox
 
         public static class Threads
         {
+            [DllImport("kernel32.dll", SetLastError = true)]
+            internal static extern void SetLastError(uint dwErrCode);
+            
             [DllImport("kernel32.dll")]
             internal static extern IntPtr GetCurrentThreadId();
 
@@ -2238,7 +2247,7 @@ namespace Mubox
 
             [DllImport("user32.dll")]
             internal static extern uint MapVirtualKey(uint uCode, MAPVK uMapType);
-            
+
             [DllImport("user32.dll")]
             internal static extern uint MapVirtualKeyEx(uint uCode, MAPVK uMapType, IntPtr dwhkl);
 
@@ -2251,73 +2260,6 @@ namespace Mubox
                 MAPVK_VK_TO_VSC_EX = 0x04
             }
 
-            internal static void SendInputViaKBParams(WinAPI.WindowHook.LLKHF flags, uint time, uint scan, uint vk, WinAPI.CAS cas)
-            {
-                if ((flags & WindowHook.LLKHF.UP) != WindowHook.LLKHF.UP)
-                {
-                    if ((cas & CAS.CONTROL) != 0)
-                    {
-                        SendInputViaKBParams((WindowHook.LLKHF)0, time, (uint)0, (uint)WinAPI.VK.LeftControl, (CAS)0);
-                        SendInputViaKBParams((WindowHook.LLKHF)0, time, (uint)0, (uint)WinAPI.VK.Control, (CAS)0);
-                    }
-                    if ((cas & CAS.ALT) != 0)
-                    {
-                        SendInputViaKBParams((WindowHook.LLKHF)0, time, (uint)0, (uint)WinAPI.VK.LeftMenu, (CAS)0);
-                        SendInputViaKBParams((WindowHook.LLKHF)0, time, (uint)0, (uint)WinAPI.VK.Menu, (CAS)0);
-                        flags |= WindowHook.LLKHF.ALTDOWN;
-                    }
-                    if ((cas & CAS.SHIFT) != 0)
-                    {
-                        SendInputViaKBParams((WindowHook.LLKHF)0, time, (uint)0, (uint)WinAPI.VK.LeftShift, (CAS)0);
-                        SendInputViaKBParams((WindowHook.LLKHF)0, time, (uint)0, (uint)WinAPI.VK.Shift, (CAS)0);
-                    }
-                }
-
-                uint result = 0;
-                if (IntPtr.Size == 8)
-                {
-                    INPUT64[] input = new INPUT64[1];
-                    input[0].InputType = InputType.INPUT_KEYBOARD;
-                    input[0].ki.dwExtraInfo = GetMessageExtraInfo();
-                    input[0].ki.Flags = ConvertFlags(flags);
-                    input[0].ki.time = GetTickCount();
-                    input[0].ki.wScan = (ushort)(scan & 0xFFFF);
-                    input[0].ki.VirtualKey = (WinAPI.VK)vk;
-                    result = SendInput(1, input, Marshal.SizeOf(input[0]));
-                }
-                else
-                {
-                    INPUT[] input = new INPUT[1];
-                    input[0].InputType = InputType.INPUT_KEYBOARD;
-                    input[0].ki.dwExtraInfo = GetMessageExtraInfo();
-                    input[0].ki.Flags = ConvertFlags(flags);
-                    input[0].ki.time = GetTickCount();
-                    input[0].ki.wScan = (ushort)(scan & 0xFFFF);
-                    input[0].ki.VirtualKey = (WinAPI.VK)vk;
-                    result = SendInput(1, input, Marshal.SizeOf(input[0]));
-                }
-                if (result == 0)
-                {
-                    int err = Marshal.GetLastWin32Error();
-                    ("SendInput(ki) Blocked, 0x" + err.ToString("X")).LogError();
-                }
-
-                if ((flags & WindowHook.LLKHF.UP) == WindowHook.LLKHF.UP)
-                {
-                    if ((cas & CAS.CONTROL) != 0)
-                    {
-                        SendInputViaKBParams(WindowHook.LLKHF.UP, time, (uint)0, (uint)WinAPI.VK.Control, (CAS)0);
-                    }
-                    if ((cas & CAS.ALT) != 0)
-                    {
-                        SendInputViaKBParams(WindowHook.LLKHF.UP, time, (uint)0, (uint)WinAPI.VK.Menu, (CAS)0);
-                    }
-                    if ((cas & CAS.SHIFT) != 0)
-                    {
-                        SendInputViaKBParams(WindowHook.LLKHF.UP, time, (uint)0, (uint)WinAPI.VK.Shift, (CAS)0);
-                    }
-                }
-            }
 
             internal static KeyEventFlags ConvertFlags(WindowHook.LLKHF flags)
             {
@@ -2331,6 +2273,26 @@ namespace Mubox
                     newFlags |= KeyEventFlags.KEYEVENTF_EXTENDEDKEY;
                 }
                 return newFlags;
+            }
+
+            internal static bool IsExtended(VK key)
+            {
+                /* http://msdn.microsoft.com/en-us/library/windows/desktop/ms646267(v=vs.85).aspx
+                 * The extended-key flag indicates whether the keystroke message originated from one 
+                 * of the additional keys on the enhanced keyboard. The extended keys consist of the 
+                 * ALT and CTRL keys on the right-hand side of the keyboard; the INS, DEL, HOME, END, 
+                 * PAGE UP, PAGE DOWN, and arrow keys in the clusters to the left of the numeric keypad; 
+                 * the NUM LOCK key; the BREAK (CTRL+PAUSE) key; the PRINT SCRN key; and the divide (/) 
+                 * and ENTER keys in the numeric keypad. The extended-key flag is set if the key is an
+                 * extended key.
+                 */
+                return (key == VK.Menu || key == VK.RightMenu ||
+                    key == VK.Control || key == VK.RightControl ||
+                    key == VK.Insert || key == VK.Delete || key == VK.Home || key == VK.End ||
+                    key == VK.Prior || key == VK.Next ||
+                    key == VK.Left || key == VK.Right || key == VK.Up || key == VK.Down ||
+                    key == VK.NumLock || key == VK.Cancel || key == VK.Snapshot ||
+                    key == VK.Divide);
             }
 
             internal static void MouseActionViaSendInput(WinAPI.WindowHook.MSLLHOOKSTRUCT hookStruct, int X, int Y)
@@ -2425,6 +2387,26 @@ namespace Mubox
                 internal MOUSEINPUT mi;
                 [FieldOffset(4)]
                 internal HARDWAREINPUT hi;
+                public override string ToString()
+                {
+                    var sb = new StringBuilder();
+                    sb.AppendFormat("{0}={1} ", "x86 InputType", InputType);
+                    switch (InputType)
+                    {
+                        case InputType.INPUT_MOUSE:
+                            sb.Append(mi.ToString());
+                            break;
+                        case InputType.INPUT_KEYBOARD:
+                            sb.Append(ki.ToString());
+                            break;
+                        case InputType.INPUT_HARDWARE:
+                            sb.Append(hi.ToString());
+                            break;
+                        default:
+                            break;
+                    }
+                    return sb.ToString();
+                }
             }
 
             [StructLayout(LayoutKind.Explicit)]
@@ -2438,6 +2420,26 @@ namespace Mubox
                 internal MOUSEINPUT mi;
                 [FieldOffset(8)]
                 internal HARDWAREINPUT hi;
+                public override string ToString()
+                {
+                    var sb = new StringBuilder();
+                    sb.AppendFormat("{0}={1} ", "x64 InputType", InputType);
+                    switch (InputType)
+                    {
+                        case InputType.INPUT_MOUSE:
+                            sb.Append(mi.ToString());
+                            break;
+                        case InputType.INPUT_KEYBOARD:
+                            sb.Append(ki.ToString());
+                            break;
+                        case InputType.INPUT_HARDWARE:
+                            sb.Append(hi.ToString());
+                            break;
+                        default:
+                            break;
+                    }
+                    return sb.ToString();
+                }
             }
 
             [SuppressMessage("Microsoft.Design", "CA1049:TypesThatOwnNativeResourcesShouldBeDisposable", Justification = "struct is not responsible for deallocation")]
@@ -2450,6 +2452,17 @@ namespace Mubox
                 internal MouseEventFlags Flags;
                 internal uint time;
                 internal IntPtr dwExtraInfo;
+                public override string ToString()
+                {
+                    var sb = new StringBuilder();
+                    sb.AppendFormat("{0}={1} ", "dx", dx);
+                    sb.AppendFormat("{0}={1} ", "dy", dy);
+                    sb.AppendFormat("{0}={1:X} ", "mouseData", mouseData);
+                    sb.AppendFormat("{0}={1:X} ", "Flags", Flags);
+                    sb.AppendFormat("{0}={1} ", "time", time);
+                    sb.AppendFormat("{0}={1} ", "dwExtraInfo", dwExtraInfo);
+                    return sb.ToString();
+                }
             }
 
             [SuppressMessage("Microsoft.Design", "CA1049:TypesThatOwnNativeResourcesShouldBeDisposable", Justification = "struct is not responsible for deallocation")]
@@ -2461,6 +2474,16 @@ namespace Mubox
                 internal KeyEventFlags Flags;
                 internal uint time;
                 internal IntPtr dwExtraInfo;
+                public override string ToString()
+                {
+                    var sb = new StringBuilder();
+                    sb.AppendFormat("{0}={1} ", "VirtualKey", VirtualKey);
+                    sb.AppendFormat("{0}={1:X} ", "wScan", wScan);
+                    sb.AppendFormat("{0}={1:X} ", "Flags", Flags);
+                    sb.AppendFormat("{0}={1} ", "time", time);
+                    sb.AppendFormat("{0}={1} ", "dwExtraInfo", dwExtraInfo);
+                    return sb.ToString();
+                }
             }
 
             [StructLayout(LayoutKind.Sequential)]
@@ -2469,6 +2492,14 @@ namespace Mubox
                 internal int uMsg;
                 internal short wParamL;
                 internal short wParamH;
+                public override string ToString()
+                {
+                    var sb = new StringBuilder();
+                    sb.AppendFormat("{0}={1} ", "uMsg", uMsg);
+                    sb.AppendFormat("{0}={1:X} ", "wParamL", wParamL);
+                    sb.AppendFormat("{0}={1} ", "wParamH", wParamH);
+                    return sb.ToString();
+                }
             }
         }
 
@@ -4646,7 +4677,7 @@ namespace Mubox
                     .Handles
                     .Where(entry =>
                         entry.AccessMask != 0x0012019f /* known issue with hanging file handles (pipes?), which we're not interested in */
-                        //&& entry.ProcessID == processId
+                    //&& entry.ProcessID == processId
                     //&& entry.ObjectType == 14 // TODO: is this the correct object type?
                     ).ToList();
 
