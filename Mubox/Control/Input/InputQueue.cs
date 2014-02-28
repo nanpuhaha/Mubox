@@ -372,14 +372,14 @@ namespace Mubox.Control.Input
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
-                    Process(new KeyboardInput
-                    {
-                        VK = (uint)WinAPI.VK.Control,
-                        Flags = WinAPI.WindowHook.LLKHF.UP,
-                        Scan = (uint)0, // TODO: convert to scan?
-                        Time = time,
-                        CAS = (WinAPI.CAS)0,
-                    });
+                    //Process(new KeyboardInput
+                    //{
+                    //    VK = (uint)WinAPI.VK.Control,
+                    //    Flags = WinAPI.WindowHook.LLKHF.UP,
+                    //    Scan = (uint)0, // TODO: convert to scan?
+                    //    Time = time,
+                    //    CAS = (WinAPI.CAS)0,
+                    //});
                 }
                 if ((cas & WinAPI.CAS.ALT) != 0)
                 {
@@ -391,14 +391,14 @@ namespace Mubox.Control.Input
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
-                    Process(new KeyboardInput
-                    {
-                        VK = (uint)WinAPI.VK.Menu,
-                        Flags = WinAPI.WindowHook.LLKHF.UP,
-                        Scan = (uint)0, // TODO: convert to scan?
-                        Time = time,
-                        CAS = (WinAPI.CAS)0,
-                    });
+                    //Process(new KeyboardInput
+                    //{
+                    //    VK = (uint)WinAPI.VK.Menu,
+                    //    Flags = WinAPI.WindowHook.LLKHF.UP,
+                    //    Scan = (uint)0, // TODO: convert to scan?
+                    //    Time = time,
+                    //    CAS = (WinAPI.CAS)0,
+                    //});
                 }
                 if ((cas & WinAPI.CAS.SHIFT) != 0)
                 {
@@ -410,14 +410,14 @@ namespace Mubox.Control.Input
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
-                    Process(new KeyboardInput
-                    {
-                        VK = (uint)WinAPI.VK.Shift,
-                        Flags = WinAPI.WindowHook.LLKHF.UP,
-                        Scan = (uint)0, // TODO: convert to scan?
-                        Time = time,
-                        CAS = (WinAPI.CAS)0,
-                    });
+                    //Process(new KeyboardInput
+                    //{
+                    //    VK = (uint)WinAPI.VK.Shift,
+                    //    Flags = WinAPI.WindowHook.LLKHF.UP,
+                    //    Scan = (uint)0, // TODO: convert to scan?
+                    //    Time = time,
+                    //    CAS = (WinAPI.CAS)0,
+                    //});
                 }
             }
         }
