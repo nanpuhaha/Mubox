@@ -289,14 +289,14 @@ namespace Mubox.Control.Input
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
-                    Process(new KeyboardInput
-                    {
-                        VK = (uint)WinAPI.VK.Control,
-                        Flags = (WinAPI.WindowHook.LLKHF)0,
-                        Scan = (uint)0, // TODO: convert to scan?
-                        Time = time,
-                        CAS = (WinAPI.CAS)0,
-                    });
+                    //Process(new KeyboardInput
+                    //{
+                    //    VK = (uint)WinAPI.VK.Control,
+                    //    Flags = (WinAPI.WindowHook.LLKHF)0,
+                    //    Scan = (uint)0, // TODO: convert to scan?
+                    //    Time = time,
+                    //    CAS = (WinAPI.CAS)0,
+                    //});
                 }
                 if ((cas & WinAPI.CAS.ALT) != 0)
                 {
@@ -308,14 +308,14 @@ namespace Mubox.Control.Input
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
-                    Process(new KeyboardInput
-                    {
-                        VK = (uint)WinAPI.VK.Menu,
-                        Flags = (WinAPI.WindowHook.LLKHF)0,
-                        Scan = (uint)0, // TODO: convert to scan?
-                        Time = time,
-                        CAS = (WinAPI.CAS)0,
-                    });
+                    //Process(new KeyboardInput
+                    //{
+                    //    VK = (uint)WinAPI.VK.Menu,
+                    //    Flags = (WinAPI.WindowHook.LLKHF)0,
+                    //    Scan = (uint)0, // TODO: convert to scan?
+                    //    Time = time,
+                    //    CAS = (WinAPI.CAS)0,
+                    //});
                     flags |= WinAPI.WindowHook.LLKHF.ALTDOWN;
                 }
                 if ((cas & WinAPI.CAS.SHIFT) != 0)
@@ -328,19 +328,20 @@ namespace Mubox.Control.Input
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
-                    Process(new KeyboardInput
-                    {
-                        VK = (uint)WinAPI.VK.Shift,
-                        Flags = (WinAPI.WindowHook.LLKHF)0,
-                        Scan = (uint)0, // TODO: convert to scan?
-                        Time = time,
-                        CAS = (WinAPI.CAS)0,
-                    });
+                    //Process(new KeyboardInput
+                    //{
+                    //    VK = (uint)WinAPI.VK.Shift,
+                    //    Flags = (WinAPI.WindowHook.LLKHF)0,
+                    //    Scan = (uint)0, // TODO: convert to scan?
+                    //    Time = time,
+                    //    CAS = (WinAPI.CAS)0,
+                    //});
                 }
             }
 
             // NOTE: some apps may actually rely on keyboard state, AttachInputThread will clobber keyboard state. now that we don't continually attach/detach we should be able to set keyboard correctly
-            WinAPI.SetKeyboardState(this.pressedKeys);
+            // TODO: this should be a game profile level option - some games exhibit 'double entry' of input when this is called
+            // WinAPI.SetKeyboardState(this.pressedKeys);
 
             WinAPI.Windows.PostMessage(ClientWindowHandle, wm, new UIntPtr(wParam), new UIntPtr(lParam));
 
