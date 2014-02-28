@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mubox.Control.Input;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -36,23 +37,21 @@ namespace Mubox.Control.Network
                         if (_windowHandle == IntPtr.Zero)
                         {
                             WindowInputQueue = IntPtr.Zero;
+                            InputManager.Detach();
                             return;
                         }
-                        IntPtr windowInputQueue = WindowInputQueue;
-                        if (WindowInputQueue == IntPtr.Zero)
+                        else
                         {
-                            if (_windowHandle != IntPtr.Zero)
+                            var windowProcessId = IntPtr.Zero;
+                            WindowInputQueue = WinAPI.Threads.GetWindowThreadProcessId(_windowHandle, out windowProcessId);
+                            if (WindowInputQueue == IntPtr.Zero)
                             {
-                                var windowProcessId = IntPtr.Zero;
-                                windowInputQueue = WinAPI.Threads.GetWindowThreadProcessId(_windowHandle, out windowProcessId);
-                                if (windowInputQueue == IntPtr.Zero)
-                                {
-                                    ("GWTPID Failed for set_WindowHandle(" + _windowHandle + ") ").Log();
-                                }
-                                else
-                                {
-                                    WindowInputQueue = windowInputQueue;
-                                }
+                                var err = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
+                                ("GWTPID Failed for set_WindowHandle(" + _windowHandle + ") err=0x" + err.ToString("X")).Log();
+                            }
+                            else
+                            {
+                                InputManager.Attach(WindowInputQueue, _windowHandle);
                             }
                         }
                     }
@@ -66,6 +65,8 @@ namespace Mubox.Control.Network
 
         public static IntPtr MyInputQueue { get; set; }
 
+        public InputQueue InputManager { get; private set; }
+
         private System.Runtime.Serialization.DataContractSerializer Serializer = new System.Runtime.Serialization.DataContractSerializer(typeof(Model.Input.InputBase),
             new Type[]
             {
@@ -76,6 +77,7 @@ namespace Mubox.Control.Network
 
         public Client()
         {
+            InputManager = new InputQueue();
         }
 
         public void Connect(string host, int port)
@@ -274,117 +276,31 @@ namespace Mubox.Control.Network
 
         private void OnMouseInputReceived(Model.Input.MouseInput mouseInput)
         {
-            bool useTIQ = true; //TODO: this needs test and reverification of semantics/rules because it does not appear to allow mouse broadcast
+            //bool useTIQ = true; //TODO: this needs test and reverification of semantics/rules because it does not appear to allow mouse broadcast
 
             // translate message and track MK changes
             WinAPI.WM wm = WinAPI.WM.USER;
             bool isButtonUpEvent = false;
 
             // strip 'absolute' flag from mask and process result
-            switch ((mouseInput.Flags | WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE) ^ WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE)
-            {
-                case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_MOVE:
-                    wm = WinAPI.WM.MOUSEMOVE;
-                    break;
 
-                case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_LEFTDOWN:
-                    wm = WinAPI.WM.LBUTTONDOWN;
-                    CurrentMK |= WinAPI.Windows.MK.MK_LBUTTON;
-                    break;
+            // denormalize coordinates to local
+            WinAPI.Windows.RECT clientRect;
+            WinAPI.Windows.GetClientRect(WindowHandle, out clientRect);
+            //int lPointX = (int)(((double)clientRect.Width / (double)65536) * mouseInput.Point.X);
+            //int lPointY = (int)(((double)clientRect.Height / (double)65536) * mouseInput.Point.Y);
 
-                case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_LEFTUP:
-                    wm = WinAPI.WM.LBUTTONUP;
-                    isButtonUpEvent = true;
-                    CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_LBUTTON) ^ WinAPI.Windows.MK.MK_LBUTTON;
-                    break;
+            // TODO: the X and Y coordinates here should be "relative" -- might want to dig up the old "mrel" code -- it doesnt matter if we xlate coordinates to client area/pixels or not
 
-                case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_RIGHTDOWN:
-                    wm = WinAPI.WM.RBUTTONDOWN;
-                    CurrentMK |= WinAPI.Windows.MK.MK_RBUTTON;
-                    break;
+            InputManager.Enqueue(mouseInput);
 
-                case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_RIGHTUP:
-                    wm = WinAPI.WM.RBUTTONUP;
-                    CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_RBUTTON) ^ WinAPI.Windows.MK.MK_RBUTTON;
-                    isButtonUpEvent = true;
-                    break;
-
-                case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_MIDDLEDOWN:
-                    wm = WinAPI.WM.MBUTTONDOWN;
-                    CurrentMK |= WinAPI.Windows.MK.MK_MBUTTON;
-                    break;
-
-                case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_MIDDLEUP:
-                    wm = WinAPI.WM.MBUTTONUP;
-                    CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_MBUTTON) ^ WinAPI.Windows.MK.MK_MBUTTON;
-                    isButtonUpEvent = true;
-                    break;
-
-                case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_XDOWN:
-                    wm = WinAPI.WM.XBUTTONDOWN;
-                    {
-                        var xbutton = WinAPI.MACROS.GET_XBUTTON_WPARAM(mouseInput.MouseData);
-                        switch (xbutton)
-                        {
-                            case WinAPI.MACROS.XBUTTONS.XBUTTON1:
-                                CurrentMK |= WinAPI.Windows.MK.MK_XBUTTON1;
-                                break;
-
-                            case WinAPI.MACROS.XBUTTONS.XBUTTON2:
-                                CurrentMK |= WinAPI.Windows.MK.MK_XBUTTON2;
-                                break;
-
-                            default:
-                                ("UnsupportedButtonDown in MouseData(" + xbutton + ") for " + this.DisplayName).Log();
-                                break;
-                        }
-                    }
-                    break;
-
-                case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_XUP:
-                    wm = WinAPI.WM.XBUTTONUP;
-                    isButtonUpEvent = true;
-                    {
-                        var xbutton = WinAPI.MACROS.GET_XBUTTON_WPARAM(mouseInput.MouseData);
-                        switch (xbutton)
-                        {
-                            case WinAPI.MACROS.XBUTTONS.XBUTTON1:
-                                CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_XBUTTON1) ^ WinAPI.Windows.MK.MK_XBUTTON1;
-                                break;
-
-                            case WinAPI.MACROS.XBUTTONS.XBUTTON2:
-                                CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_XBUTTON2) ^ WinAPI.Windows.MK.MK_XBUTTON2;
-                                break;
-
-                            default:
-                                ("UnsupportedButtonUp in MouseData(" + xbutton + ") for " + this.DisplayName).Log();
-                                break;
-                        }
-                    }
-                    break;
-
-                case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_WHEEL:
-                case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_HWHEEL:
-                    wm = WinAPI.WM.MOUSEWHEEL;
-                    break;
-
-                default:
-                    wm = mouseInput.WM;
-                    break;
-            }
-
+            /* superceded by InputManager (above)
             // no target window? can't use
             if (WindowHandle == IntPtr.Zero)
             {
                 ("NoWindowHandle Failed OnMouseInputReceived, Input Loss for " + this.DisplayName).Log();
                 return;
             }
-
-            // denormalize coordinates to local
-            WinAPI.Windows.RECT clientRect;
-            WinAPI.Windows.GetClientRect(WindowHandle, out clientRect);
-            int lPointX = (int)(((double)clientRect.Width / (double)65536) * mouseInput.Point.X);
-            int lPointY = (int)(((double)clientRect.Height / (double)65536) * mouseInput.Point.Y);
 
             lock (_tiqLock)
             {
@@ -426,6 +342,7 @@ namespace Mubox.Control.Network
                     MouseActionViaSendMessage((int)mouseInput.Point.X, (int)mouseInput.Point.Y, lPointX, lPointY, wm, mouseInput.MouseData, isButtonUpEvent);
                 }
             }
+             */
         }
 
         private void OnKeyboardInputReceived(Model.Input.KeyboardInput keyboardInput)
@@ -454,43 +371,14 @@ namespace Mubox.Control.Network
 
             // prevent windows key-repeat
             // TODO: this should be a profile-level option
-            if (IsRepeatKey(keyboardInput.VK, keyboardInput.Scan, keyboardInput.Flags, keyboardInput.Time))
-            {
-                return;
-            }
 
             lock (_tiqLock)
             {
                 // maintain MK state
-                switch ((WinAPI.VK)keyboardInput.VK)
-                {
-                    case WinAPI.VK.Control:
-                    case WinAPI.VK.LeftControl:
-                    case WinAPI.VK.RightControl:
-                        if ((keyboardInput.Flags & WinAPI.WindowHook.LLKHF.UP) == WinAPI.WindowHook.LLKHF.UP)
-                        {
-                            CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_CONTROL) ^ WinAPI.Windows.MK.MK_CONTROL;
-                        }
-                        else
-                        {
-                            CurrentMK |= WinAPI.Windows.MK.MK_CONTROL;
-                        }
-                        break;
 
-                    case WinAPI.VK.Shift:
-                    case WinAPI.VK.LeftShift:
-                    case WinAPI.VK.RightShift:
-                        if ((keyboardInput.Flags & WinAPI.WindowHook.LLKHF.UP) == WinAPI.WindowHook.LLKHF.UP)
-                        {
-                            CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_SHIFT) ^ WinAPI.Windows.MK.MK_SHIFT;
-                        }
-                        else
-                        {
-                            CurrentMK |= WinAPI.Windows.MK.MK_CONTROL;
-                        }
-                        break;
-                }
+                InputManager.Enqueue(keyboardInput);
 
+                /* superceded by new 'KeyboardInputAdapter' (above)
                 IntPtr windowHandle = WindowHandle;
 
                 // no target window
@@ -523,6 +411,7 @@ namespace Mubox.Control.Network
                 // use TIQ
                 Action action = () => OnKeyboardEventViaTIQ(keyboardInput.VK, keyboardInput.Flags, keyboardInput.Scan, keyboardInput.Time, keyboardInput.CAS);
                 ActionViaTIQ(action, foregroundInputQueue, "OnKeyboardInputReceived");
+                 */
             }
         }
 
@@ -595,8 +484,7 @@ namespace Mubox.Control.Network
             queue.Enqueue(action);
         }
 
-        public WinAPI.Windows.MK CurrentMK { get; private set; }
-
+        /* inputmanager
         public static bool TryResolveTIQ(out IntPtr foregroundInputQueue, out IntPtr foregroundWindowHandle, long activationExpiryTime)
         {
             foregroundWindowHandle = IntPtr.Zero;
@@ -614,7 +502,9 @@ namespace Mubox.Control.Network
             } while ((foregroundInputQueue == IntPtr.Zero) && (DateTime.Now.Ticks <= activationExpiryTime));
             return foregroundInputQueue != IntPtr.Zero;
         }
+         */
 
+        /* superceded by InputManager
         private void ActionViaTIQ(Action action, IntPtr foregroundInputQueue, string callingComponent)
         {
             bool detachWIQ = false;
@@ -666,41 +556,10 @@ namespace Mubox.Control.Network
                 }
             }
         }
+         */
 
-        #region client-side 'IsRepeatKey' behavior
 
-        private byte[] pressedKeys = new byte[256];
-
-        private bool IsRepeatKey(uint vk, uint scan, WinAPI.WindowHook.LLKHF flags, uint time)
-        {
-            bool keyIsPressed = pressedKeys[vk] == 0x80;
-            if (WinAPI.WindowHook.LLKHF.UP != (flags & WinAPI.WindowHook.LLKHF.UP))
-            {
-                if (keyIsPressed)
-                {
-                    return false;
-                }
-                else
-                {
-                    this.pressedKeys[vk] = 0x80;
-                }
-            }
-            else
-            {
-                if (!keyIsPressed)
-                {
-                    return false;
-                }
-                else
-                {
-                    this.pressedKeys[vk] = (byte)(WinAPI.IsToggled((WinAPI.VK)vk) ? 1 : 0);
-                }
-            }
-            return false;
-        }
-
-        #endregion client-side 'IsRepeatKey' behavior
-
+        /* superceded by InputManager
         private void OnKeyboardEventViaTIQ(uint vk, WinAPI.WindowHook.LLKHF flags, uint scan, uint time, WinAPI.CAS cas)
         {
             var wParam = vk;
@@ -780,33 +639,14 @@ namespace Mubox.Control.Network
                 }
             }
         }
+         */
 
         public static volatile IntPtr LastActivatedClientWindowHandle = IntPtr.Zero; // HACK can't mouse-click between game windows without mouse buttons getting stuck
 
         private static object OnMouseEventLock = new object();
 
-        private void MouseActionViaSendMessage(int pointX, int pointY, int lPointX, int lPointY, WinAPI.WM wm, uint mouseData, bool isButtonUpEvent)
-        {
-            var clientRelativeCoordinates = WinAPI.MACROS.MAKELPARAM(
-                (ushort)lPointX,
-                (ushort)lPointY);
-
-            //            IntPtr previousWindowCapture = Win32.Cursor.GetCapture() // COMMENTED BY CODEIT.RIGHT;
-            lock (OnMouseEventLock)
-            {
-                //Win32.Cursor.SetCapture(windowHandle);
-
-                // TODO: WinAPI.Windows.SendMessage(_windowHandle, WinAPI.WM.ACTIVATEAPP, _windowHandle, new UIntPtr(WinAPI.MACROS.MAKELPARAM((ushort)wm, (ushort)WinAPI.HitTestValues.HTCLIENT)));
-                // TODO: WinAPI.Windows.SendMessage(_windowHandle, WinAPI.WM.ACTIVATE, _windowHandle, new UIntPtr(WinAPI.MACROS.MAKELPARAM((ushort)wm, (ushort)WinAPI.HitTestValues.HTCLIENT)));
-                WinAPI.Windows.SendMessage(_windowHandle, WinAPI.WM.MOUSEACTIVATE, _windowHandle, new UIntPtr(WinAPI.MACROS.MAKELPARAM((ushort)wm, (ushort)WinAPI.HitTestValues.HTCLIENT)));
-                WinAPI.Windows.SendMessage(_windowHandle, WinAPI.WM.MOUSEMOVE, new UIntPtr((uint)CurrentMK), new UIntPtr(clientRelativeCoordinates));
-                WinAPI.Windows.SendMessage(_windowHandle, wm, new UIntPtr(mouseData), new UIntPtr(clientRelativeCoordinates));
-                //("OnMouseEvent SendMessage(" + _windowHandle.ToString() + ", " + wm + ", " + mouseData + ", " + clientRelativeCoordinates + ", " + pointX + ", " + pointY + ", " + lPointX + ", " + lPointY + ", (" + CurrentMK + "), " + isButtonUpEvent).Log();
-                //Win32.Cursor.ReleaseCapture();
-            }
-        }
-
         // NOTE: the following is reference implementation from 2009, which used to be called as a 'VIQ' actionnew UIntPtr(
+        /* superceded by InputManager
         private void MouseActionViaPostMessage(int pointX, int pointY, int lPointX, int lPointY, WinAPI.WM wm, uint mouseData, bool isButtonUpEvent)
         {
             uint clientRelativeCoordinates = WinAPI.MACROS.MAKELPARAM(
@@ -832,6 +672,7 @@ namespace Mubox.Control.Network
                 ("OnMouseEvent PostMessage(" + _windowHandle.ToString() + ", " + wm + ", " + mouseData + ", " + clientRelativeCoordinates + ", " + pointX + ", " + pointY + ", " + lPointX + ", " + lPointY + ", (" + CurrentMK + "), " + isButtonUpEvent).Log();
             }
         }
+         */
 
 
         private void OnActivateClient()
@@ -861,6 +702,7 @@ namespace Mubox.Control.Network
                     }
 
                     // resolve TIQ
+                    /* not necessary?
                     IntPtr foregroundWindowHandle;
                     IntPtr foregroundInputQueue;
                     if (!TryResolveTIQ(out foregroundInputQueue, out foregroundWindowHandle, activationExpiryTime))
@@ -868,10 +710,11 @@ namespace Mubox.Control.Network
                         ("TryResolveTIQ Failed OnActivateClient for " + this.DisplayName).Log();
                         return;
                     }
+                     */
 
                     // use TIQ
-                    Action action = () =>
-                    {
+                    //Action action = () =>
+                    //{
                         try
                         {
                             WinAPI.Windows.SetForegroundWindow(_windowHandle);
@@ -883,8 +726,8 @@ namespace Mubox.Control.Network
                         {
                             ex.Log();
                         }
-                    };
-                    ActionViaTIQ(action, foregroundInputQueue, "OnActivateClient");
+                    //};
+                    //ActionViaTIQ(action, foregroundInputQueue, "OnActivateClient");
                 } while ((DateTime.Now.Ticks < activationExpiryTime) && (_windowHandle != WinAPI.Windows.GetForegroundWindow()));
                 ("ActivateClientAction took " + onActivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName).Log();
             }
@@ -917,6 +760,7 @@ namespace Mubox.Control.Network
                 }
 
                 // resolve TIQ
+                    /* not necessary?
                 IntPtr foregroundWindowHandle;
                 IntPtr foregroundInputQueue;
                 if (!TryResolveTIQ(out foregroundInputQueue, out foregroundWindowHandle, activationExpiryTime))
@@ -924,10 +768,11 @@ namespace Mubox.Control.Network
                     ("TryResolveTIQ Failed OnDeactivateClient for " + this.DisplayName).Log();
                     return;
                 }
+                     */
 
                 // use TIQ
-                Action action = () =>
-                {
+                //Action action = () =>
+                //{
                     try
                     {
                         WinAPI.Windows.SetWindowPos(_windowHandle, WinAPI.Windows.Position.HWND_TOP, -1, -1, -1, -1, WinAPI.Windows.Options.SWP_NOSIZE | WinAPI.Windows.Options.SWP_NOMOVE | WinAPI.Windows.Options.SWP_NOACTIVATE);
@@ -936,8 +781,8 @@ namespace Mubox.Control.Network
                     {
                         ex.Log();
                     }
-                };
-                ActionViaTIQ(action, foregroundInputQueue, "OnDeactivateClient");
+                //};
+                //ActionViaTIQ(action, foregroundInputQueue, "OnDeactivateClient");
             }
             ("DeactivateClientAction took " + onDeactivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName).Log();
         }
