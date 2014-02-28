@@ -61,7 +61,7 @@ namespace Mubox.View
                 {
                     try
                     {
-                        string profileName = Mubox.View.PromptForClientNameDialog.PromptForClientName();
+                        string profileName = Mubox.View.Profile.PromptForProfileNameDialog.PromptForProfileName();
                         // TODO try and enforce "unique" profile names
 
                         var profileSettings = Mubox.Configuration.MuboxConfigSection.Default.Profiles.GetOrCreateNew(profileName);
