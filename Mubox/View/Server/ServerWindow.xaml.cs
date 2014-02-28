@@ -272,41 +272,27 @@ namespace Mubox.View.Server
 
                     if (e.WM == WinAPI.WM.MOUSEMOVE)
                     {
-                        e.Point = new Point(relX, relY);
+                        //e.Point = new Point(relX, relY);
 
                         // track mouse position
                         TrackMousePositionClientRelative(e, activeClient, clients);
 
-                        //// this was experimental code, and did not address the real problem (the real problem is that mouse focus/capture is being stolen away from the target client, even when it's an only and active client)
-                        ////if (mouseButtonInfo != null)
-                        ////{
-                        ////    var lastMouseDownTimestampExpiry = mouseButtonInfo.LastDownTimestamp.AddMilliseconds(Mubox.Configuration.MuboxConfigSection.Default.MouseBufferMilliseconds);
-                        ////    if (e.CreatedTime.Ticks < lastMouseDownTimestampExpiry.Ticks) // TODO: this logic seems incorrect, this seems like a hacky attempt to hide 'mouse cursor centering' performed by games when panning views. this is the only place it is used
-                        ////    {
-                        ////        clients = new ClientBase[0];
-                        ////    }
-                        ////    e.Handled = e.Handled || (mouseButtonInfo.IsDown && lastMouseDownTimestampExpiry.Ticks > DateTime.Now.Ticks);
-                        ////}
 
-                        if (clients.Length > 0)
-                        {
-                            List<ClientBase> reducedClientsForMouseMove = new List<ClientBase>();
-                            List<string> addressExclusionTable = new List<string>(ClientBase.localAddressTable);
-                            foreach (var item in clients)
-                            {
-                                if (!addressExclusionTable.Contains(item.Address))
-                                {
-                                    reducedClientsForMouseMove.Add(item);
-                                    addressExclusionTable.Add(item.Address);
-                                }
-                            }
-                            clients = reducedClientsForMouseMove.ToArray();
-                        }
-                    }
-                    else
-                    {
-                        // assuming relative coordinates, we only want coordinates to be dispatched for mousemove events, and not for button events
-                        e.Point = new Point();
+                        // NOTE: mouse broadcast to multiple local clients requires we do not filter like this, this was a remnant of when we still relied on SendInput for sending input to the 'active' client
+                        //if (clients.Length > 0)
+                        //{
+                        //    List<ClientBase> reducedClientsForMouseMove = new List<ClientBase>();
+                        //    List<string> addressExclusionTable = new List<string>(ClientBase.localAddressTable);
+                        //    foreach (var item in clients)
+                        //    {
+                        //        if (!addressExclusionTable.Contains(item.Address))
+                        //        {
+                        //            reducedClientsForMouseMove.Add(item);
+                        //            addressExclusionTable.Add(item.Address);
+                        //        }
+                        //    }
+                        //    clients = reducedClientsForMouseMove.ToArray();
+                        //}
                     }
 
                     foreach (ClientBase client in clients)
@@ -336,7 +322,9 @@ namespace Mubox.View.Server
             if (clientForCoordinateNormalization != null)
             {
                 // track client-relative position
-                this.L_e_Point = new Point(Math.Ceiling((double)(e.Point.X - clientForCoordinateNormalization.CachedScreenFromClientRect.Left) * (65536.0 / (double)clientForCoordinateNormalization.CachedScreenFromClientRect.Width)), Math.Ceiling((double)(e.Point.Y - clientForCoordinateNormalization.CachedScreenFromClientRect.Top) * (65536.0 / (double)clientForCoordinateNormalization.CachedScreenFromClientRect.Height)));
+                this.L_e_Point = new Point(
+                    Math.Ceiling((double)(e.Point.X - clientForCoordinateNormalization.CachedScreenFromClientRect.Left) * (65536.0 / (double)clientForCoordinateNormalization.CachedScreenFromClientRect.Width)), 
+                    Math.Ceiling((double)(e.Point.Y - clientForCoordinateNormalization.CachedScreenFromClientRect.Top) * (65536.0 / (double)clientForCoordinateNormalization.CachedScreenFromClientRect.Height)));
             }
         }
 
@@ -425,9 +413,9 @@ namespace Mubox.View.Server
         private void ForwardMouseEvent(MouseInput e, ClientBase clientBase)
         {
             MouseInput L_e = new MouseInput();
-            //L_e.IsAbsolute = true;
+            L_e.IsAbsolute = true;
             L_e.MouseData = e.MouseData;
-            L_e.Point = e.Point;
+            L_e.Point = L_e_Point;
             L_e.Time = e.Time;
             L_e.WindowDesktopHandle = clientBase.WindowDesktopHandle;
             L_e.WindowStationHandle = clientBase.WindowStationHandle;
