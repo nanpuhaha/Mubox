@@ -1110,7 +1110,7 @@ namespace Mubox
             [return: MarshalAs(UnmanagedType.Bool)]
             internal static extern bool SetForegroundWindow(IntPtr hWnd);
 
-            [DllImport("user32.dll")]
+            [DllImport("user32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             internal static extern bool AttachThreadInput(IntPtr idAttach, IntPtr idAttachTo, bool fAttach);
 
