@@ -58,7 +58,7 @@ Even when Keyboard Multicast is not enabled, if the 'active' client is on anothe
 <div id="mouse-multicast"></div>
 ## Mouse Multicast
 
-Mubox will simultaneously broadcast mouse movement and mouse clicks from one moust to multiple clients locally or remotely, this is referred to as "Mouse Multicast" or "Mouse Clone".
+Mubox will simultaneously broadcast mouse movement and mouse clicks from one mouse to multiple clients locally or remotely, this is referred to as "Mouse Multicast" or "Mouse Clone".
 
 This feature must be enabled from the System Tray first, it is activated using the CAPSLOCK key, and offers both a 'when CAPSLOCK is toggled' mode and 'only when CAPSLOCK is pressed' mode of operation.
 
