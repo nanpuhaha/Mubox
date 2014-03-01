@@ -220,7 +220,7 @@ namespace Mubox.Control.Input
 
         private void Process(KeyboardInput keyboardInput)
         {
-            if (IsRepeatKey(keyboardInput.VK, keyboardInput.Scan, keyboardInput.Flags, keyboardInput.Time))
+            if (UpdatePressedKeys(keyboardInput.VK, keyboardInput.Scan, keyboardInput.Flags, keyboardInput.Time))
             {
                 return;
             }
@@ -254,13 +254,13 @@ namespace Mubox.Control.Input
                     break;
             }
 
-            uint vk = keyboardInput.VK;
+            var vk = keyboardInput.VK;
             WinAPI.WindowHook.LLKHF flags = keyboardInput.Flags;
             uint scan = keyboardInput.Scan;
             uint time = keyboardInput.Time;
             WinAPI.CAS cas = keyboardInput.CAS;
 
-            var wParam = vk;
+            var wParam = (uint)vk;
 
             WinAPI.WM wm = (((flags & WinAPI.WindowHook.LLKHF.UP) == WinAPI.WindowHook.LLKHF.UP) ? WinAPI.WM.KEYUP : WinAPI.WM.KEYDOWN); // TODO SYSKEYDOWN via Win32.WindowHook.LLKHF.AltKey ?
             uint lParam = 0x01;
@@ -283,7 +283,7 @@ namespace Mubox.Control.Input
                 {
                     Process(new KeyboardInput
                     {
-                        VK = (uint)WinAPI.VK.LeftControl,
+                        VK = WinAPI.VK.LeftControl,
                         Flags = (WinAPI.WindowHook.LLKHF)0,
                         Scan = (uint)0, // TODO: convert to scan?
                         Time = time,
@@ -302,7 +302,7 @@ namespace Mubox.Control.Input
                 {
                     Process(new KeyboardInput
                     {
-                        VK = (uint)WinAPI.VK.LeftMenu,
+                        VK = WinAPI.VK.LeftMenu,
                         Flags = (WinAPI.WindowHook.LLKHF)0,
                         Scan = (uint)0, // TODO: convert to scan?
                         Time = time,
@@ -322,7 +322,7 @@ namespace Mubox.Control.Input
                 {
                     Process(new KeyboardInput
                     {
-                        VK = (uint)WinAPI.VK.LeftShift,
+                        VK = WinAPI.VK.LeftShift,
                         Flags = (WinAPI.WindowHook.LLKHF)0,
                         Scan = (uint)0, // TODO: convert to scan?
                         Time = time,
@@ -343,10 +343,35 @@ namespace Mubox.Control.Input
             // TODO: this should be a game profile level option - some games exhibit 'double entry' of input when this is called
             // WinAPI.SetKeyboardState(this.pressedKeys);
 
+            if (this.pressedKeys[(int)WinAPI.VK.Menu])
+            {
+                switch (wm)
+                {
+                    case WinAPI.WM.KEYDOWN:
+                        wm = WinAPI.WM.SYSKEYDOWN;
+                        break;
+                    case WinAPI.WM.KEYUP:
+                        wm = WinAPI.WM.SYSKEYUP;
+                        break;
+                }
+            } 
+            else
+            {
+                switch (wm)
+                {
+                    case WinAPI.WM.SYSKEYDOWN:
+                        wm = WinAPI.WM.KEYDOWN;
+                        break;
+                    case WinAPI.WM.SYSKEYUP:
+                        wm = WinAPI.WM.KEYUP;
+                        break;
+                }
+            }
+
             WinAPI.Windows.PostMessage(ClientWindowHandle, wm, new UIntPtr(wParam), new UIntPtr(lParam));
 
             // if keydown, translate message
-            if (wm == WinAPI.WM.KEYDOWN)
+            if (wm == WinAPI.WM.KEYDOWN || wm == WinAPI.WM.SYSKEYDOWN)
             {
                 var msg = new WinAPI.Windows.MSG();
                 msg.hwnd = ClientWindowHandle;
@@ -366,7 +391,7 @@ namespace Mubox.Control.Input
                 {
                     Process(new KeyboardInput
                     {
-                        VK = (uint)WinAPI.VK.LeftControl,
+                        VK = WinAPI.VK.LeftControl,
                         Flags = WinAPI.WindowHook.LLKHF.UP,
                         Scan = (uint)0, // TODO: convert to scan?
                         Time = time,
@@ -385,7 +410,7 @@ namespace Mubox.Control.Input
                 {
                     Process(new KeyboardInput
                     {
-                        VK = (uint)WinAPI.VK.LeftMenu,
+                        VK = WinAPI.VK.LeftMenu,
                         Flags = WinAPI.WindowHook.LLKHF.UP,
                         Scan = (uint)0, // TODO: convert to scan?
                         Time = time,
@@ -404,7 +429,7 @@ namespace Mubox.Control.Input
                 {
                     Process(new KeyboardInput
                     {
-                        VK = (uint)WinAPI.VK.LeftShift,
+                        VK = WinAPI.VK.LeftShift,
                         Flags = WinAPI.WindowHook.LLKHF.UP,
                         Scan = (uint)0, // TODO: convert to scan?
                         Time = time,
@@ -424,34 +449,41 @@ namespace Mubox.Control.Input
 
         #region client-side 'IsRepeatKey' AND 'GetAsyncKeyState' behavior
 
-        private byte[] pressedKeys = new byte[256];
+        private System.Collections.BitArray pressedKeys = new System.Collections.BitArray(256);
 
-        private bool IsRepeatKey(uint vk, uint scan, WinAPI.WindowHook.LLKHF flags, uint time)
+        private bool IsKeyPressed(WinAPI.VK vk)
         {
-            bool keyIsPressed = pressedKeys[vk] == 0x80;
+            return pressedKeys[(int)vk];
+        }
+
+        /// <summary>
+        /// <para>Updates key state and returns value indicating transitions.</para>
+        /// </summary>
+        /// <param name="vk"></param>
+        /// <param name="scan"></param>
+        /// <param name="flags"></param>
+        /// <param name="time"></param>
+        /// <returns>True if the key state has transitioned.</returns>
+        private bool UpdatePressedKeys(WinAPI.VK vk, uint scan, WinAPI.WindowHook.LLKHF flags, uint time)
+        {
+            var result = false;
             if (WinAPI.WindowHook.LLKHF.UP != (flags & WinAPI.WindowHook.LLKHF.UP))
             {
-                if (keyIsPressed)
+                if (!IsKeyPressed(vk))
                 {
-                    return false;
-                }
-                else
-                {
-                    this.pressedKeys[vk] = 0x80;
+                    result = true;
+                    pressedKeys[(int)vk] = true;
                 }
             }
             else
             {
-                if (!keyIsPressed)
+                if (IsKeyPressed(vk))
                 {
-                    return false;
-                }
-                else
-                {
-                    this.pressedKeys[vk] = (byte)(WinAPI.IsToggled((WinAPI.VK)vk) ? 1 : 0);
+                    result = true;
+                    pressedKeys[(int)vk] = false;
                 }
             }
-            return false;
+            return result;
         }
 
         #endregion client-side 'IsRepeatKey' behavior

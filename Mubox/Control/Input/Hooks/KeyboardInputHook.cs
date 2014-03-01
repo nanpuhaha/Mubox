@@ -136,7 +136,8 @@ namespace Mubox.Control.Input.Hooks
 
         public static event EventHandler<KeyboardInput> KeyboardInputReceived;
 
-        private static byte[] pressedKeys = new byte[256];
+        // TODO: initialize this to current key state on init to deal with rare/theoretical key state desync
+        private static System.Collections.BitArray pressedKeys = new System.Collections.BitArray(256);
         private static object pressedKeysLock = new object();
 
         private static Performance KeyboardInputPerformance = Performance.CreatePerformance("_KeyboardInput");
@@ -151,20 +152,20 @@ namespace Mubox.Control.Input.Hooks
             }
 
             // fix for 'key repeat' windows feature
-            if (pressedKeys.Contains((byte)(hookStruct.vkCode & 0xFF)))
+            if (pressedKeys[(int)hookStruct.vkCode])
             {
                 return false;
             }
 
-            // and ignore "global desktop keys"
+            // ignore "global desktop keys"
             Mubox.Configuration.KeySetting globalKeySetting = null;
             if (Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Keys.TryGetKeySetting((WinAPI.VK)hookStruct.vkCode, out globalKeySetting) && (globalKeySetting.SendToDesktop))
             {
                 return false;
             }
 
-            // filter repeated keys, we don't rebroadcast these
-            if (IsRepeatKey(hookStruct) && Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled && !Mubox.Configuration.MuboxConfigSection.Default.DisableRepeatKeyFiltering)
+            // update pressed keys
+            if (!UpdatePressedKeys(hookStruct) && Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled && !Mubox.Configuration.MuboxConfigSection.Default.DisableRepeatKeyFiltering)
             {
                 return true;
             }
@@ -190,7 +191,7 @@ namespace Mubox.Control.Input.Hooks
                         }
                         if (keySetting != null)
                         {
-                            keyboardInputEventArgs.VK = (uint)keySetting.OutputKey;
+                            keyboardInputEventArgs.VK = keySetting.OutputKey;
                             keyboardInputEventArgs.CAS = keySetting.OutputModifiers;
                         }
                     }
@@ -202,36 +203,36 @@ namespace Mubox.Control.Input.Hooks
             return false;
         }
 
-        private static bool IsRepeatKey(WinAPI.WindowHook.KBDLLHOOKSTRUCT hookStruct)
+        /// <summary>
+        /// <para>Updates 'pressed keys', returns true if pressed keys was updated.</para>
+        /// </summary>
+        /// <param name="hookStruct"></param>
+        /// <returns>True if key state has/is changed due to this event.</returns>
+        private static bool UpdatePressedKeys(WinAPI.WindowHook.KBDLLHOOKSTRUCT hookStruct)
         {
-            int vk = (int)(hookStruct.vkCode & 0xFF);
+            var vk = ((int)hookStruct.vkCode) & 0xFF;
+            var result = false;
             lock (pressedKeysLock)
             {
-                bool keyIsPressed = pressedKeys[vk] == 0x80;
-                if (WinAPI.WindowHook.LLKHF.UP != (hookStruct.flags & WinAPI.WindowHook.LLKHF.UP))
+                bool keyIsPressed = (pressedKeys[vk]);
+                if (!hookStruct.flags.HasFlag(WinAPI.WindowHook.LLKHF.UP))
                 {
-                    if (keyIsPressed)
+                    if (!keyIsPressed)
                     {
-                        return true;
-                    }
-                    else
-                    {
-                        pressedKeys[vk] = 0x80;
+                        result = true; // key state is changing
+                        pressedKeys[vk] = true;
                     }
                 }
                 else
                 {
-                    if (!keyIsPressed)
+                    if (keyIsPressed)
                     {
-                        return true;
-                    }
-                    else
-                    {
-                        pressedKeys[vk] = (byte)(WinAPI.IsToggled((WinAPI.VK)vk) ? 1 : 0);
+                        result = true; // key state is changing
+                        pressedKeys[vk] = false;
                     }
                 }
             }
-            return false;
+            return result;
         }
 
         private static void OnKeyboardInputReceivedInternal(KeyboardInput e)
