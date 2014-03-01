@@ -118,7 +118,7 @@ Fast game switching is a feature of Mubox that replaces the Windows Task Switche
 
 When you switch active clients your input is immediately dispatched to the active client, whether or not it is visible, locally running or on a remote machine.
 
-This function makes more sense when soloboxing, or when you're not using [Keyboard Multicast](#keyboard-multicast) and [Mouse Clone](#mouse-clone) features, since the input from your keyboard and mouse must be manually switched to control specific clients.
+This function makes more sense when soloboxing, or when you're not using [Keyboard Multicast](#keyboard-multicast) and [Mouse Multicast](#mouse-multicast) features, since the input from your keyboard and mouse must be manually switched to control specific clients.
 
 
 ## Summary
