@@ -151,12 +151,6 @@ namespace Mubox.Control.Input.Hooks
                 return false;
             }
 
-            // fix for 'key repeat' windows feature
-            if (pressedKeys[(int)hookStruct.vkCode])
-            {
-                return false;
-            }
-
             // ignore "global desktop keys"
             Mubox.Configuration.KeySetting globalKeySetting = null;
             if (Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.Keys.TryGetKeySetting((WinAPI.VK)hookStruct.vkCode, out globalKeySetting) && (globalKeySetting.SendToDesktop))
@@ -203,6 +197,11 @@ namespace Mubox.Control.Input.Hooks
             return false;
         }
 
+        private static bool IsKeyPressed(WinAPI.VK vk)
+        {
+            return pressedKeys[(int)vk];
+        }
+
         /// <summary>
         /// <para>Updates 'pressed keys', returns true if pressed keys was updated.</para>
         /// </summary>
@@ -210,26 +209,21 @@ namespace Mubox.Control.Input.Hooks
         /// <returns>True if key state has/is changed due to this event.</returns>
         private static bool UpdatePressedKeys(WinAPI.WindowHook.KBDLLHOOKSTRUCT hookStruct)
         {
-            var vk = ((int)hookStruct.vkCode) & 0xFF;
             var result = false;
-            lock (pressedKeysLock)
+            if (WinAPI.WindowHook.LLKHF.UP != (hookStruct.flags & WinAPI.WindowHook.LLKHF.UP))
             {
-                bool keyIsPressed = (pressedKeys[vk]);
-                if (!hookStruct.flags.HasFlag(WinAPI.WindowHook.LLKHF.UP))
+                if (!IsKeyPressed(hookStruct.vkCode))
                 {
-                    if (!keyIsPressed)
-                    {
-                        result = true; // key state is changing
-                        pressedKeys[vk] = true;
-                    }
+                    result = true;
+                    pressedKeys[(int)hookStruct.vkCode] = true;
                 }
-                else
+            }
+            else
+            {
+                if (IsKeyPressed(hookStruct.vkCode))
                 {
-                    if (keyIsPressed)
-                    {
-                        result = true; // key state is changing
-                        pressedKeys[vk] = false;
-                    }
+                    result = true;
+                    pressedKeys[(int)hookStruct.vkCode] = false;
                 }
             }
             return result;

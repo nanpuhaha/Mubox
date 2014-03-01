@@ -220,7 +220,7 @@ namespace Mubox.Control.Input
 
         private void Process(KeyboardInput keyboardInput)
         {
-            if (UpdatePressedKeys(keyboardInput.VK, keyboardInput.Scan, keyboardInput.Flags, keyboardInput.Time))
+            if (!UpdatePressedKeys(keyboardInput.VK, keyboardInput.Scan, keyboardInput.Flags, keyboardInput.Time))
             {
                 return;
             }

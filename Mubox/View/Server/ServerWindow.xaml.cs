@@ -639,6 +639,12 @@ namespace Mubox.View.Server
                 }
                 return false;
             };
+            actionMap[WinAPI.VK.Tab][WinAPI.WM.SYSKEYUP] = (e) =>
+            {
+                return (Mubox.Configuration.MuboxConfigSection.Default.DisableAltTabHook)
+                    ? false
+                    : true;
+            };
 
             actionMap[WinAPI.VK.Capital][WinAPI.WM.KEYDOWN] = (e) =>
             {
