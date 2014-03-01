@@ -158,7 +158,7 @@ namespace Mubox.Extensions
                 var client = new Extensibility.MuboxClientBridge(
                     (key) =>
                     {
-                        e.Client.Dispatch((ushort)key);
+                        e.Client.Dispatch(key);
                     },
                     (me) =>
                     {
