@@ -114,6 +114,9 @@ namespace Mubox.Configuration
 
         #endregion AutoRunOnQuickLaunch
 
+        /// <summary>
+        /// <para>aka "do not broadcast a key repeat event sent by the OS"</para>
+        /// </summary>
         [ConfigurationProperty("DisableRepeatKeyFiltering", IsRequired = false, DefaultValue = default(bool))]
         public bool DisableRepeatKeyFiltering
         {
