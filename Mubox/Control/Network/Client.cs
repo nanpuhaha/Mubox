@@ -31,8 +31,8 @@ namespace Mubox.Control.Network
             {
                 if (_windowHandle != value)
                 {
-                    lock (_tiqLock)
-                    {
+                    //lock (_tiqLock)
+                    //{
                         _windowHandle = value;
                         if (_windowHandle == IntPtr.Zero)
                         {
@@ -54,7 +54,7 @@ namespace Mubox.Control.Network
                                 InputManager.Attach(WindowInputQueue, _windowHandle);
                             }
                         }
-                    }
+                    //}
                 }
             }
         }
@@ -272,7 +272,7 @@ namespace Mubox.Control.Network
             // TODO: log
         }
 
-        private static object _tiqLock = new object();
+        private static object _activationLock = new object();
 
         private void OnMouseInputReceived(Model.Input.MouseInput mouseInput)
         {
@@ -372,8 +372,8 @@ namespace Mubox.Control.Network
             // prevent windows key-repeat
             // TODO: this should be a profile-level option
 
-            lock (_tiqLock)
-            {
+            //lock (_tiqLock)
+            //{
                 // maintain MK state
 
                 keyboardInput.Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(keyboardInput.VK, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC);
@@ -413,7 +413,7 @@ namespace Mubox.Control.Network
                 Action action = () => OnKeyboardEventViaTIQ(keyboardInput.VK, keyboardInput.Flags, keyboardInput.Scan, keyboardInput.Time, keyboardInput.CAS);
                 ActionViaTIQ(action, foregroundInputQueue, "OnKeyboardInputReceived");
                  */
-            }
+            //}
         }
 
         private void OnCommandInputReceived(Model.Input.CommandInput commandInput)
@@ -680,7 +680,7 @@ namespace Mubox.Control.Network
         {
             ("ReceivedActivateRequest for " + this.DisplayName).Log();
             DateTime onActivateClientReceivedTimestamp = DateTime.Now;
-            lock (_tiqLock)
+            lock (_activationLock)
             {
                 ("ActivateClientLock took " + onActivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName).Log();
                 onActivateClientReceivedTimestamp = DateTime.Now;
@@ -739,7 +739,7 @@ namespace Mubox.Control.Network
         {
             ("ReceivedDeactivateRequest for " + this.DisplayName).Log();
             DateTime onDeactivateClientReceivedTimestamp = DateTime.Now;
-            lock (_tiqLock)
+            lock (_activationLock)
             {
                 ("DeactivateClientLock took " + onDeactivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName).Log();
                 onDeactivateClientReceivedTimestamp = DateTime.Now;
