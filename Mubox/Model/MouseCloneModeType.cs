@@ -1,6 +1,6 @@
 ﻿namespace Mubox.Model
 {
-    public enum MouseCloneModeType
+    public enum MouseMulticastModeType
     {
         Disabled,
         Toggled,

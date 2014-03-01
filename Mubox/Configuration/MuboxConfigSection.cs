@@ -59,11 +59,11 @@ namespace Mubox.Configuration
             set { base["MouseBufferMilliseconds"] = value; }
         }
 
-        [ConfigurationProperty("MouseCloneMode", IsRequired = false, DefaultValue = MouseCloneModeType.Disabled)]
-        public MouseCloneModeType MouseCloneMode
+        [ConfigurationProperty("MouseMulticastMode", IsRequired = false, DefaultValue = MouseMulticastModeType.Disabled)]
+        public MouseMulticastModeType MouseMulticastMode
         {
-            get { return (MouseCloneModeType)base["MouseCloneMode"]; }
-            set { base["MouseCloneMode"] = value; }
+            get { return (MouseMulticastModeType)base["MouseMulticastMode"]; }
+            set { base["MouseMulticastMode"] = value; }
         }
 
         [ConfigurationProperty("PreferredTheme", IsRequired = false, DefaultValue = "Default")]

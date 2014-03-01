@@ -189,51 +189,51 @@ namespace Mubox.View
                         //if (Mubox.Configuration.MuboxConfigSection.Default.EnableMouseCapture)
                         {
                             {
-                                // "Mouse Clone" Menu
-                                List<MenuItem> mouseCloneModeMenu = new List<MenuItem>();
+                                // "Mouse Multicast" Menu
+                                List<MenuItem> mouseMulticastModeMenu = new List<MenuItem>();
 
                                 // "Disabled"
                                 menuItem = new MenuItem();
                                 menuItem.IsCheckable = true;
-                                menuItem.IsChecked = Mubox.Configuration.MuboxConfigSection.Default.MouseCloneMode == MouseCloneModeType.Disabled;
+                                menuItem.IsChecked = Mubox.Configuration.MuboxConfigSection.Default.MouseMulticastMode == MouseMulticastModeType.Disabled;
                                 menuItem.Click += (sender, e) =>
                                 {
-                                    Mubox.Configuration.MuboxConfigSection.Default.MouseCloneMode = MouseCloneModeType.Disabled;
+                                    Mubox.Configuration.MuboxConfigSection.Default.MouseMulticastMode = MouseMulticastModeType.Disabled;
                                     Mubox.Configuration.MuboxConfigSection.Save();
                                 };
                                 menuItem.Header = "Disabled";
-                                menuItem.ToolTip = "Use this option to Disable the Mouse Clone feature.";
-                                mouseCloneModeMenu.Add(menuItem);
+                                menuItem.ToolTip = "Use this option to Disable the Mouse Multicast feature.";
+                                mouseMulticastModeMenu.Add(menuItem);
 
                                 // "Toggled"
                                 menuItem = new MenuItem();
                                 menuItem.IsCheckable = true;
-                                menuItem.IsChecked = (Mubox.Configuration.MuboxConfigSection.Default.MouseCloneMode == Mubox.Model.MouseCloneModeType.Toggled);
+                                menuItem.IsChecked = (Mubox.Configuration.MuboxConfigSection.Default.MouseMulticastMode == Mubox.Model.MouseMulticastModeType.Toggled);
                                 menuItem.Click += (sender, e) =>
                                 {
-                                    Mubox.Configuration.MuboxConfigSection.Default.MouseCloneMode = Mubox.Model.MouseCloneModeType.Toggled;
+                                    Mubox.Configuration.MuboxConfigSection.Default.MouseMulticastMode = Mubox.Model.MouseMulticastModeType.Toggled;
                                     Mubox.Configuration.MuboxConfigSection.Save();
                                 };
                                 menuItem.Header = "Toggled";
-                                menuItem.ToolTip = "Mouse Clone is Active while CAPS LOCK is ON, and Inactive while CAPS LOCK is OFF.";
-                                mouseCloneModeMenu.Add(menuItem);
+                                menuItem.ToolTip = "Mouse Multicast is Active while CAPS LOCK is ON, and Inactive while CAPS LOCK is OFF.";
+                                mouseMulticastModeMenu.Add(menuItem);
 
                                 // "Pressed"
                                 menuItem = new MenuItem();
                                 menuItem.IsCheckable = true;
-                                menuItem.IsChecked = (Mubox.Configuration.MuboxConfigSection.Default.MouseCloneMode == MouseCloneModeType.Pressed);
+                                menuItem.IsChecked = (Mubox.Configuration.MuboxConfigSection.Default.MouseMulticastMode == MouseMulticastModeType.Pressed);
                                 menuItem.Click += (sender, e) =>
                                 {
-                                    Mubox.Configuration.MuboxConfigSection.Default.MouseCloneMode = Mubox.Model.MouseCloneModeType.Pressed;
+                                    Mubox.Configuration.MuboxConfigSection.Default.MouseMulticastMode = Mubox.Model.MouseMulticastModeType.Pressed;
                                     Mubox.Configuration.MuboxConfigSection.Save();
                                 };
                                 menuItem.Header = "Pressed";
-                                menuItem.ToolTip = "Mouse Clone is Active while CAPS LOCK Key is pressed, and Inactive while CAPS LOCK Key is released.";
-                                mouseCloneModeMenu.Add(menuItem);
+                                menuItem.ToolTip = "Mouse Multicast is Active while CAPS LOCK Key is pressed, and Inactive while CAPS LOCK Key is released.";
+                                mouseMulticastModeMenu.Add(menuItem);
 
                                 menuItem = new MenuItem();
-                                menuItem.Header = "Mouse Clone";
-                                menuItem.ItemsSource = mouseCloneModeMenu;
+                                menuItem.Header = "Mouse Multicast";
+                                menuItem.ItemsSource = mouseMulticastModeMenu;
                                 quickLaunchMenuItems.Add(menuItem);
                             }
                             {

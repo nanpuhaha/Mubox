@@ -130,7 +130,7 @@ namespace Mubox.View.Server
             }
 
 
-            var shouldCloneMouse = ShouldCloneMouse(e);
+            var shouldMulticastMouse = ShouldMulticastMouse(e);
 
             // track relative movement
             // TODO: except when the mouse moves TO the center of the screen or center of client area, some games do this to implement view pan
@@ -251,7 +251,7 @@ namespace Mubox.View.Server
             // send to client
             if (Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled && (activeClient != null))
             {
-                //if (!shouldCloneMouse)
+                //if (!shouldMulticastMouse)
                 //{
                 //    e.Handled = !(activeClient.IsLocalAddress && (e.WM == Win32.WM.MOUSEMOVE));
                 //    if (!activeClient.IsLocalAddress || e.WM != Win32.WM.MOUSEMOVE)
@@ -266,7 +266,7 @@ namespace Mubox.View.Server
                 {
                     e.Handled = (e.WM != WinAPI.WM.MOUSEMOVE);
 
-                    ClientBase[] clients = shouldCloneMouse
+                    ClientBase[] clients = shouldMulticastMouse
                         ? GetCachedClients()
                         : new[] { activeClient };
 
@@ -400,13 +400,13 @@ namespace Mubox.View.Server
             Mouse_AbsoluteMovement_Screen_Resolution_UpdateTimestampTicks = DateTime.Now.Ticks;
         }
 
-        private static bool ShouldCloneMouse(MouseInput e)
+        private static bool ShouldMulticastMouse(MouseInput e)
         {
             return
                 (
-                    ((Mubox.Configuration.MuboxConfigSection.Default.MouseCloneMode == MouseCloneModeType.Toggled) && WinAPI.IsToggled(WinAPI.VK.Capital))
+                    ((Mubox.Configuration.MuboxConfigSection.Default.MouseMulticastMode == MouseMulticastModeType.Toggled) && WinAPI.IsToggled(WinAPI.VK.Capital))
                     ||
-                    ((Mubox.Configuration.MuboxConfigSection.Default.MouseCloneMode == MouseCloneModeType.Pressed) && WinAPI.IsPressed(WinAPI.VK.Capital))
+                    ((Mubox.Configuration.MuboxConfigSection.Default.MouseMulticastMode == MouseMulticastModeType.Pressed) && WinAPI.IsPressed(WinAPI.VK.Capital))
                 );
         }
 
@@ -642,7 +642,7 @@ namespace Mubox.View.Server
 
             actionMap[WinAPI.VK.Capital][WinAPI.WM.KEYDOWN] = (e) =>
             {
-                // work around for mouse hook breakage, we noticed under W7 that the mouse hook would be periodically "lost" - this allows us to fix it using the Mouse Clone hotkey "CAPS LOCK"
+                // work around for mouse hook breakage, we noticed under W7 that the mouse hook would be periodically "lost" - this allows us to fix it using the Mouse Multicast hotkey "CAPS LOCK"
                 MouseInputHook.Stop();
                 MouseInputHook.Start();
                 e.Handled = false;

@@ -45,7 +45,7 @@ namespace Mubox.Model.Input
         public bool IsDoubleClick { get; set; }
 
         /// <summary>
-        /// True if the button is Down due to a Multicast (e.g. Mouse Clone, Key Clone).
+        /// True if the button is Down due to a Multicast (e.g. Mouse Multicast, Key Multicast).
         /// </summary>
         public bool IsMulticast { get; set; }
     }
