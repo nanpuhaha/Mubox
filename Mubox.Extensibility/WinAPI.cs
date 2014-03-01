@@ -468,7 +468,7 @@ namespace Mubox
             [StructLayout(LayoutKind.Sequential)]
             public struct KBDLLHOOKSTRUCT
             {
-                internal uint vkCode;
+                internal WinAPI.VK vkCode;
                 internal uint scanCode;
                 internal LLKHF flags;
                 internal uint time;
@@ -518,7 +518,12 @@ namespace Mubox
         /// <summary>
         /// Enumeration for virtual keys.
         /// </summary>
-        public enum VK : ushort
+        /// <remarks>
+        /// <para>Because this type is used in interop structure definitions it MUST remain uint (uint32) typed (4bytes in size).</para>
+        /// <para>Changing the bit width of this enum necessarily requires refactors of all dependent code to be "uint" based instead of "VK" based.</para>
+        /// <para>Don't change the base!</para>
+        /// </remarks>
+        public enum VK : uint
         {
             /// <summary></summary>
             LeftButton = 0x01,
@@ -2246,10 +2251,10 @@ namespace Mubox
             internal static extern ushort VkKeyScan(char ch);
 
             [DllImport("user32.dll")]
-            internal static extern uint MapVirtualKey(uint uCode, MAPVK uMapType);
+            internal static extern uint MapVirtualKey(VK uCode, MAPVK uMapType);
 
             [DllImport("user32.dll")]
-            internal static extern uint MapVirtualKeyEx(uint uCode, MAPVK uMapType, IntPtr dwhkl);
+            internal static extern uint MapVirtualKeyEx(VK uCode, MAPVK uMapType, IntPtr dwhkl);
 
             public enum MAPVK : uint
             {
@@ -2275,7 +2280,7 @@ namespace Mubox
                 return newFlags;
             }
 
-            internal static bool IsExtended(VK key)
+            internal static bool IsExtendedKey(VK key)
             {
                 /* http://msdn.microsoft.com/en-us/library/windows/desktop/ms646267(v=vs.85).aspx
                  * The extended-key flag indicates whether the keystroke message originated from one 
@@ -2469,7 +2474,7 @@ namespace Mubox
             [StructLayout(LayoutKind.Sequential)]
             public struct KEYBDINPUT
             {
-                internal VK VirtualKey;
+                internal ushort VirtualKey;
                 internal ushort wScan;
                 internal KeyEventFlags Flags;
                 internal uint time;
@@ -3776,7 +3781,7 @@ namespace Mubox
         /// <param name="vk"></param>
         /// <returns></returns>
         [DllImport("user32.dll")]
-        private static extern KeyState GetAsyncKeyState(uint vk);
+        private static extern KeyState GetAsyncKeyState(VK vk);
 
         public enum KeyState : ushort
         {
@@ -3788,16 +3793,16 @@ namespace Mubox
 
         internal static bool IsPressed(VK vk)
         {
-            return (KeyState.Is == (KeyState.Is & GetAsyncKeyState((uint)vk)));
+            return (KeyState.Is == (KeyState.Is & GetAsyncKeyState(vk)));
         }
 
         internal static bool IsToggled(VK vk)
         {
-            return (KeyState.Toggled == (KeyState.Toggled & GetKeyState((uint)vk)));
+            return (KeyState.Toggled == (KeyState.Toggled & GetKeyState(vk)));
         }
 
         [DllImport("user32.dll")]
-        private static extern KeyState GetKeyState(uint vk);
+        private static extern KeyState GetKeyState(VK vk);
 
         [DllImport("user32.dll")]
         internal static extern bool SetKeyboardState(byte[] lpKeyState);

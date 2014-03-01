@@ -264,17 +264,18 @@ namespace Mubox.Model.Client
         {
         }
 
-        public virtual void Dispatch(ushort vk)
+        public virtual void Dispatch(WinAPI.VK vk)
         {
-            var scan = WinAPI.SendInputApi.MapVirtualKeyEx((uint)vk, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC, System.Windows.Forms.InputLanguage.CurrentInputLanguage.Handle);
+            // TODO: scan code mapping should always be done on the destination machine, since it contains hardware/driver specific values
+            var scan = WinAPI.SendInputApi.MapVirtualKeyEx(vk, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC, System.Windows.Forms.InputLanguage.CurrentInputLanguage.Handle);
             Dispatch(new KeyboardInput { WM = Mubox.WinAPI.WM.KEYDOWN, VK = vk, Time = WinAPI.SendInputApi.GetTickCount(), Scan = scan });
             System.Threading.Thread.Sleep(0x4d);
             Dispatch(new KeyboardInput { WM = Mubox.WinAPI.WM.KEYUP, VK = vk, Time = WinAPI.SendInputApi.GetTickCount(), Scan = scan, Flags = WinAPI.WindowHook.LLKHF.UP });
         }
 
-        private void Dispatch(IEnumerable<ushort> vkSet)
+        private void Dispatch(IEnumerable<WinAPI.VK> vkSet)
         {
-            foreach (ushort vk in vkSet)
+            foreach (WinAPI.VK vk in vkSet)
             {
                 Dispatch(vk);
             }
