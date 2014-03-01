@@ -93,7 +93,10 @@ Each Mubox Client and Game is run in a user "sand box", this is a special user a
 
 Games which prompt to be run as an administrator will still have access to your desktop. Do not authorize them if you wish to keep them from detecting Mubox.
 
-This is not a fool-proof anti-detection mechanism, and was primarily implemented to ensure that games were launched with limited user access and rights.
+This is not a fool-proof anti-detection mechanism, and was primarily implemented:
+
+- To ensure that games were launched with limited user access and rights.
+- To ensure that games which rely on Windows User Profiles (registry and folders) do not conflict/overwrite each other.
 
 
 <div id="multiboxing"></div>
