@@ -376,6 +376,7 @@ namespace Mubox.Control.Network
             {
                 // maintain MK state
 
+                keyboardInput.Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(keyboardInput.VK, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC);
                 InputManager.Enqueue(keyboardInput);
 
                 /* superceded by new 'KeyboardInputAdapter' (above)

@@ -225,8 +225,6 @@ namespace Mubox.Control.Input
                 return;
             }
 
-            keyboardInput.Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(keyboardInput.Scan, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
-
             switch ((WinAPI.VK)keyboardInput.VK)
             {
                 case WinAPI.VK.Control:
