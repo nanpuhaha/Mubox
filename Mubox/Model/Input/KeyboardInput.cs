@@ -18,7 +18,7 @@ namespace Mubox.Model.Input
         }
 
         [DataMember]
-        public uint VK { get; set; }
+        public WinAPI.VK VK { get; set; }
 
         [DataMember]
         public WinAPI.CAS CAS { get; set; }
@@ -34,13 +34,13 @@ namespace Mubox.Model.Input
 
         public override string ToString()
         {
-            return string.Format("VK/{0}/{1}/{2}/{3}/{4}/{5}/{6}",
+            return string.Format("VK/{0}/{1:X}/{2}/{3}/{4}/{5}/{6}",
                         VK,
-                        (uint)Scan,
-                        (uint)Flags,
-                        (uint)Time,
-                        ((uint)WM).ToString(),
-                        ((byte)CAS).ToString(),
+                        Scan,
+                        Flags,
+                        Time,
+                        WM,
+                        CAS,
                         base.ToString());
         }
     }

@@ -97,17 +97,17 @@ namespace Mubox.Model.Input
 
         public override string ToString()
         {
-            return string.Format("{0}/{1}/{2}/{3}/{4}/{5}/{6}",
+            return string.Format("{0}/{1:X}/{2:X}/{3}/{4}/{5}/{6}",
                             IsDoubleClickEvent
                                 ? "DBL" // double-click event
                                 : IsClickEvent
                                     ? "CLK" // single-click event
                                     : "MS", // non-click event
-                            (uint)Flags,
-                            (uint)MouseData,
+                            Flags,
+                            MouseData,
                             (int)Point.X,
                             (int)Point.Y,
-                            (uint)Time,
+                            Time,
                             base.ToString());
         }
     }
