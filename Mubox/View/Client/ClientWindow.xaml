@@ -27,13 +27,6 @@
             </TabItem>
             <TabItem Header="Game Settings" Name="tabGameSettings">
                 <Grid >
-                    <Label HorizontalAlignment="Left" Margin="34,10,0,0" Name="labelPreset" TabIndex="7" Width="92" Height="24" VerticalAlignment="Top">Game Preset</Label>
-                    <ComboBox Name="groupPreset" Margin="132,10,27,0" Height="24" VerticalAlignment="Top">
-                        <!-- TODO: store/load selection from config -->
-                        <!-- TODO: the UI parts need to be refactored into game-specific versions of the UI, bound to the same common model -->
-                        <ComboBoxItem>Guild Wars 2</ComboBoxItem>
-                        <ComboBoxItem>World of Warcraft</ComboBoxItem>
-                    </ComboBox>
                     <Label  Height="24" HorizontalAlignment="Left" Margin="34,59,0,0" Name="label6" TabIndex="7" VerticalAlignment="Top" Width="92">Game EXE</Label>
                     <TextBox Height="23" Margin="132,61,27,0" Name="textApplicationPath" TabIndex="8" ToolTip="Path to EXE" VerticalAlignment="Top" TextChanged="textApplicationPath_TextChanged">D:\Games\Guild Wars 2\gw2.exe</TextBox>
                     <CheckBox  Margin="132,0,112,92" Name="checkIsolateApplication" Checked="checkIsolateApplication_Checked" Unchecked="checkIsolateApplication_Unchecked" Height="16" VerticalAlignment="Bottom">Game Isolation (e.g. SymLinks)</CheckBox>
