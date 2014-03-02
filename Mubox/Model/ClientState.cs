@@ -12,7 +12,7 @@ namespace Mubox.Model
         public WinAPI.SandboxApi.Sandbox Sandbox { get; set; }
 
         public Mubox.Configuration.ProfileSettings Profile { get; set; }
-        
+
         private ClientState()
         {
             Timer = new System.Timers.Timer();
@@ -286,11 +286,24 @@ namespace Mubox.Model
 
             try
             {
+                var pid = gameProcess.Id;
                 gameProcess.Refresh();
 
-                if (gameProcess.HasExited)
+                var children = Mubox.WinAPI.Toolhelp32.GetChildProcesses(pid);
+                if (children != null && children.Count() > 0)
                 {
-                    ("GameProcessExited for " + this.Settings.Name).LogInfo();
+                    foreach (var child in children)
+                    {
+                        child.Refresh();
+                        var text = (child.MainWindowTitle ?? child.MainModule.ModuleName) ?? "Unknown";
+                        ("ChildGameProcess for " + this.Settings.Name + " found pid=" + child.Id + " " + text).LogInfo();
+                        GameProcess = child;
+                        Sandbox.Process = child;
+                    }
+                }
+                else if (gameProcess.HasExited)
+                {
+                    ("NoGameProcess for " + this.Settings.Name + " pid=" + pid).LogError();
                     GameProcess = null;
                     Sandbox.Process = null;
                     Settings.WindowHandle = IntPtr.Zero;
@@ -327,12 +340,12 @@ namespace Mubox.Model
                         {
                             gameProcess.PriorityClass = ProcessPriorityClass.Idle;
                         }
+                        ManageProcessorAffinity(gameProcess);
                     }
                     else
                     {
                         ("GameProcessNotResponding for " + this.Settings.Name).LogWarn();
                     }
-                    ManageProcessorAffinity(gameProcess);
                 }
             }
             catch (Exception ex)
@@ -457,12 +470,15 @@ namespace Mubox.Model
                 // TODO: killing game process should only be performed when Mubox launched the process
                 try
                 {
-                    this.GameProcess.CloseMainWindow();
-                    if (!this.GameProcess.WaitForExit(5000)) // TODO: arbitrary, and it's unclear why some games refuse to process WM_CLOSE properly
+                    if (!GameProcess.HasExited)
                     {
-                        if (!this.GameProcess.HasExited)
+                        this.GameProcess.CloseMainWindow();
+                        if (!this.GameProcess.WaitForExit(5000)) // TODO: arbitrary, and it's unclear why some games refuse to process WM_CLOSE properly
                         {
-                            this.GameProcess.Kill();
+                            if (!this.GameProcess.HasExited)
+                            {
+                                this.GameProcess.Kill();
+                            }
                         }
                     }
                 }
