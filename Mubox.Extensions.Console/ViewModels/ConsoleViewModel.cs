@@ -22,6 +22,19 @@ namespace Mubox.Extensions.Console.ViewModels
         {
             _dispatcher = Dispatcher.CurrentDispatcher;
             Messages = new ObservableCollection<ConsoleMessage>();
+            var assembly = System.Reflection.Assembly.GetEntryAssembly();
+            if (assembly == null)
+            {
+                assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            }
+            var message = new ConsoleMessage
+            {
+                Timestamp = DateTime.Now,
+                Category = "Mubox",
+                Text = assembly.GetName().Version.ToString() + " Ready.",
+            };
+            Messages.Add(message);
+            LatestMessage = message;
         }
 
         internal void AddMessageInternal(string category, string text)

@@ -126,7 +126,7 @@ namespace Mubox.Control.Input
                 if (!detached)
                 {
                     var err = Marshal.GetLastWin32Error();
-                    (string.Format("InputManager failed AttachThreadInput(false) err=0x{2:X} ({0:X8}) ({1:X8})", myInputQueueId, ClientInputQueueId, err)).LogCritical();
+                    (string.Format("InputManager failed AttachThreadInput(false) err=0x{2:X} ({0:X8}) ({1:X8})", myInputQueueId, ClientInputQueueId, err)).LogWarn();
                 }
             }
         }

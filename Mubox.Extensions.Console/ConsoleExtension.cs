@@ -75,19 +75,19 @@ namespace Mubox.Extensions.Console
         public void Keyboard_InputReceived(object sender, Extensibility.Input.KeyboardEventArgs e)
         {
             //e.Log();
-            _viewModel.AddMessageInternal("Keyboard Input",
-                string.Format("name={0} {1}",
-                    e.Client != null ? e.Client.Name : "(no client)",
-                    e.ToString()));
+            //_viewModel.AddMessageInternal("Keyboard Input",
+            //    string.Format("name={0} {1}",
+            //        e.Client != null ? e.Client.Name : "(no client)",
+            //        e.ToString()));
         }
 
         public void Mouse_InputReceived(object sender, Extensibility.Input.MouseEventArgs e)
         {
             //e.Log();
-            _viewModel.AddMessageInternal("Mouse Input",
-                string.Format("name={0} {1}",
-                    e.Client != null ? e.Client.Name : "(no client)",
-                    e.ToString()));
+            //_viewModel.AddMessageInternal("Mouse Input",
+            //    string.Format("name={0} {1}",
+            //        e.Client != null ? e.Client.Name : "(no client)",
+            //        e.ToString()));
         }
 
         public void _mubox_ActiveClientChanged(object sender, ClientEventArgs e)
@@ -132,10 +132,10 @@ namespace Mubox.Extensions.Console
                 _presenter.Closing += OnWindowClosing;
                 // TODO: save/restore last-known size and position
                 _presenter.WindowStartupLocation = WindowStartupLocation.Manual;
-                _presenter.Width = 640.0;
-                _presenter.Height = 480.0;
-                _presenter.Top = 256;
-                _presenter.Left = 64;
+                _presenter.Width = 512.0;
+                _presenter.Height = 256;
+                _presenter.Top = 32;
+                _presenter.Left = 32;
                 _application = new System.Windows.Application();
                 _application.Run(_presenter);
             }

@@ -356,7 +356,10 @@ namespace Mubox.Model.Client
         public override void Dispatch(MouseInput e)
         {
 #if DEBUG
-            ("Dispatch(" + _displayName + ") " + Convert.ToString(e)).Log();
+            if (e.WM != WinAPI.WM.MOUSEMOVE) // reduce CPU cost of DEBUG logging
+            {
+                ("Dispatch(" + _displayName + ") " + Convert.ToString(e)).Log();
+            }
 #endif
             ServerTxPerformanceIncrement("MOUSE");
             try
@@ -389,7 +392,8 @@ namespace Mubox.Model.Client
 
         public override void Dispatch(CommandInput e)
         {
-#if DEBUG
+#if DEBUG_VERBOSE
+            // DEBUG_VERBOSE because these serve almost no practical purpose when debugging
             ("Dispatch(" + _displayName + ") " + Convert.ToString(e)).Log();
 #endif
             ServerTxPerformanceIncrement("CMD");
