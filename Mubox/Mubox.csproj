@@ -158,7 +158,6 @@
       <DependentUpon>PromptForClientNameDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\SysTrayMenu.cs" />
-    <Resource Include="Content\Images\ExtraLifeBanner.png" />
     <Content Include="Content\Icons\Mubox2013.ico" />
     <Content Include="Extensions\Mubox.Extensions.AntiAfk.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -231,11 +230,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Content Include="View\Themes\ExtraLife.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Page Include="View\Chrome\ChromelessWindowTemplate.xaml">

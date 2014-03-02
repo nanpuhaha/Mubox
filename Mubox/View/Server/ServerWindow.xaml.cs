@@ -1081,7 +1081,6 @@ namespace Mubox.View.Server
             AddThemeResource(themesList, "Red");
             AddThemeResource(themesList, "Green");
             AddThemeResource(themesList, "Blue");
-            AddThemeResource(themesList, "ExtraLife");
             comboThemeSelector.SelectionChanged += (L_sender, L_e) =>
             {
                 Mubox.View.Themes.ThemeDescriptor theme = (comboThemeSelector.SelectedItem as Mubox.View.Themes.ThemeDescriptor);
