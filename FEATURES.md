@@ -16,6 +16,7 @@ Mubox does not make any attempt to duplicate the experience, workflow, usabailit
 - [Sand Box](#sandbox) using limited user accounts.
 - [Multiboxing](#multiboxing) multiple clients on multiple computers.
 - [Fast Client Switching](#fast-client-switching) via ALT-TAB.
+- [Launcher Support](#launcher-support)
 
 <div id="system-tray"></div>
 ## System Tray Menu
@@ -119,6 +120,14 @@ Fast game switching is a feature of Mubox that replaces the Windows Task Switche
 When you switch active clients your input is immediately dispatched to the active client, whether or not it is visible, locally running or on a remote machine.
 
 This function makes more sense when soloboxing, or when you're not using [Keyboard Multicast](#keyboard-multicast) and [Mouse Multicast](#mouse-multicast) features, since the input from your keyboard and mouse must be manually switched to control specific clients.
+
+
+<div id="launcher-support"></div>
+## Launcher Support
+
+Mubox should work with most launcher-based games. Launcher-based games, like EvE, prompt you to log in before actually putting you into the game client.
+
+Some launchers may not work well with Mubox due to how they are implemented, and you may need to [Toggle Input Capture](#toggle-input-capture) in order to enter a username and password.
 
 
 ## Summary
