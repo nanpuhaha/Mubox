@@ -18,7 +18,6 @@ namespace Mubox.Control.Input.Hooks
         private static WinAPI.WindowHook.HookProc hookProc = null;
         private static IntPtr hookProcPtr = IntPtr.Zero;
         private static long _nextMouseMoveAccept = 0L;
-        private static long _mouseMoveAcceptmod = 20L;
 
         public static UIntPtr MouseHook(int nCode, UIntPtr wParam, IntPtr lParam)
         {
