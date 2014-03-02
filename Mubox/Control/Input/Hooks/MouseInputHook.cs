@@ -17,6 +17,8 @@ namespace Mubox.Control.Input.Hooks
         private static Performance MouseInputPerformance = null;
         private static WinAPI.WindowHook.HookProc hookProc = null;
         private static IntPtr hookProcPtr = IntPtr.Zero;
+        private static long _nextMouseMoveAccept = 0L;
+        private static long _mouseMoveAcceptmod = 20L;
 
         public static UIntPtr MouseHook(int nCode, UIntPtr wParam, IntPtr lParam)
         {
@@ -25,10 +27,18 @@ namespace Mubox.Control.Input.Hooks
                 if (nCode == 0)
                 {
                     var wm = (WinAPI.WM)wParam.ToUInt32();
+                    if (wm == WinAPI.WM.MOUSEMOVE)
+                    {
+                        if (DateTime.Now.Ticks <= _nextMouseMoveAccept)
+                        {
+                            return UIntPtr.Zero; // not handled
+                        }
+                        _nextMouseMoveAccept = DateTime.Now.AddMilliseconds(50).Ticks; // 20fps - we limit this to ease off of network and cpu utilization for mousemove, the framerate choice here is arbitrary
+                    }
                     Mubox.WinAPI.WindowHook.MSLLHOOKSTRUCT mouseHookStruct = (Mubox.WinAPI.WindowHook.MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(Mubox.WinAPI.WindowHook.MSLLHOOKSTRUCT));
                     if (OnMouseInputReceived(wm, mouseHookStruct))
                     {
-                        return new UIntPtr(1);
+                        return new UIntPtr(1); // handled
                     }
                 }
             }
