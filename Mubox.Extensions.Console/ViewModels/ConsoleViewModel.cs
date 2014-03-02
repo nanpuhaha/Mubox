@@ -27,11 +27,17 @@ namespace Mubox.Extensions.Console.ViewModels
             {
                 assembly = System.Reflection.Assembly.GetExecutingAssembly();
             }
+#if DEBUG
+            var text = assembly.GetName().Version.ToString() + " DEBUG";
+#else
+            var text = assembly.GetName().Version.ToString() + " RELEASE";
+#endif
+
             var message = new ConsoleMessage
             {
                 Timestamp = DateTime.Now,
                 Category = "Mubox",
-                Text = assembly.GetName().Version.ToString() + " Ready.",
+                Text = text,
             };
             Messages.Add(message);
             LatestMessage = message;
@@ -39,6 +45,14 @@ namespace Mubox.Extensions.Console.ViewModels
 
         internal void AddMessageInternal(string category, string text)
         {
+#if !DEBUG
+            if (category == "Verbose")
+            {
+                // when not compiled for debugging we throw away all Verbose console output
+                return;
+            }
+#endif
+
             var message = new ConsoleMessage
                 {
                     Timestamp = DateTime.Now,
