@@ -614,7 +614,6 @@ namespace Mubox.View.Client
                 buttonLaunchApplication.IsEnabled = false;
                 ApplicationLaunchPath = textApplicationPath.Text;
                 ClientState.Settings.IsolationPath = textIsolationPath.Text.TrimEnd(' ', '\\') + '\\';
-                System.IO.Path.GetFileName(ApplicationLaunchPath);
                 string applicationExeName = System.IO.Path.GetFileName(textApplicationPath.Text);
                 bool checkIsolateApplication_IsChecked = checkIsolateApplication.IsChecked.GetValueOrDefault(false);
                 buttonLaunchApplication.IsEnabled = false;
