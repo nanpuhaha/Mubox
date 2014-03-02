@@ -18,14 +18,15 @@ namespace Mubox.Control.Input.Hooks
         private static WinAPI.WindowHook.HookProc hookProc = null;
         private static IntPtr hookProcPtr = IntPtr.Zero;
 
-        public static UIntPtr MouseHook(int nCode, IntPtr wParam, IntPtr lParam)
+        public static UIntPtr MouseHook(int nCode, UIntPtr wParam, IntPtr lParam)
         {
             try
             {
                 if (nCode == 0)
                 {
+                    var wm = (WinAPI.WM)wParam.ToUInt32();
                     Mubox.WinAPI.WindowHook.MSLLHOOKSTRUCT mouseHookStruct = (Mubox.WinAPI.WindowHook.MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(Mubox.WinAPI.WindowHook.MSLLHOOKSTRUCT));
-                    if (OnMouseInputReceived((WinAPI.WM)wParam, mouseHookStruct))
+                    if (OnMouseInputReceived(wm, mouseHookStruct))
                     {
                         return new UIntPtr(1);
                     }

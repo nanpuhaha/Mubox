@@ -529,12 +529,12 @@ namespace Mubox
             internal static extern IntPtr SetWindowsHookEx(HookType hookType, IntPtr callbackPtr, IntPtr hModule, uint dwThreadId);
 
             [DllImport("user32.dll")]
-            internal static extern UIntPtr CallNextHookEx(IntPtr hHook, int nCode, IntPtr wParam, IntPtr lParam);
+            internal static extern UIntPtr CallNextHookEx(IntPtr hHook, int nCode, UIntPtr wParam, IntPtr lParam);
 
             [DllImport("user32.dll")]
             internal static extern bool UnhookWindowsHookEx(IntPtr hhk);
 
-            internal delegate UIntPtr HookProc(int code, IntPtr wParam, IntPtr lParam);
+            internal delegate UIntPtr HookProc(int code, UIntPtr wParam, IntPtr lParam);
 
             internal delegate int LowLevelKeyboardProc(int nCode, WM windowMessage, IntPtr keyboardHookStruct);
 

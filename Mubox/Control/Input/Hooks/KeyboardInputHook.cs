@@ -17,14 +17,15 @@ namespace Mubox.Control.Input.Hooks
         private static WinAPI.WindowHook.HookProc hookProc = null;
         private static IntPtr hookProcPtr = IntPtr.Zero;
 
-        public static UIntPtr KeyboardHook(int nCode, IntPtr wParam, IntPtr lParam)
+        public static UIntPtr KeyboardHook(int nCode, UIntPtr wParam, IntPtr lParam)
         {
             try
             {
                 if (nCode == 0)
                 {
+                    var wm = (WinAPI.WM)wParam.ToUInt32();
                     Mubox.WinAPI.WindowHook.KBDLLHOOKSTRUCT keyboardHookStruct = (Mubox.WinAPI.WindowHook.KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(Mubox.WinAPI.WindowHook.KBDLLHOOKSTRUCT));
-                    if (OnKeyboardInputReceived((WinAPI.WM)wParam, keyboardHookStruct))
+                    if (OnKeyboardInputReceived(wm, keyboardHookStruct))
                     {
                         return new UIntPtr(1);
                     }
