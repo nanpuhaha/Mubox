@@ -667,7 +667,7 @@ namespace Mubox.View.Client
                                     System.IO.Directory.CreateDirectory(ClientState.Settings.IsolationPath);
                                 }
 
-                                string adjustedIsolationPath = System.IO.Path.Combine(ClientState.Settings.IsolationPath, ClientState.Settings.Name);
+                                string adjustedIsolationPath = System.IO.Path.Combine(ClientState.Settings.IsolationPath, ClientState.Profile.Name + ClientState.Settings.Name);
 
                                 if (!System.IO.Directory.Exists(adjustedIsolationPath))
                                 {
