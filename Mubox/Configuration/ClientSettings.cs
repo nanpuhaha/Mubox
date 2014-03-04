@@ -125,7 +125,7 @@ namespace Mubox.Configuration
         #endregion
         #region ApplicationArguments
 
-        [ConfigurationProperty("ApplicationArguments", IsRequired = false, DefaultValue = "-windowed")]
+        [ConfigurationProperty("ApplicationArguments", IsRequired = false, DefaultValue = "")]
         public string ApplicationArguments
         {
             get { return (string)base["ApplicationArguments"]; }
