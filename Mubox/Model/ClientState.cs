@@ -267,6 +267,8 @@ namespace Mubox.Model
 
         public event EventHandler<EventArgs> GameProcessFound;
 
+        private IList<Process> _processes = new List<Process>();
+
         [SuppressMessage("Microsoft.Security", "CA2122")]
         public void MonitorGameProcess()
         {
@@ -296,6 +298,7 @@ namespace Mubox.Model
                     {
                         child.Refresh();
                         var text = (child.MainWindowTitle ?? child.MainModule.ModuleName) ?? "Unknown";
+                        _processes.Add(child);
                         ("ChildGameProcess for " + this.Settings.Name + " found pid=" + child.Id + " " + text).LogInfo();
                         GameProcess = child;
                         Sandbox.Process = child;
@@ -303,17 +306,47 @@ namespace Mubox.Model
                 }
                 else if (gameProcess.HasExited)
                 {
-                    ("NoGameProcess for " + this.Settings.Name + " pid=" + pid).LogError();
-                    GameProcess = null;
-                    Sandbox.Process = null;
-                    Settings.WindowHandle = IntPtr.Zero;
-                    if (NetworkClient != null)
+                    _processes.Remove(gameProcess);
+                    if (_processes.Count > 0)
                     {
-                        NetworkClient.WindowHandle = Settings.WindowHandle;
+                        var processes = _processes.ToArray();
+                        foreach (var L_process in processes)
+                        {
+                            try
+                            {
+                                L_process.Refresh();
+                                if (L_process.HasExited)
+                                {
+                                    _processes.Remove(L_process);
+                                }
+                                else
+                                {
+                                    ("PreviousGameProcess for " + this.Settings.Name + " pid=" + L_process.Id).LogInfo();
+                                    pid = L_process.Id;
+                                    GameProcess = L_process;
+                                    Sandbox.Process = L_process;
+                                }
+                            }
+                            catch
+                            {
+                                _processes.Remove(L_process);
+                            }
+                        }
                     }
-                    if (GameProcessExited != null)
+                    if (_processes.Count == 0)
                     {
-                        GameProcessExited(this, new EventArgs());
+                        ("NoGameProcess for " + this.Settings.Name).LogError();
+                        GameProcess = null;
+                        Sandbox.Process = null;
+                        Settings.WindowHandle = IntPtr.Zero;
+                        if (NetworkClient != null)
+                        {
+                            NetworkClient.WindowHandle = Settings.WindowHandle;
+                        }
+                        if (GameProcessExited != null)
+                        {
+                            GameProcessExited(this, new EventArgs());
+                        }
                     }
                 }
                 else
