@@ -269,18 +269,40 @@ namespace Mubox.Model
             }
             set
             {
+                if (_gameProcess != null && value != null && _gameProcess.Id == value.Id)
+                {
+                    // avoid stack overflow exception due to ElectChildProcess call, while still allowing agressive crawling of child processes whenever current game process changes
+                    return;
+                }
                 _gameProcess = value;
                 if (value != null)
                 {
-                    if (!_processes.Contains(value))
+                    var alreadyTracking = false;
+                    lock (_processes)
                     {
-                        _processes.Add(value);
+                        foreach (var L_process in _processes)
+                        {
+                            if (L_process.Id == value.Id)
+                            {
+                                alreadyTracking = true;
+                            }
+                        }
+                        if (!alreadyTracking)
+                        {
+                            _processes.Add(value);
+                        }
                     }
+                    if (!alreadyTracking)
+                    {
+                        TryElectProcessOnExit(value);
+                        ("TrackingGameProcess for " + this.Settings.Name + " found pid=" + value.Id + " hwnd=" + value.MainWindowHandle.ToString("X")).LogInfo();
+                    }
+                    ElectChildProcess(value.Id);
                 }
             }
         }
 
-        private long GameProcessNextCheckTime;
+        private long GameProcessNextCheckTime = 0L;
 
         public event EventHandler<EventArgs> GameProcessExited;
 
@@ -296,13 +318,12 @@ namespace Mubox.Model
                 return;
             }
 
-            GameProcessNextCheckTime = 0L; // DateTime.Now.AddSeconds(5).Ticks;
+            GameProcessNextCheckTime = DateTime.Now.AddSeconds(5).Ticks;
 
             Process gameProcess = GameProcess;
             if (gameProcess == null)
             {
                 ("NoGameProcess for " + this.Settings.Name).Log();
-                GameProcessNextCheckTime = DateTime.Now.AddSeconds(5).Ticks;
                 return;
             }
 
@@ -311,22 +332,19 @@ namespace Mubox.Model
                 var pid = gameProcess.Id;
                 gameProcess.Refresh();
 
-                var children = Mubox.WinAPI.Toolhelp32.GetChildProcesses(pid);
-                if (children != null && children.Count() > 0)
+                if (ElectChildProcess(pid))
                 {
-                    foreach (var child in children)
-                    {
-                        child.Refresh();
-                        var text = (child.MainWindowTitle ?? child.MainModule.ModuleName) ?? "Unknown";
-                        _processes.Add(child);
-                        ("ChildGameProcess for " + this.Settings.Name + " found pid=" + child.Id + " " + text).LogInfo();
-                        GameProcess = child;
-                        Sandbox.Process = child;
-                    }
+                    // gameProcess = GameProcess;
                 }
-                else if (gameProcess.HasExited)
+                else if (gameProcess.HasExited || gameProcess.MainWindowHandle == IntPtr.Zero)
                 {
-                    _processes.Remove(gameProcess);
+                    if (gameProcess.HasExited)
+                    {
+                        lock (_processes)
+                        {
+                            _processes.Remove(gameProcess);
+                        }
+                    }
                     if (_processes.Count > 0)
                     {
                         var processes = _processes.ToArray();
@@ -337,25 +355,32 @@ namespace Mubox.Model
                                 L_process.Refresh();
                                 if (L_process.HasExited)
                                 {
-                                    _processes.Remove(L_process);
+                                    lock (_processes)
+                                    {
+                                        _processes.Remove(L_process);
+                                    }
                                 }
-                                else
+                                else if (L_process.MainWindowHandle != IntPtr.Zero)
                                 {
-                                    ("PreviousGameProcess for " + this.Settings.Name + " pid=" + L_process.Id).LogInfo();
+                                    ("PreviousGameProcess for " + this.Settings.Name + " pid=" + L_process.Id + " hwnd=" + L_process.MainWindowHandle.ToString("X")).LogInfo();
                                     pid = L_process.Id;
                                     GameProcess = L_process;
                                     Sandbox.Process = L_process;
+                                    break;
                                 }
                             }
                             catch
                             {
-                                _processes.Remove(L_process);
+                                lock (_processes)
+                                {
+                                    _processes.Remove(L_process);
+                                }
                             }
                         }
                     }
                     if (_processes.Count == 0)
                     {
-                        ("NoGameProcess for " + this.Settings.Name).LogError();
+                        ("GameExitDetected for " + this.Settings.Name).LogWarn();
                         GameProcess = null;
                         Sandbox.Process = null;
                         Settings.WindowHandle = IntPtr.Zero;
@@ -405,6 +430,59 @@ namespace Mubox.Model
             {
                 ex.Log();
             }
+        }
+
+        private bool ElectChildProcess(int pid)
+        {
+            var electedNewProcess = false;
+            var children = Mubox.WinAPI.Toolhelp32.GetChildProcesses(pid);
+            if (children != null && children.Count() > 0)
+            {
+                foreach (var child in children)
+                {
+                    var hwnd = child.MainWindowHandle;
+                    var alreadyTracking = false;
+                    lock (_processes)
+                    {
+                        foreach (var L_process in _processes)
+                        {
+                            if (L_process.Id == child.Id)
+                            {
+                                alreadyTracking = true;
+                            }
+                        }
+                        if (!alreadyTracking)
+                        {
+                            _processes.Add(child);
+                            TryElectProcessOnExit(child);
+                            ("TrackingGameProcess for " + this.Settings.Name + " found pid=" + child.Id + " hwnd=" + hwnd.ToString("X")).LogInfo();
+                        }
+                    }
+                    if (!ElectChildProcess(child.Id) && hwnd != IntPtr.Zero && GameProcess != child && !child.HasExited)
+                    {
+                        ("ElectingGameProcess for " + this.Settings.Name + " found pid=" + child.Id + " hwnd=" + hwnd.ToString("X")).LogInfo();
+                        GameProcess = child;
+                        Sandbox.Process = child;
+                        electedNewProcess = true;
+                    }
+                }
+                return electedNewProcess;
+            }
+            return electedNewProcess;
+        }
+
+        private void TryElectProcessOnExit(Process child)
+        {
+            try
+            {
+                int pid = child.Id;
+                // using closure for access to 'child' within following handler
+                child.Exited += (s, e) =>
+                    {
+                        ElectChildProcess(pid);
+                    };
+            }
+            catch { /* NOP */ }
         }
 
         [SuppressMessage("Microsoft.Security", "CA2122")]
