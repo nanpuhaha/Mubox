@@ -270,9 +270,12 @@ namespace Mubox.Model
             set
             {
                 _gameProcess = value;
-                if (!_processes.Contains(value))
+                if (value != null)
                 {
-                    _processes.Add(value);
+                    if (!_processes.Contains(value))
+                    {
+                        _processes.Add(value);
+                    }
                 }
             }
         }
