@@ -57,7 +57,8 @@
     <Compile Include="Views\ConsoleView.xaml.cs">
       <DependentUpon>ConsoleView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ListBoxExtenders.cs" />
+    <Compile Include="Views\ListViewExtenders.cs" />
+    <Compile Include="Views\ListViewItemStyleSelector.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mubox.Extensibility\Mubox.Extensibility.csproj">

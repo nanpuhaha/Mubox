@@ -6,10 +6,15 @@
              mc:Ignorable="d" 
              xmlns:l="clr-namespace:Mubox.Extensions.Console.Views"
              d:DesignHeight="480" d:DesignWidth="640">
+    <UserControl.Resources>
+        <l:ListViewItemStyleSelector x:Key="consoleStyleSelector" />
+    </UserControl.Resources>
     <Grid>
-        <ListBox ItemsSource="{Binding Messages}" FontFamily="Consolas" FontSize="10" Foreground="#FF127816" Background="Black"
+        <ListView ItemsSource="{Binding Messages}" 
+                 ItemContainerStyleSelector="{DynamicResource consoleStyleSelector}"
+                 FontFamily="Consolas" FontSize="8" Foreground="#FF127816" Background="Black"
                  VirtualizingPanel.ScrollUnit="Item" ScrollViewer.IsDeferredScrollingEnabled="True"
                  SelectedItem="{Binding LatestMessage}"
-                 IsSynchronizedWithCurrentItem="True" l:ListBoxExtenders.AutoScrollToCurrentItem="True"/>
+                 IsSynchronizedWithCurrentItem="True" l:ListViewExtenders.AutoScrollToCurrentItem="True"/>
     </Grid>
 </UserControl>

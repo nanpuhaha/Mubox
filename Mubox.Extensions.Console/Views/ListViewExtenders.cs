@@ -13,11 +13,11 @@ namespace Mubox.Extensions.Console.Views
     /// <summary>
     /// This class contains a few useful extenders for the ListBox
     /// </summary>
-    public class ListBoxExtenders : DependencyObject
+    public class ListViewExtenders : DependencyObject
     {
         #region Properties
 
-        public static readonly DependencyProperty AutoScrollToCurrentItemProperty = DependencyProperty.RegisterAttached("AutoScrollToCurrentItem", typeof(bool), typeof(ListBoxExtenders), new UIPropertyMetadata(default(bool), OnAutoScrollToCurrentItemChanged));
+        public static readonly DependencyProperty AutoScrollToCurrentItemProperty = DependencyProperty.RegisterAttached("AutoScrollToCurrentItem", typeof(bool), typeof(ListViewExtenders), new UIPropertyMetadata(default(bool), OnAutoScrollToCurrentItemChanged));
 
         /// <summary>
         /// Returns the value of the AutoScrollToCurrentItemProperty
@@ -47,19 +47,19 @@ namespace Mubox.Extensions.Console.Views
         /// This method will be called when the AutoScrollToCurrentItem
         /// property was changed
         /// </summary>
-        /// <param name="s">The sender (the ListBox)</param>
+        /// <param name="s">The sender (the ListView)</param>
         /// <param name="e">Some additional information</param>
         public static void OnAutoScrollToCurrentItemChanged(DependencyObject s, DependencyPropertyChangedEventArgs e)
         {
-            var listBox = s as ListBox;
-            if (listBox != null)
+            var listView = s as ListView;
+            if (listView != null)
             {
-                var listBoxItems = listBox.Items;
+                var listBoxItems = listView.Items;
                 if (listBoxItems != null)
                 {
                     var newValue = (bool)e.NewValue;
 
-                    var autoScrollToCurrentItemWorker = new EventHandler((s1, e2) => OnAutoScrollToCurrentItem(listBox));
+                    var autoScrollToCurrentItemWorker = new EventHandler((s1, e2) => OnAutoScrollToCurrentItem(listView));
 
                     if (newValue)
                         listBoxItems.CurrentChanged += autoScrollToCurrentItemWorker;
@@ -73,11 +73,11 @@ namespace Mubox.Extensions.Console.Views
         /// This method will be called when the ListBox should
         /// be scrolled to the given index
         /// </summary>
-        /// <param name="listBox">The ListBox which should be scrolled</param>
+        /// <param name="listView">The ListBox which should be scrolled</param>
         /// <param name="index">The index of the item to which it should be scrolled</param>
-        public static void OnAutoScrollToCurrentItem(ListBox listBox)
+        public static void OnAutoScrollToCurrentItem(ListView listView)
         {
-            listBox.ScrollIntoView(listBox.Items.CurrentItem);
+            listView.ScrollIntoView(listView.Items.CurrentItem);
         }
 
         #endregion
