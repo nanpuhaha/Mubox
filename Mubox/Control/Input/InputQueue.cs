@@ -102,6 +102,7 @@ namespace Mubox.Control.Input
                     {
                         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
                         var input = default(InputBase);
+                        IntPtr oldActiveWindow = WinAPI.Windows.SetActiveWindow(ClientWindowHandle);
                         while (_inputQueue.TryDequeue(out input) && stopwatch.ElapsedMilliseconds < 20)
                         {
                             if (input is MouseInput)
@@ -123,11 +124,13 @@ namespace Mubox.Control.Input
             finally
             {
                 var detached = WinAPI.Windows.AttachThreadInput(myInputQueueId, ClientInputQueueId, false);
+#if DEBUG
                 if (!detached)
                 {
                     var err = Marshal.GetLastWin32Error();
                     (string.Format("InputManager failed AttachThreadInput(false) err=0x{2:X} ({0:X8}) ({1:X8})", myInputQueueId, ClientInputQueueId, err)).LogWarn();
                 }
+#endif
             }
         }
 
