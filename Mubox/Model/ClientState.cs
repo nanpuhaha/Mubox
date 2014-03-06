@@ -17,7 +17,7 @@ namespace Mubox.Model
         {
             Timer = new System.Timers.Timer();
             Timer.Elapsed += Timer_Elapsed;
-            Timer.Interval = 1000;
+            Timer.Interval = 100;
             Timer.Start();
         }
 
@@ -259,7 +259,23 @@ namespace Mubox.Model
             }
         }
 
-        public System.Diagnostics.Process GameProcess { get; set; }
+        private System.Diagnostics.Process _gameProcess;
+
+        public System.Diagnostics.Process GameProcess
+        {
+            get
+            {
+                return _gameProcess;
+            }
+            set
+            {
+                _gameProcess = value;
+                if (!_processes.Contains(value))
+                {
+                    _processes.Add(value);
+                }
+            }
+        }
 
         private long GameProcessNextCheckTime;
 
@@ -277,12 +293,13 @@ namespace Mubox.Model
                 return;
             }
 
-            GameProcessNextCheckTime = DateTime.Now.AddSeconds(5).Ticks;
+            GameProcessNextCheckTime = 0L; // DateTime.Now.AddSeconds(5).Ticks;
 
             Process gameProcess = GameProcess;
             if (gameProcess == null)
             {
                 ("NoGameProcess for " + this.Settings.Name).Log();
+                GameProcessNextCheckTime = DateTime.Now.AddSeconds(5).Ticks;
                 return;
             }
 
