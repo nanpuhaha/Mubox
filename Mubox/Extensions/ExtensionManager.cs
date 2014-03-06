@@ -113,7 +113,12 @@ namespace Mubox.Extensions
 
         private Extensibility.MuboxClientBridge GetClientByName(string clientName)
         {
-            return _clients
+            var L_clients = default(IEnumerable<MuboxClientBridge>);
+            lock (_clients)
+            {
+                L_clients = _clients.ToArray();
+            }
+            return L_clients
                 .Where(c => c.Name == clientName)
                 .FirstOrDefault();
         }
@@ -183,7 +188,10 @@ namespace Mubox.Extensions
                 {
                     client.Name = (dnc_s as Mubox.Model.Client.ClientBase).DisplayName;
                 };
-                _clients.Add(client);
+                lock (_clients)
+                {
+                    _clients.Add(client);
+                }
                 _extensions.Values.ToList()
                     .ForEach(ext =>
                     {
@@ -202,12 +210,20 @@ namespace Mubox.Extensions
                     name = e.Client.DisplayName;
                 });
                 e.Client.IsAttachedChanged -= Client_IsAttachedChanged;
-                var client = _clients
+                var L_clients = default(IEnumerable<MuboxClientBridge>);
+                lock (_clients)
+                {
+                    L_clients = _clients.ToArray();
+                }
+                var client = L_clients
                     .Where(c => c.Name.Equals(name))
                     .FirstOrDefault();
                 if (client != null)
                 {
-                    _clients.Remove(client);
+                    lock (_clients)
+                    {
+                        _clients.Remove(client);
+                    }
                     _extensions.Values.ToList()
                         .ForEach(ext =>
                         {
@@ -221,25 +237,37 @@ namespace Mubox.Extensions
         {
             Task.Factory.StartNew(delegate()
             {
-                var based = sender as Mubox.Model.Client.ClientBase;
-                var basedName = default(string);
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        basedName = based.DisplayName;
-                    });
-                var client = _clients
-                    .Where(c => c.Name.Equals(basedName))
-                    .FirstOrDefault();
-                if (client != null)
+                try
                 {
-                    if (based.IsAttached)
+                    var based = sender as Mubox.Model.Client.ClientBase;
+                    var basedName = default(string);
+                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            basedName = based.DisplayName;
+                        });
+                    var L_clients = default(IEnumerable<MuboxClientBridge>);
+                    lock (_clients)
                     {
-                        client.OnAttached();
+                        L_clients = _clients.ToArray();
                     }
-                    else
+                    var client = L_clients
+                        .Where(c => c.Name.Equals(basedName))
+                        .FirstOrDefault();
+                    if (client != null)
                     {
-                        client.OnDetached();
+                        if (based.IsAttached)
+                        {
+                            client.OnAttached();
+                        }
+                        else
+                        {
+                            client.OnDetached();
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    ex.Log();
                 }
             }, TaskCreationOptions.PreferFairness);
         }
