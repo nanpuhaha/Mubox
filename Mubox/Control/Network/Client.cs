@@ -279,14 +279,14 @@ namespace Mubox.Control.Network
             //bool useTIQ = true; //TODO: this needs test and reverification of semantics/rules because it does not appear to allow mouse broadcast
 
             // translate message and track MK changes
-            WinAPI.WM wm = WinAPI.WM.USER;
-            bool isButtonUpEvent = false;
+            //WinAPI.WM wm = WinAPI.WM.USER;
+            //bool isButtonUpEvent = false;
 
             // strip 'absolute' flag from mask and process result
 
             // denormalize coordinates to local
-            WinAPI.Windows.RECT clientRect;
-            WinAPI.Windows.GetClientRect(WindowHandle, out clientRect);
+            //WinAPI.Windows.RECT clientRect;
+            //WinAPI.Windows.GetClientRect(WindowHandle, out clientRect);
             //int lPointX = (int)(((double)clientRect.Width / (double)65536) * mouseInput.Point.X);
             //int lPointY = (int)(((double)clientRect.Height / (double)65536) * mouseInput.Point.Y);
 
