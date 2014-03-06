@@ -5868,13 +5868,13 @@ namespace Mubox
                                 {
                                     var child = Process.GetProcessById((int)procEntry.th32ProcessID);
                                     children.Add(child);
-                                    ("Toolhelp32.GetChildProcesses " + pid.ToString() + " " + child.Id.ToString() + " " + child.MainWindowHandle.ToString("X") + " " + child.MainWindowTitle).Log();
+                                    //("Toolhelp32.GetChildProcesses " + pid.ToString() + " " + child.Id.ToString() + " " + child.MainWindowHandle.ToString("X") + " " + child.MainWindowTitle).Log();
                                 }
                             } while (Process32Next(handleToSnapshot, ref procEntry));
                         }
                         else
                         {
-                            ("Toolhelp32.Process32First failed err=0x" + Marshal.GetLastWin32Error().ToString("X")).LogError();
+                            //("Toolhelp32.Process32First failed err=0x" + Marshal.GetLastWin32Error().ToString("X")).LogError();
                             return null;
                         }
                     }
