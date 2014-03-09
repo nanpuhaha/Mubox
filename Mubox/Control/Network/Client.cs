@@ -678,29 +678,29 @@ namespace Mubox.Control.Network
 
         private void OnActivateClient()
         {
-            ("ReceivedActivateRequest for " + this.DisplayName).Log();
+            //("ReceivedActivateRequest for " + this.DisplayName).Log();
             DateTime onActivateClientReceivedTimestamp = DateTime.Now;
             lock (_activationLock)
             {
-                ("ActivateClientLock took " + onActivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName).Log();
+                //("ActivateClientLock took " + onActivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName).Log();
                 onActivateClientReceivedTimestamp = DateTime.Now;
                 LastActivatedClientWindowHandle = _windowHandle;
                 long activationExpiryTime = DateTime.Now.AddMilliseconds(1000).Ticks;
                 do
                 {
-                    ("ActivateClientAttempt@" + WindowHandle + " for " + this.DisplayName).Log();
+                    //("ActivateClientAttempt@" + WindowHandle + " for " + this.DisplayName).Log();
                     if (WindowHandle == IntPtr.Zero)
                     {
                         ("NoWindowHandle Failed OnActivateClient for " + this.DisplayName).Log();
                         return;
                     }
 
-                    IntPtr windowInputQueue = WindowInputQueue;
-                    if (windowInputQueue == IntPtr.Zero)
-                    {
-                        ("NoWindowInputQueue Failed OnActivateClient for " + this.DisplayName).Log();
-                        return;
-                    }
+                    //IntPtr windowInputQueue = WindowInputQueue;
+                    //if (windowInputQueue == IntPtr.Zero)
+                    //{
+                    //    ("NoWindowInputQueue Failed OnActivateClient for " + this.DisplayName).Log();
+                    //    return;
+                    //}
 
                     // resolve TIQ
                     /* not necessary?
@@ -730,35 +730,37 @@ namespace Mubox.Control.Network
                     //};
                     //ActionViaTIQ(action, foregroundInputQueue, "OnActivateClient");
                 } while ((DateTime.Now.Ticks < activationExpiryTime) && (_windowHandle != WinAPI.Windows.GetForegroundWindow()));
+#if DEBUG
                 ("ActivateClientAction took " + onActivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName).Log();
+#endif
             }
             NotifyClientActivated();
         }
 
         private void OnDeactivateClient()
         {
-            ("ReceivedDeactivateRequest for " + this.DisplayName).Log();
+            //("ReceivedDeactivateRequest for " + this.DisplayName).Log();
             DateTime onDeactivateClientReceivedTimestamp = DateTime.Now;
             lock (_activationLock)
             {
-                ("DeactivateClientLock took " + onDeactivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName).Log();
+                //("DeactivateClientLock took " + onDeactivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName).Log();
                 onDeactivateClientReceivedTimestamp = DateTime.Now;
                 LastActivatedClientWindowHandle = _windowHandle;
-                long activationExpiryTime = DateTime.Now.AddMilliseconds(1000).Ticks;
+                //long activationExpiryTime = DateTime.Now.AddMilliseconds(1000).Ticks;
 
-                ("DeactivateClientAttempt@" + WindowHandle + " for " + this.DisplayName).Log();
+                //("DeactivateClientAttempt@" + WindowHandle + " for " + this.DisplayName).Log();
                 if (WindowHandle == IntPtr.Zero)
                 {
-                    ("NoWindowHandle Failed OnDeactivateClient for " + this.DisplayName).Log();
+                    ("NoWindowHandle Failed OnDeactivateClient for " + this.DisplayName).LogWarn();
                     return;
                 }
 
-                IntPtr windowInputQueue = WindowInputQueue;
-                if (windowInputQueue == IntPtr.Zero)
-                {
-                    ("NoWindowInputQueue Failed OnDeactivateClient for " + this.DisplayName).Log();
-                    return;
-                }
+                //IntPtr windowInputQueue = WindowInputQueue;
+                //if (windowInputQueue == IntPtr.Zero)
+                //{
+                //    ("NoWindowInputQueue Failed OnDeactivateClient for " + this.DisplayName).Log();
+                //    return;
+                //}
 
                 // resolve TIQ
                     /* not necessary?
@@ -785,7 +787,9 @@ namespace Mubox.Control.Network
                 //};
                 //ActionViaTIQ(action, foregroundInputQueue, "OnDeactivateClient");
             }
+#if DEBUG
             ("DeactivateClientAction took " + onDeactivateClientReceivedTimestamp.Subtract(DateTime.Now) + " for " + this.DisplayName).Log();
+#endif
         }
 
         public event EventHandler<EventArgs> Connected;
