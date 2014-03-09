@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -70,6 +71,7 @@ namespace Mubox.View.Server
                         WinAPI.WM.RBUTTONDOWN,
                         WinAPI.WM.RBUTTONDBLCLK,
                         WinAPI.WM.RBUTTONUP,
+                        WinAPI.WM.MOUSEMOVE, // for 'EnableMousePanningFix'
                     },
                     new WinAPI.WM[]
                     {
@@ -94,79 +96,7 @@ namespace Mubox.View.Server
 
         private void MouseInputHook_MouseInputReceived(object sender, MouseInput e)
         {
-            if (!Mubox.Configuration.MuboxConfigSection.Default.EnableMouseCapture)
-            {
-                e.Handled = false;
-                return;
-            }
-
-            Mubox.Extensions.ExtensionManager.Instance.OnMouseInputReceived(sender, e);
-            //if (Mubox.Extensions.ExtensionManager.Instance.OnMouseInputReceived(sender, e))
-            //{
-            //    e.Handled = false;
-            //    return;
-            //}
-
-            ClientBase activeClient = ActiveClient;
-
-            #region Mouse_RelativeMovement
-
-            // one-time init
-            if (e.WM == WinAPI.WM.MOUSEMOVE)
-            {
-                if (this.Mouse_RelativeMovement_LastX == double.MinValue)
-                {
-                    this.Mouse_RelativeMovement_LastX = e.Point.X;
-                    this.Mouse_RelativeMovement_LastY = e.Point.Y;
-                    return;
-                }
-
-                // update for resolution changes every XX seconds
-                if ((DateTime.Now.Ticks - Mouse_AbsoluteMovement_Screen_Resolution_UpdateTimestampTicks) > TimeSpan.FromSeconds(15).Ticks)
-                {
-                    Mouse_Screen_OnResolutionChanged();
-                    return;
-                }
-            }
-
-
-            var shouldMulticastMouse = ShouldMulticastMouse(e);
-
-            // track relative movement
-            // TODO: except when the mouse moves TO the center of the screen or center of client area, some games do this to implement view pan
-            // TODO: except when the mouse moves FROM the center of the screen, somce games do this to implement view pan
-            int relX = (int)e.Point.X;
-            int relY = (int)e.Point.Y;
-
-            if (e.WM == WinAPI.WM.MOUSEMOVE)
-            {
-                relX -= (int)this.Mouse_RelativeMovement_LastX;
-                relY -= (int)this.Mouse_RelativeMovement_LastY;
-
-                this.Mouse_RelativeMovement_LastX += relX;
-                if (this.Mouse_RelativeMovement_LastX <= 0)
-                {
-                    this.Mouse_RelativeMovement_LastX = 0;
-                }
-                else if (this.Mouse_RelativeMovement_LastX >= Mouse_AbsoluteMovement_Screen_ResolutionX)
-                {
-                    this.Mouse_RelativeMovement_LastX = Mouse_AbsoluteMovement_Screen_ResolutionX;
-                }
-
-                this.Mouse_RelativeMovement_LastY += relY;
-                if (this.Mouse_RelativeMovement_LastY <= 0)
-                {
-                    this.Mouse_RelativeMovement_LastY = 0;
-                }
-                else if (this.Mouse_RelativeMovement_LastY >= Mouse_AbsoluteMovement_Screen_ResolutionY)
-                {
-                    this.Mouse_RelativeMovement_LastY = Mouse_AbsoluteMovement_Screen_ResolutionY;
-                }
-            }
-
-            #endregion Mouse_RelativeMovement
-
-            #region 'Mouse Buffering' Option
+            #region Mouse 'Button State' Tracking
 
             ButtonState mouseButtonInfo = null;
             if (Mouse_Buttons.TryGetValue(e.WM, out mouseButtonInfo))
@@ -174,12 +104,49 @@ namespace Mubox.View.Server
                 var dateTimeNow = DateTime.Now;
                 switch (e.WM)
                 {
+                    case WinAPI.WM.MOUSEMOVE:
+                        if (mouseButtonInfo.IsDown && MuboxConfigSection.Default.Profiles.ActiveProfile.EnableMousePanningFix)
+                        {
+                            if ((int)e.Point.X != mouseButtonInfo.ClickX || (int)e.Point.Y != mouseButtonInfo.ClickY)
+                            {
+                                // TODO: screen bounds code may be incorrect for multimon, not properly tested
+                                var drawingPoint = new System.Drawing.Point(mouseButtonInfo.ClickX, mouseButtonInfo.ClickY);
+                                var screen = System.Windows.Forms.Screen.FromPoint(drawingPoint);
+                                var x = (ushort)Math.Ceiling((double)(mouseButtonInfo.ClickX) * (65536.0 / (double)screen.Bounds.Width));
+                                var y = (ushort)Math.Ceiling((double)(mouseButtonInfo.ClickY) * (65536.0 / (double)screen.Bounds.Height));
+                                var mouseinput = new Mubox.WinAPI.SendInputApi.INPUT
+                                {
+                                    InputType = WinAPI.SendInputApi.InputType.INPUT_MOUSE,
+                                    mi = new WinAPI.SendInputApi.MOUSEINPUT
+                                    {
+                                        dwExtraInfo = WinAPI.SendInputApi.GetMessageExtraInfo(),
+                                        dx = x,
+                                        dy = y,
+                                        Flags = WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_MOVE | WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_ABSOLUTE,
+                                        mouseData = 0,
+                                        time = e.Time + 1,
+                                    },
+                                };
+                                WinAPI.SendInputApi.SendInput(1, new Mubox.WinAPI.SendInputApi.INPUT[]
+                                {
+                                    mouseinput,
+                                }, Marshal.SizeOf(mouseinput));
+                                e.Handled = true;
+                            }
+                            else
+                            {
+                                e.Handled = true;
+                            }
+                        }
+                        break;
                     case WinAPI.WM.LBUTTONDOWN:
                     case WinAPI.WM.RBUTTONDOWN:
                     case WinAPI.WM.MBUTTONDOWN:
                     case WinAPI.WM.XBUTTONDOWN:
                         if (!mouseButtonInfo.IsDown)
                         {
+                            mouseButtonInfo.ClickX = (int)e.Point.X;
+                            mouseButtonInfo.ClickY = (int)e.Point.Y;
                             mouseButtonInfo.IsClick = false;
                             mouseButtonInfo.IsDoubleClick =
                                 // within buffer timestamp for a second down/up transition to be interpretted as a double-click
@@ -248,6 +215,73 @@ namespace Mubox.View.Server
 
             #endregion 'Mouse Buffering' Option
 
+            if (!Mubox.Configuration.MuboxConfigSection.Default.EnableMouseCapture)
+            {
+                e.Handled = false;
+                return;
+            }
+
+            Mubox.Extensions.ExtensionManager.Instance.OnMouseInputReceived(sender, e);
+
+            ClientBase activeClient = ActiveClient;
+
+            #region Mouse_RelativeMovement
+
+            // one-time init
+            if (e.WM == WinAPI.WM.MOUSEMOVE)
+            {
+                if (this.Mouse_RelativeMovement_LastX == double.MinValue)
+                {
+                    this.Mouse_RelativeMovement_LastX = e.Point.X;
+                    this.Mouse_RelativeMovement_LastY = e.Point.Y;
+                    return;
+                }
+
+                // update for resolution changes every XX seconds
+                if ((DateTime.Now.Ticks - Mouse_AbsoluteMovement_Screen_Resolution_UpdateTimestampTicks) > TimeSpan.FromSeconds(15).Ticks)
+                {
+                    Mouse_Screen_OnResolutionChanged();
+                    return;
+                }
+            }
+
+
+            var shouldMulticastMouse = ShouldMulticastMouse(e);
+
+            // track relative movement
+            // TODO: except when the mouse moves TO the center of the screen or center of client area, some games do this to implement view pan
+            // TODO: except when the mouse moves FROM the center of the screen, somce games do this to implement view pan
+            int relX = (int)e.Point.X;
+            int relY = (int)e.Point.Y;
+
+            if (e.WM == WinAPI.WM.MOUSEMOVE)
+            {
+                relX -= (int)this.Mouse_RelativeMovement_LastX;
+                relY -= (int)this.Mouse_RelativeMovement_LastY;
+
+                this.Mouse_RelativeMovement_LastX += relX;
+                if (this.Mouse_RelativeMovement_LastX <= 0)
+                {
+                    this.Mouse_RelativeMovement_LastX = 0;
+                }
+                else if (this.Mouse_RelativeMovement_LastX >= Mouse_AbsoluteMovement_Screen_ResolutionX)
+                {
+                    this.Mouse_RelativeMovement_LastX = Mouse_AbsoluteMovement_Screen_ResolutionX;
+                }
+
+                this.Mouse_RelativeMovement_LastY += relY;
+                if (this.Mouse_RelativeMovement_LastY <= 0)
+                {
+                    this.Mouse_RelativeMovement_LastY = 0;
+                }
+                else if (this.Mouse_RelativeMovement_LastY >= Mouse_AbsoluteMovement_Screen_ResolutionY)
+                {
+                    this.Mouse_RelativeMovement_LastY = Mouse_AbsoluteMovement_Screen_ResolutionY;
+                }
+            }
+
+            #endregion Mouse_RelativeMovement
+
             // send to client
             if (Mubox.Configuration.MuboxConfigSection.Default.IsCaptureEnabled && (activeClient != null))
             {
@@ -266,33 +300,24 @@ namespace Mubox.View.Server
                 {
                     e.Handled = (e.WM != WinAPI.WM.MOUSEMOVE);
 
-                    ClientBase[] clients = shouldMulticastMouse
+                    var clients = shouldMulticastMouse
                         ? GetCachedClients()
                         : new[] { activeClient };
 
                     if (e.WM == WinAPI.WM.MOUSEMOVE)
                     {
-                        //e.Point = new Point(relX, relY);
-
                         // track mouse position
                         TrackMousePositionClientRelative(e, activeClient, clients);
 
-
-                        // NOTE: mouse broadcast to multiple local clients requires we do not filter like this, this was a remnant of when we still relied on SendInput for sending input to the 'active' client
-                        //if (clients.Length > 0)
-                        //{
-                        //    List<ClientBase> reducedClientsForMouseMove = new List<ClientBase>();
-                        //    List<string> addressExclusionTable = new List<string>(ClientBase.localAddressTable);
-                        //    foreach (var item in clients)
-                        //    {
-                        //        if (!addressExclusionTable.Contains(item.Address))
-                        //        {
-                        //            reducedClientsForMouseMove.Add(item);
-                        //            addressExclusionTable.Add(item.Address);
-                        //        }
-                        //    }
-                        //    clients = reducedClientsForMouseMove.ToArray();
-                        //}
+                        // in the case of the 'active, local' client it is presumed that the mouse is correctly interacting with said client and thus is removed from the list of target clients, otherwise the client may be receiving double the number of mousemove events
+                        if (clients.Length > 0)
+                        {
+                            if (mouseButtonInfo.IsDown && MuboxConfigSection.Default.Profiles.ActiveProfile.EnableMousePanningFix)
+                            {
+                                clients = clients.Where(c => c.ClientId != activeClient.ClientId)
+                                .ToArray();
+                            }
+                        }
                     }
 
                     foreach (ClientBase client in clients)
