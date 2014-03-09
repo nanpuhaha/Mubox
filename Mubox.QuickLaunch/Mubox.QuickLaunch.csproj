@@ -25,7 +25,7 @@
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
     <TargetZone>LocalIntranet</TargetZone>
-    <GenerateManifests>true</GenerateManifests>
+    <GenerateManifests>false</GenerateManifests>
     <ApplicationIcon>Mubox2013.ico</ApplicationIcon>
     <IsWebBootstrapper>true</IsWebBootstrapper>
     <ExcludedPermissions>
