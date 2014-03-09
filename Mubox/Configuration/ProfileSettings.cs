@@ -81,6 +81,22 @@ namespace Mubox.Configuration
             }
         }
 
+        /// <summary>
+        /// <para>
+        /// Some games reset/alter the mouse position when panning with the mouse in a way that 
+        /// is not compatible with Mubox (and similar applications), this results in erratic 
+        /// 'spinning' of the camera because the game continues to read an incorrect position.
+        ///
+        /// This option attemps to provide a 'fix' for some of these games.
+        /// </para>
+        /// </summary>
+        [ConfigurationProperty("EnableMousePanningFix", IsRequired = false, DefaultValue = false)]
+        public bool EnableMousePanningFix
+        {
+            get { return (bool)base["EnableMousePanningFix"]; }
+            set { if (EnableMousePanningFix != value) { base["EnableMousePanningFix"] = value; this.OnPropertyChanged(o => o.EnableMousePanningFix); } }
+        }
+
         [ConfigurationProperty("Keys")]
         public KeySettingCollection Keys
         {
