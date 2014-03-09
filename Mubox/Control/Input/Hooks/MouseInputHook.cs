@@ -30,7 +30,8 @@ namespace Mubox.Control.Input.Hooks
                     {
                         if (DateTime.Now.Ticks <= _nextMouseMoveAccept)
                         {
-                            return UIntPtr.Zero; // not handled
+                            // a.k.a not handled
+                            return Mubox.WinAPI.WindowHook.CallNextHookEx(hHook, nCode, wParam, lParam);
                         }
                         _nextMouseMoveAccept = DateTime.Now.AddMilliseconds(50).Ticks; // 20fps - we limit this to ease off of network and cpu utilization for mousemove, the framerate choice here is arbitrary
                     }
