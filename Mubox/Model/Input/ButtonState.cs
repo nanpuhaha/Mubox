@@ -48,5 +48,15 @@ namespace Mubox.Model.Input
         /// True if the button is Down due to a Multicast (e.g. Mouse Multicast, Key Multicast).
         /// </summary>
         public bool IsMulticast { get; set; }
+
+        /// <summary>
+        /// X Position of Cursor when last clicked, used for 'Mouse Panning Fix'
+        /// </summary>
+        public int ClickX { get; set; }
+
+        /// <summary>
+        /// Y Position of Cursor when last clicked, used for 'Mouse Panning Fix'
+        /// </summary>
+        public int ClickY { get; set; }
     }
 }
