@@ -318,6 +318,7 @@ namespace Mubox.Extensions
                 return;
             }
 
+            // TODO: consider queued mouse input instead of spawning a new task fro every event
             Task.Factory.StartNew(delegate()
             {
                 // translate input

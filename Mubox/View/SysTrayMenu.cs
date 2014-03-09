@@ -352,6 +352,19 @@ namespace Mubox.View
                 "Note, the game will not run until the client successfully connects to the Server, once a Server Connection is established the Launch will continue.";
             quickLaunchClientShortcuts.Add(menuItem);
 
+            // "Enable Mouse Panning Fix"
+            menuItem = new MenuItem();
+            menuItem.IsCheckable = true;
+            menuItem.IsChecked = profile.EnableMousePanningFix;
+            menuItem.Click += (sender, e) =>
+            {
+                profile.EnableMousePanningFix = !profile.EnableMousePanningFix;
+                Mubox.Configuration.MuboxConfigSection.Save();
+            };
+            menuItem.Header = "Enable Mouse Panning Fix";
+            menuItem.ToolTip = "Only enable this option if you experience 'erratic' behavior when panning with the mouse. Properly written games do not have this problem.";
+            quickLaunchClientShortcuts.Add(menuItem);
+
             // New Mubox Client
             menuItem = new MenuItem();
             menuItem.Click += (sender, e) =>
