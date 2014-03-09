@@ -151,21 +151,41 @@ namespace Mubox.Control.Input
                     break;
 
                 case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_LEFTDOWN:
+                    //WinAPI.Cursor.SetCapture(ClientWindowHandle);
                     wm = WinAPI.WM.LBUTTONDOWN;
                     CurrentMK |= WinAPI.Windows.MK.MK_LBUTTON;
                     break;
 
                 case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_LEFTUP:
+                    //var priorCapture = WinAPI.Cursor.GetCapture();
+                    //if (priorCapture == IntPtr.Zero)
+                    //{
+                    //    ("GetCapture Fail").LogWarn();
+                    //}
+                    //else
+                    //{
+                    //    WinAPI.Cursor.ReleaseCapture();
+                    //}
                     wm = WinAPI.WM.LBUTTONUP;
                     CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_LBUTTON) ^ WinAPI.Windows.MK.MK_LBUTTON;
                     break;
 
                 case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_RIGHTDOWN:
+                    //WinAPI.Cursor.SetCapture(ClientWindowHandle);
                     wm = WinAPI.WM.RBUTTONDOWN;
                     CurrentMK |= WinAPI.Windows.MK.MK_RBUTTON;
                     break;
 
                 case WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_RIGHTUP:
+                    //var priorCapture = WinAPI.Cursor.GetCapture();
+                    //if (priorCapture == IntPtr.Zero)
+                    //{
+                    //    ("GetCapture Fail").LogWarn();
+                    //}
+                    //else
+                    //{
+                    //    WinAPI.Cursor.ReleaseCapture();
+                    //}
                     wm = WinAPI.WM.RBUTTONUP;
                     CurrentMK = (CurrentMK | WinAPI.Windows.MK.MK_RBUTTON) ^ WinAPI.Windows.MK.MK_RBUTTON;
                     break;
