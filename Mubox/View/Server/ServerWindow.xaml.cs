@@ -137,6 +137,7 @@ namespace Mubox.View.Server
                             {
                                 e.Handled = true;
                             }
+                            return;
                         }
                         break;
                     case WinAPI.WM.LBUTTONDOWN:
