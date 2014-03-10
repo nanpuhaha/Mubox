@@ -842,23 +842,8 @@ namespace Mubox.View.Server
             }
         }
 
-        // TODO: it is unclear why this is necessary, will remove after testing
-        //private void TryAutoEnableMulticastOnce()
-        //{
-        //    if (SetMulticastOneTime)
-        //    {
-        //        if (!Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.EnableMulticast)
-        //        {
-        //            Mubox.Configuration.MuboxConfigSection.Default.Profiles.ActiveProfile.EnableMulticast = true;
-        //            Mubox.Configuration.MuboxConfigSection.Save();
-        //        }
-        //        SetMulticastOneTime = false;
-        //    }
-        //}
-
         public void SetInputCapture(bool enable, bool showServerUI)
         {
-            // TODO: audible beep representing enable/disable states
             if (enable)
             {
                 // TryAutoEnableMulticastOnce();

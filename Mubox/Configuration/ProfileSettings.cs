@@ -97,6 +97,24 @@ namespace Mubox.Configuration
             set { if (EnableMousePanningFix != value) { base["EnableMousePanningFix"] = value; this.OnPropertyChanged(o => o.EnableMousePanningFix); } }
         }
 
+        /// <summary>
+        /// <para>
+        /// Some games don't appear to respond to LeftControl, LeftMenu nor LeftShift key messages.
+        /// 
+        /// This option performs a translation from Left/Right to less-specific messages (e.g. for LeftShift we translate to Shift, for RightMenu we translate to Menu, etc.)
+        /// 
+        /// If necessary we will re-work this to be more specific about which keys to translate, but currently this applies to all three.
+        /// 
+        /// By default this option is enabled because so far most games (but NOT all) appear to need this translation.
+        /// </para>
+        /// </summary>
+        [ConfigurationProperty("EnableCASFix", IsRequired = false, DefaultValue = true)]
+        public bool EnableCASFix
+        {
+            get { return (bool)base["EnableCASFix"]; }
+            set { if (EnableCASFix != value) { base["EnableCASFix"] = value; this.OnPropertyChanged(o => o.EnableCASFix); } }
+        }
+
         [ConfigurationProperty("Keys")]
         public KeySettingCollection Keys
         {

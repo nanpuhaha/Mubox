@@ -365,6 +365,19 @@ namespace Mubox.View
             menuItem.ToolTip = "Only enable this option if you experience 'erratic' behavior when panning with the mouse. Properly written games do not have this problem.";
             quickLaunchClientShortcuts.Add(menuItem);
 
+            // "Enable CAS Fix"
+            menuItem = new MenuItem();
+            menuItem.IsCheckable = true;
+            menuItem.IsChecked = profile.EnableCASFix;
+            menuItem.Click += (sender, e) =>
+            {
+                profile.EnableCASFix = !profile.EnableCASFix;
+                Mubox.Configuration.MuboxConfigSection.Save();
+            };
+            menuItem.Header = "Enable Control-Alt-Shift Fix";
+            menuItem.ToolTip = "Only enable this option if you have problems with the Control, Alt and Shift keys in your game.";
+            quickLaunchClientShortcuts.Add(menuItem);
+
             // New Mubox Client
             menuItem = new MenuItem();
             menuItem.Click += (sender, e) =>

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Mubox.Model.Input;
+using Mubox.Configuration;
 
 namespace Mubox.Control.Input.Hooks
 {
@@ -68,8 +69,6 @@ namespace Mubox.Control.Input.Hooks
                     keyboardHookCheckThread.Start();
                 }
 
-                //                IntPtr nextHook = IntPtr.Zero // COMMENTED BY CODEIT.RIGHT;
-                //IntPtr dwThreadId = Win32.Threads.GetCurrentThreadId();
                 var modules = System.Reflection.Assembly.GetEntryAssembly().GetModules();
                 IntPtr hModule = Marshal.GetHINSTANCE(modules[0]);
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate()
@@ -150,6 +149,28 @@ namespace Mubox.Control.Input.Hooks
             if (hookStruct.flags.HasFlag(WinAPI.WindowHook.LLKHF.INJECTED))
             {
                 return false;
+            }
+
+            // coerce specialized left/right shift-state to generalized shift-state
+            if (MuboxConfigSection.Default.Profiles.ActiveProfile.EnableCASFix)
+            {
+                switch ((WinAPI.VK)hookStruct.vkCode)
+                {
+                    case WinAPI.VK.LeftShift:
+                    case WinAPI.VK.RightShift:
+                        hookStruct.vkCode = WinAPI.VK.Shift;
+                        break;
+
+                    case WinAPI.VK.LeftMenu:
+                    case WinAPI.VK.RightMenu:
+                        hookStruct.vkCode = WinAPI.VK.Menu;
+                        break;
+
+                    case WinAPI.VK.LeftControl:
+                    case WinAPI.VK.RightControl:
+                        hookStruct.vkCode = WinAPI.VK.Control;
+                        break;
+                }
             }
 
             // ignore "global desktop keys"

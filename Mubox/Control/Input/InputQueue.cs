@@ -278,10 +278,10 @@ namespace Mubox.Control.Input
             }
 
             var vk = keyboardInput.VK;
-            WinAPI.WindowHook.LLKHF flags = keyboardInput.Flags;
-            uint scan = keyboardInput.Scan;
-            uint time = keyboardInput.Time;
-            WinAPI.CAS cas = keyboardInput.CAS;
+            var flags = keyboardInput.Flags;
+            var scan = keyboardInput.Scan;
+            var time = keyboardInput.Time;
+            var cas = keyboardInput.CAS;
 
             var wParam = (uint)vk;
 
@@ -306,67 +306,43 @@ namespace Mubox.Control.Input
                 {
                     Process(new KeyboardInput
                     {
-                        VK = WinAPI.VK.LeftControl,
+                        VK = WinAPI.VK.Control,
                         Flags = (WinAPI.WindowHook.LLKHF)0,
                         Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.LeftControl, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
-                    //Process(new KeyboardInput
-                    //{
-                    //    VK = (uint)WinAPI.VK.Control,
-                    //    Flags = (WinAPI.WindowHook.LLKHF)0,
-                    //    Scan = (uint)0, // TODO: convert to scan?
-                    //    Time = time,
-                    //    CAS = (WinAPI.CAS)0,
-                    //});
                 }
                 if ((cas & WinAPI.CAS.ALT) != 0)
                 {
                     Process(new KeyboardInput
                     {
-                        VK = WinAPI.VK.LeftMenu,
+                        VK = WinAPI.VK.Menu,
                         Flags = (WinAPI.WindowHook.LLKHF)0,
                         Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.LeftMenu, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
-                    //Process(new KeyboardInput
-                    //{
-                    //    VK = (uint)WinAPI.VK.Menu,
-                    //    Flags = (WinAPI.WindowHook.LLKHF)0,
-                    //    Scan = (uint)0, // TODO: convert to scan?
-                    //    Time = time,
-                    //    CAS = (WinAPI.CAS)0,
-                    //});
                     flags |= WinAPI.WindowHook.LLKHF.ALTDOWN;
                 }
                 if ((cas & WinAPI.CAS.SHIFT) != 0)
                 {
                     Process(new KeyboardInput
                     {
-                        VK = WinAPI.VK.LeftShift,
+                        VK = WinAPI.VK.Shift,
                         Flags = (WinAPI.WindowHook.LLKHF)0,
                         Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.LeftShift, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
-                    //Process(new KeyboardInput
-                    //{
-                    //    VK = (uint)WinAPI.VK.Shift,
-                    //    Flags = (WinAPI.WindowHook.LLKHF)0,
-                    //    Scan = (uint)0, // TODO: convert to scan?
-                    //    Time = time,
-                    //    CAS = (WinAPI.CAS)0,
-                    //});
                 }
             }
 
             // NOTE: some apps may actually rely on keyboard state, AttachInputThread will clobber keyboard state. now that we don't continually attach/detach we should be able to set keyboard correctly
             // TODO: this should be a game profile level option - some games exhibit 'double entry' of input when this is called
-            // WinAPI.SetKeyboardState(this.pressedKeys);
+            WinAPI.SetKeyboardState(this.pressedKeys);
 
-            if (this.pressedKeys[(int)WinAPI.VK.Menu])
+            if (this.pressedKeys[(int)WinAPI.VK.Menu] == 0x80)
             {
                 switch (wm)
                 {
@@ -417,69 +393,45 @@ namespace Mubox.Control.Input
                 {
                     Process(new KeyboardInput
                     {
-                        VK = WinAPI.VK.LeftControl,
+                        VK = WinAPI.VK.Control,
                         Flags = WinAPI.WindowHook.LLKHF.UP,
                         Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.LeftControl, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
-                    //Process(new KeyboardInput
-                    //{
-                    //    VK = (uint)WinAPI.VK.Control,
-                    //    Flags = WinAPI.WindowHook.LLKHF.UP,
-                    //    Scan = (uint)0, // TODO: convert to scan?
-                    //    Time = time,
-                    //    CAS = (WinAPI.CAS)0,
-                    //});
                 }
                 if ((cas & WinAPI.CAS.ALT) != 0)
                 {
                     Process(new KeyboardInput
                     {
-                        VK = WinAPI.VK.LeftMenu,
+                        VK = WinAPI.VK.Menu,
                         Flags = WinAPI.WindowHook.LLKHF.UP,
                         Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.LeftMenu, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
-                    //Process(new KeyboardInput
-                    //{
-                    //    VK = (uint)WinAPI.VK.Menu,
-                    //    Flags = WinAPI.WindowHook.LLKHF.UP,
-                    //    Scan = (uint)0, // TODO: convert to scan?
-                    //    Time = time,
-                    //    CAS = (WinAPI.CAS)0,
-                    //});
                 }
                 if ((cas & WinAPI.CAS.SHIFT) != 0)
                 {
                     Process(new KeyboardInput
                     {
-                        VK = WinAPI.VK.LeftShift,
+                        VK = WinAPI.VK.Shift,
                         Flags = WinAPI.WindowHook.LLKHF.UP,
                         Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.LeftShift, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
-                    //Process(new KeyboardInput
-                    //{
-                    //    VK = (uint)WinAPI.VK.Shift,
-                    //    Flags = WinAPI.WindowHook.LLKHF.UP,
-                    //    Scan = (uint)0, // TODO: convert to scan?
-                    //    Time = time,
-                    //    CAS = (WinAPI.CAS)0,
-                    //});
                 }
             }
         }
 
         #region client-side 'IsRepeatKey' AND 'GetAsyncKeyState' behavior
 
-        private System.Collections.BitArray pressedKeys = new System.Collections.BitArray(256);
+        private byte[] pressedKeys = new byte[256];
 
         private bool IsKeyPressed(WinAPI.VK vk)
         {
-            return pressedKeys[(int)vk];
+            return pressedKeys[(int)vk] == 0x80;
         }
 
         /// <summary>
@@ -498,7 +450,7 @@ namespace Mubox.Control.Input
                 if (!IsKeyPressed(vk))
                 {
                     result = true;
-                    pressedKeys[(int)vk] = true;
+                    pressedKeys[(int)vk] = 0x80;
                 }
             }
             else
@@ -506,7 +458,7 @@ namespace Mubox.Control.Input
                 if (IsKeyPressed(vk))
                 {
                     result = true;
-                    pressedKeys[(int)vk] = false;
+                    pressedKeys[(int)vk] = 0x00;
                 }
             }
             return result;

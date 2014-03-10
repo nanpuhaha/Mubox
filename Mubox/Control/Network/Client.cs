@@ -1,4 +1,5 @@
-﻿using Mubox.Control.Input;
+﻿using Mubox.Configuration;
+using Mubox.Control.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -347,35 +348,8 @@ namespace Mubox.Control.Network
 
         private void OnKeyboardInputReceived(Model.Input.KeyboardInput keyboardInput)
         {
-            // coerce specialized left/right shift-state to generalized shift-state
-            // TODO: this should be a profile-level option
-            /*
-            switch ((WinAPI.VK)keyboardInput.VK)
-            {
-                case WinAPI.VK.LeftShift:
-                case WinAPI.VK.RightShift:
-                    keyboardInput.VK = (uint)WinAPI.VK.Shift;
-                    break;
-
-                case WinAPI.VK.LeftMenu:
-                case WinAPI.VK.RightMenu:
-                    keyboardInput.VK = (uint)WinAPI.VK.Menu;
-                    break;
-
-                case WinAPI.VK.LeftControl:
-                case WinAPI.VK.RightControl:
-                    keyboardInput.VK = (uint)WinAPI.VK.Control;
-                    break;
-            }
-             */
-
-            // prevent windows key-repeat
-            // TODO: this should be a profile-level option
-
             //lock (_tiqLock)
             //{
-                // maintain MK state
-
                 keyboardInput.Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(keyboardInput.VK, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC);
                 InputManager.Enqueue(keyboardInput);
 
