@@ -341,7 +341,7 @@ namespace Mubox.Control.Input
             // NOTE: some apps may actually rely on keyboard state, AttachInputThread will clobber keyboard state. now that we don't continually attach/detach we should be able to set keyboard correctly
             // TODO: this should be a game profile level option - some games exhibit 'double entry' of input when this is called
             WinAPI.SetKeyboardState(this.pressedKeys);
-
+            /* REMOVED: key state becomes invalid for at least one game with this implemented - need to put it into an option if it needs to be re-added - was never noticed because for a while LeftMenu was not being translated into 'Menu' and this code was not executing
             if (this.pressedKeys[(int)WinAPI.VK.Menu] == 0x80 || keyboardInput.VK == WinAPI.VK.Menu)
             {
                 switch (wm)
@@ -366,7 +366,7 @@ namespace Mubox.Control.Input
                         break;
                 }
             }
-            
+            */
             WinAPI.Windows.SendMessage(ClientWindowHandle, wm, new UIntPtr(wParam), new UIntPtr(lParam));
 
             // if keydown, translate message
