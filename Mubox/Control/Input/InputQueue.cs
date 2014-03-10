@@ -308,7 +308,7 @@ namespace Mubox.Control.Input
                     {
                         VK = WinAPI.VK.Control,
                         Flags = (WinAPI.WindowHook.LLKHF)0,
-                        Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.LeftControl, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
+                        Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.Control, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
@@ -319,7 +319,7 @@ namespace Mubox.Control.Input
                     {
                         VK = WinAPI.VK.Menu,
                         Flags = (WinAPI.WindowHook.LLKHF)0,
-                        Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.LeftMenu, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
+                        Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.Menu, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
@@ -331,7 +331,7 @@ namespace Mubox.Control.Input
                     {
                         VK = WinAPI.VK.Shift,
                         Flags = (WinAPI.WindowHook.LLKHF)0,
-                        Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.LeftShift, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
+                        Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.Shift, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
@@ -342,7 +342,7 @@ namespace Mubox.Control.Input
             // TODO: this should be a game profile level option - some games exhibit 'double entry' of input when this is called
             WinAPI.SetKeyboardState(this.pressedKeys);
 
-            if (this.pressedKeys[(int)WinAPI.VK.Menu] == 0x80)
+            if (this.pressedKeys[(int)WinAPI.VK.Menu] == 0x80 || keyboardInput.VK == WinAPI.VK.Menu)
             {
                 switch (wm)
                 {
@@ -395,7 +395,7 @@ namespace Mubox.Control.Input
                     {
                         VK = WinAPI.VK.Control,
                         Flags = WinAPI.WindowHook.LLKHF.UP,
-                        Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.LeftControl, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
+                        Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.Control, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
@@ -406,7 +406,7 @@ namespace Mubox.Control.Input
                     {
                         VK = WinAPI.VK.Menu,
                         Flags = WinAPI.WindowHook.LLKHF.UP,
-                        Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.LeftMenu, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
+                        Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.Menu, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
@@ -417,7 +417,7 @@ namespace Mubox.Control.Input
                     {
                         VK = WinAPI.VK.Shift,
                         Flags = WinAPI.WindowHook.LLKHF.UP,
-                        Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.LeftShift, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
+                        Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(WinAPI.VK.Shift, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC),
                         Time = time,
                         CAS = (WinAPI.CAS)0,
                     });
