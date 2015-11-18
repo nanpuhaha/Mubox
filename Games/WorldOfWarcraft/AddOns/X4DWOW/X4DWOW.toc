@@ -1,0 +1,28 @@
+## Title: X4D|cfffff56c (2.0)
+## Version: 2.0
+## Author: Shaun Wilson <mrshaunwilson@msn.com>
+## Interface: 60200
+## SavedVariablesPerCharacter: X4DPersistence
+## Notes: Macros, Commands and Behaviors useful for multiboxers. Author: Shaun Wilson <mrshaunwilson@msn.com> 
+## X-Website: http://mubox.codeplex.com/
+## X-License: MS-RL
+
+packages\LibStub\LibStub.lua
+
+X4D.lua
+
+X4D_Convert.lua
+X4D_Colors.lua
+X4D_Log.lua
+X4D_DB.lua
+X4D_Async.lua
+
+X4D_Player.lua
+X4D_Macros.lua
+X4D_HUD.lua
+X4D_Group.lua
+X4D_Equipment.lua
+X4D_Inventory.lua
+X4D_PVP.lua
+
+X4D_OnLoad.lua
