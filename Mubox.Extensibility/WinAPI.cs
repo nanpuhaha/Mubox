@@ -5229,23 +5229,27 @@ namespace Mubox
             /// <summary>
             /// Method which attempts to 'fix' anything which prevents us from multi-launching and sandboxing a process.
             /// </summary>
-            public static void TryFixMultilaunch(WinAPI.SandboxApi.Sandbox sandbox, string applicationName)
+            public static void TryFixMultilaunch(Process process)
             {
-                // most windows programes rely on a named mutex to limit application runs to a single instance, here are a list of mutexes to release/close
-                CloseNamedMutexes(sandbox, new string[]
+                for (int i = 0; i < 10; i++)
                 {
-                    "AN-Mutex",
-                    "AN-Mutex-Window-Guild Wars 2",
-                    "AN-Mutex-Install-101",
-                    // TODO: move list to config
-                });
+                    if (CloseNamedMutexes(process, new string[]
+                    {
+                        "PoERun",
+                        "AN-Mutex",
+                        "AN-Mutex-Window-Guild Wars 2",
+                        "AN-Mutex-Install-101",
+                        // TODO: move list to config
+                    })) break;
+                    System.Threading.Thread.Sleep(100);
+                }
             }
 
-            public static bool CloseNamedMutexes(WinAPI.SandboxApi.Sandbox sandbox, string[] mutexNames)
+            public static bool CloseNamedMutexes(Process process, string[] mutexNames)
             {
                 var mutexWasClosed = false;
 
-                var processId = sandbox.Process.Id;
+                var processId = process.Id;
                 var result = Mubox.WinAPI.SandboxApi.GetSystemHandleInformation();
                 var entries = result
                     .Handles
@@ -5261,7 +5265,7 @@ namespace Mubox
                     var handle = new IntPtr(entry.HandleValue);
                     IntPtr hDupe;
                     var duped = DuplicateHandle(
-                        sandbox.Process.Handle,
+                        process.Handle,
                         handle,
                         currentProcessHandle,
                         out hDupe,
@@ -5302,7 +5306,7 @@ namespace Mubox
                                         {
                                             IntPtr hClose;
                                             var closed = DuplicateHandle(
-                                                sandbox.Process.Handle,
+                                                process.Handle,
                                                 handle,
                                                 currentProcessHandle,
                                                 out hClose,
@@ -5312,12 +5316,12 @@ namespace Mubox
                                             if (closed)
                                             {
                                                 CloseHandle(hClose);
-                                                ("Closed Remote Handle: pid=" + sandbox.Process.Id + " handle=" + handle.ToInt64().ToString("X") + " status=" + ntstatus + " type=" + entry.ObjectType + " name=" + typeName).Log();
+                                                ("Closed Remote Handle: pid=" + process.Id + " handle=" + handle.ToInt64().ToString("X") + " status=" + ntstatus + " type=" + entry.ObjectType + " name=" + typeName).Log();
                                                 mutexWasClosed = true;
                                             }
                                             else
                                             {
-                                                ("Failed to Closed Remote Handle: pid=" + sandbox.Process.Id + " handle=" + handle.ToInt64().ToString("X") + " status=" + ntstatus + " type=" + entry.ObjectType + " name=" + typeName).Log();
+                                                ("Failed to Closed Remote Handle: pid=" + process.Id + " handle=" + handle.ToInt64().ToString("X") + " status=" + ntstatus + " type=" + entry.ObjectType + " name=" + typeName).Log();
                                             }
                                         }
                                     }

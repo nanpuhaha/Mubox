@@ -408,6 +408,7 @@ namespace Mubox.Model
                         if (newProcessWindow)
                         {
                             ("NewGameProcess for " + this.Settings.Name).Log();
+                            WinAPI.SandboxApi.TryFixMultilaunch(gameProcess);
                             Settings.WindowHandle = newWindowHandle;
                             if (GameProcessFound != null)
                             {

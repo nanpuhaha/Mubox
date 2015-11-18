@@ -732,14 +732,6 @@ namespace Mubox.View.Client
                                 ApplicationLaunchPath,
                                 ClientState.Settings.ApplicationArguments,
                                 ApplicationLaunchPath.Replace(applicationExeName, ""));
-
-                            for (int i = 0; i < 10; i++)
-                            {
-                                WinAPI.SandboxApi.TryFixMultilaunch(
-                                    ClientState.Sandbox,
-                                    ApplicationLaunchPath);
-                                System.Threading.Thread.Sleep(100);
-                            }
                         }
                         this.Dispatcher.BeginInvoke((Action)delegate() { this.tabControl1.SelectedItem = tabProcessManagement; });
                         clientState_SetStatusText("Application Started.");
