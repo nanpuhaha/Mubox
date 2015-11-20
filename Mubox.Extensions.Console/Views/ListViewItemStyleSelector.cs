@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -35,19 +30,24 @@ namespace Mubox.Extensions.Console.Views
                         case "CRITICAL":
                             foregroundSetter.Value = Brushes.Red;
                             break;
+
                         case "ERROR":
                             foregroundSetter.Value = Brushes.Orange;
                             break;
+
                         case "WARNING":
                             foregroundSetter.Value = Brushes.Yellow;
                             break;
+
                         case "INFORMATION":
                         case "MUBOX":
                             foregroundSetter.Value = Brushes.CornflowerBlue;
                             break;
+
                         case "VERBOSE":
                             foregroundSetter.Value = Brushes.Gray;
                             break;
+
                         default:
                             foregroundSetter.Value = Brushes.GhostWhite;
                             break;

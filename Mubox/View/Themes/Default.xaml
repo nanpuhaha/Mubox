@@ -31,5 +31,4 @@
         <GradientStop Color="{DynamicResource MuboxPrimaryColor}" Offset="0.66" />
         <GradientStop Color="{DynamicResource MuboxHiliteColor}" Offset="1" />
     </LinearGradientBrush>
-
 </ResourceDictionary>

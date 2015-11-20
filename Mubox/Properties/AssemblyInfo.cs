@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Shaun Wilson")]
 [assembly: AssemblyProduct("Mubox")]
-[assembly: AssemblyCopyright("Copyright © Shaun Wilson 2009-2014")]
+[assembly: AssemblyCopyright("Copyright © Shaun Wilson 2008-2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

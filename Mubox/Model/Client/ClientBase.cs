@@ -1,9 +1,8 @@
-﻿using System;
+﻿using Mubox.Model.Input;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
-using Mubox.Model.Input;
 
 namespace Mubox.Model.Client
 {
@@ -21,12 +20,14 @@ namespace Mubox.Model.Client
 
         public Guid ClientId { get; set; }
 
-        #endregion
+        #endregion ClientId
+
         #region ProfileName
 
         public string ProfileName { get; set; }
 
-        #endregion
+        #endregion ProfileName
+
         #region Address
 
         /// <summary>
@@ -77,7 +78,8 @@ namespace Mubox.Model.Client
             }
         }
 
-        #endregion
+        #endregion Address
+
         #region IsAttached
 
         private bool _isAttached { get; set; }
@@ -103,12 +105,14 @@ namespace Mubox.Model.Client
 
         public event EventHandler<EventArgs> IsAttachedChanged;
 
-        #endregion
+        #endregion IsAttached
+
         #region LastActivatedTimestamp
 
         public long LastActivatedTimestamp { get; set; }
 
-        #endregion
+        #endregion LastActivatedTimestamp
+
         #region DisplayName
 
         /// <summary>
@@ -165,7 +169,8 @@ namespace Mubox.Model.Client
         {
         }
 
-        #endregion
+        #endregion DisplayName
+
         public static string Sanitize(string text)
         {
             byte[] textBytes = WinAPI.CodePage.ConvertToCodePage(text, 1251);
@@ -190,24 +195,28 @@ namespace Mubox.Model.Client
 
         public IntPtr WindowStationHandle { get; set; }
 
-        #endregion
+        #endregion WindowStationHandle
+
         #region WindowDesktopHandle
 
         public IntPtr WindowDesktopHandle { get; set; }
 
-        #endregion
+        #endregion WindowDesktopHandle
+
         #region WindowHandle
 
         public IntPtr WindowHandle { get; set; }
 
-        #endregion
+        #endregion WindowHandle
+
         #region CachedScreenFromClientRect
 
         public WinAPI.Windows.RECT CachedScreenFromClientRect { get; set; }
 
         public DateTime CachedScreenFromClientRectExpiry { get; set; }
 
-        #endregion
+        #endregion CachedScreenFromClientRect
+
         #region Latency
 
         /// <summary>
@@ -227,7 +236,7 @@ namespace Mubox.Model.Client
             set { SetValue(LatencyProperty, value); }
         }
 
-        #endregion
+        #endregion Latency
 
         #region PerformanceInfo
 
@@ -248,7 +257,7 @@ namespace Mubox.Model.Client
             set { SetValue(PerformanceInfoProperty, value); }
         }
 
-        #endregion
+        #endregion PerformanceInfo
 
         public bool FixAltKey { get; set; }
 

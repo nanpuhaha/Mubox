@@ -23,7 +23,7 @@ namespace Mubox.Model.Client
             set { SetValue(MainWindowTitleProperty, value); }
         }
 
-        #endregion
+        #endregion MainWindowTitle
 
         #region ProcessId
 
@@ -44,7 +44,7 @@ namespace Mubox.Model.Client
             set { SetValue(ProcessIdProperty, value); }
         }
 
-        #endregion
+        #endregion ProcessId
 
         #region ProcessName
 
@@ -65,7 +65,7 @@ namespace Mubox.Model.Client
             set { SetValue(ProcessNameProperty, value); }
         }
 
-        #endregion
+        #endregion ProcessName
 
         #region IsWindowResponding
 
@@ -86,7 +86,7 @@ namespace Mubox.Model.Client
             set { SetValue(IsWindowRespondingProperty, value); }
         }
 
-        #endregion
+        #endregion IsWindowResponding
 
         #region WorkingSet
 
@@ -107,7 +107,7 @@ namespace Mubox.Model.Client
             set { SetValue(WorkingSetProperty, value); }
         }
 
-        #endregion
+        #endregion WorkingSet
 
         #region PeakWorkingSet
 
@@ -128,7 +128,7 @@ namespace Mubox.Model.Client
             set { SetValue(PeakWorkingSetProperty, value); }
         }
 
-        #endregion
+        #endregion PeakWorkingSet
 
         #region VirtualMemorySize
 
@@ -149,7 +149,7 @@ namespace Mubox.Model.Client
             set { SetValue(VirtualMemorySizeProperty, value); }
         }
 
-        #endregion
+        #endregion VirtualMemorySize
 
         #region PeakVirtualMemorySize
 
@@ -170,7 +170,7 @@ namespace Mubox.Model.Client
             set { SetValue(PeakVirtualMemorySizeProperty, value); }
         }
 
-        #endregion
+        #endregion PeakVirtualMemorySize
 
         #region NetworkSendTime
 
@@ -191,6 +191,6 @@ namespace Mubox.Model.Client
             set { SetValue(NetworkSendTimeProperty, value); }
         }
 
-        #endregion
+        #endregion NetworkSendTime
     }
 }

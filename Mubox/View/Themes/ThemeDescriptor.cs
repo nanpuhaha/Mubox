@@ -23,7 +23,7 @@ namespace Mubox.View.Themes
             set { SetValue(NameProperty, value); }
         }
 
-        #endregion
+        #endregion Name
 
         #region Resources
 
@@ -44,6 +44,6 @@ namespace Mubox.View.Themes
             set { SetValue(ResourcesProperty, value); }
         }
 
-        #endregion
+        #endregion Resources
     }
 }

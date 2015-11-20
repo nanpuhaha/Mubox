@@ -1,21 +1,17 @@
 ﻿using Mubox.Extensibility;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mubox.Extensions.AntiAfk
 {
     public class AntiAfkExtension
         : MarshalByRefObject, IExtension
     {
-        IMubox _mubox;
+        private IMubox _mubox;
 
-        Thread _thread;
+        private Thread _thread;
 
-        bool _exitYet;
+        private bool _exitYet;
 
         private ProxyEventHandler<ClientEventArgs> _onActiveClientChanged;
         private ProxyEventHandler<Extensibility.Input.KeyboardEventArgs> _onKeyboardInputReceived;
@@ -66,7 +62,7 @@ namespace Mubox.Extensions.AntiAfk
             _mubox.ActiveClientChanged -= _onActiveClientChanged.Proxy;
             _mubox.Keyboard.InputReceived -= _onKeyboardInputReceived.Proxy;
             _mubox.Mouse.InputReceived -= _onMouseInputReceived.Proxy;
-            
+
             _exitYet = true;
 
             if (!_thread.Join(2500)) // 2.5 seconds
@@ -79,7 +75,7 @@ namespace Mubox.Extensions.AntiAfk
 
         public void Keyboard_InputReceived(object sender, Extensibility.Input.KeyboardEventArgs e)
         {
-             _lastInputTimestamp = DateTime.UtcNow.Ticks;
+            _lastInputTimestamp = DateTime.UtcNow.Ticks;
         }
 
         public void Mouse_InputReceived(object sender, Extensibility.Input.MouseEventArgs e)
@@ -111,8 +107,9 @@ namespace Mubox.Extensions.AntiAfk
                 WinAPI.VK.E,
                 WinAPI.VK.Q,
             };
+
         private static int _antiAfkKeyRotationCurrent = 0;
-        
+
         private void AntiAFkExtensionAppThread(object obj)
         {
             Thread.CurrentThread.SetApartmentState(ApartmentState.STA);
@@ -130,7 +127,7 @@ namespace Mubox.Extensions.AntiAfk
                     if (_lastInputTimestamp < DateTime.UtcNow.AddSeconds(-2 * (waitTimeSeconds / 3.0)).Ticks)
                     {
                         ConsoleWrite("AntiAfk", "Keeping you there.");
-                        foreach (var client in _mubox.Clients) 
+                        foreach (var client in _mubox.Clients)
                         {
                             client.KeyPress(key);
                         }

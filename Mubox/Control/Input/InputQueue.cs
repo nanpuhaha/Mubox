@@ -1,13 +1,8 @@
-﻿using Mubox.Control.Network;
-using Mubox.Model.Input;
+﻿using Mubox.Model.Input;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mubox.Control.Input
 {
@@ -25,6 +20,7 @@ namespace Mubox.Control.Input
 
         // used to 'denormalize' mouseinput coordinates into clientrelative coordinates
         private WinAPI.Windows.RECT _clientWindowRect;
+
         private long _clientWindowRectExpiry = 0L;
 
         public WinAPI.Windows.RECT ClientWindowRect
@@ -349,6 +345,7 @@ namespace Mubox.Control.Input
                     case WinAPI.WM.KEYDOWN:
                         wm = WinAPI.WM.SYSKEYDOWN;
                         break;
+
                     case WinAPI.WM.KEYUP:
                         wm = WinAPI.WM.SYSKEYUP;
                         break;
@@ -361,6 +358,7 @@ namespace Mubox.Control.Input
                     case WinAPI.WM.SYSKEYDOWN:
                         wm = WinAPI.WM.KEYDOWN;
                         break;
+
                     case WinAPI.WM.SYSKEYUP:
                         wm = WinAPI.WM.KEYUP;
                         break;
@@ -464,7 +462,6 @@ namespace Mubox.Control.Input
             return result;
         }
 
-        #endregion client-side 'IsRepeatKey' behavior
-
+        #endregion client-side 'IsRepeatKey' AND 'GetAsyncKeyState' behavior
     }
 }

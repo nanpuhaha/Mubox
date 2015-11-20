@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace InputDebugTool
@@ -20,7 +10,7 @@ namespace InputDebugTool
     /// </summary>
     public partial class MainWindow : Window
     {
-        Mubox.Configuration.KeySettingCollection keysettings;
+        private Mubox.Configuration.KeySettingCollection keysettings;
 
         private void Window_KeyUpDown(object sender, KeyEventArgs e)
         {
@@ -61,15 +51,19 @@ namespace InputDebugTool
                 case MouseButton.Left:
                     ellipse = lmb;
                     break;
+
                 case MouseButton.Middle:
                     ellipse = mmb;
                     break;
+
                 case MouseButton.Right:
                     ellipse = rmb;
                     break;
+
                 case MouseButton.XButton1:
                     ellipse = xb1;
                     break;
+
                 case MouseButton.XButton2:
                     ellipse = xb2;
                     break;
@@ -79,6 +73,7 @@ namespace InputDebugTool
                 case MouseButtonState.Pressed:
                     ellipse.SetValue(UIElement.VisibilityProperty, Visibility.Visible);
                     break;
+
                 case MouseButtonState.Released:
                     ellipse.SetValue(UIElement.VisibilityProperty, Visibility.Hidden);
                     break;

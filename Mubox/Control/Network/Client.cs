@@ -1,8 +1,6 @@
-﻿using Mubox.Configuration;
-using Mubox.Control.Input;
+﻿using Mubox.Control.Input;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Sockets;
 using System.Text;
@@ -34,27 +32,27 @@ namespace Mubox.Control.Network
                 {
                     //lock (_tiqLock)
                     //{
-                        _windowHandle = value;
-                        if (_windowHandle == IntPtr.Zero)
+                    _windowHandle = value;
+                    if (_windowHandle == IntPtr.Zero)
+                    {
+                        WindowInputQueue = IntPtr.Zero;
+                        InputManager.Detach();
+                        return;
+                    }
+                    else
+                    {
+                        var windowProcessId = IntPtr.Zero;
+                        WindowInputQueue = WinAPI.Threads.GetWindowThreadProcessId(_windowHandle, out windowProcessId);
+                        if (WindowInputQueue == IntPtr.Zero)
                         {
-                            WindowInputQueue = IntPtr.Zero;
-                            InputManager.Detach();
-                            return;
+                            var err = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
+                            ("GWTPID Failed for set_WindowHandle(" + _windowHandle + ") err=0x" + err.ToString("X")).Log();
                         }
                         else
                         {
-                            var windowProcessId = IntPtr.Zero;
-                            WindowInputQueue = WinAPI.Threads.GetWindowThreadProcessId(_windowHandle, out windowProcessId);
-                            if (WindowInputQueue == IntPtr.Zero)
-                            {
-                                var err = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
-                                ("GWTPID Failed for set_WindowHandle(" + _windowHandle + ") err=0x" + err.ToString("X")).Log();
-                            }
-                            else
-                            {
-                                InputManager.Attach(WindowInputQueue, _windowHandle);
-                            }
+                            InputManager.Attach(WindowInputQueue, _windowHandle);
                         }
+                    }
                     //}
                 }
             }
@@ -338,7 +336,6 @@ namespace Mubox.Control.Network
 
                 if (!useTIQ)
                 {
-
                     // dispatch
                     MouseActionViaSendMessage((int)mouseInput.Point.X, (int)mouseInput.Point.Y, lPointX, lPointY, wm, mouseInput.MouseData, isButtonUpEvent);
                 }
@@ -350,43 +347,43 @@ namespace Mubox.Control.Network
         {
             //lock (_tiqLock)
             //{
-                keyboardInput.Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(keyboardInput.VK, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC);
-                InputManager.Enqueue(keyboardInput);
+            keyboardInput.Scan = (uint)WinAPI.SendInputApi.MapVirtualKey(keyboardInput.VK, WinAPI.SendInputApi.MAPVK.MAPVK_VK_TO_VSC);
+            InputManager.Enqueue(keyboardInput);
 
-                /* superceded by new 'KeyboardInputAdapter' (above)
-                IntPtr windowHandle = WindowHandle;
+            /* superceded by new 'KeyboardInputAdapter' (above)
+            IntPtr windowHandle = WindowHandle;
 
-                // no target window
-                if (windowHandle == IntPtr.Zero)
-                {
-                    ("NoWindowHandle Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName).Log();
-                    WinAPI.SendInputApi.SendInputViaKBParams(keyboardInput.Flags, keyboardInput.Time, keyboardInput.Scan, keyboardInput.VK, keyboardInput.CAS);
-                    return;
-                }
+            // no target window
+            if (windowHandle == IntPtr.Zero)
+            {
+                ("NoWindowHandle Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName).Log();
+                WinAPI.SendInputApi.SendInputViaKBParams(keyboardInput.Flags, keyboardInput.Time, keyboardInput.Scan, keyboardInput.VK, keyboardInput.CAS);
+                return;
+            }
 
-                // no TIQ available
-                IntPtr windowInputQueue = WindowInputQueue;
-                if (windowInputQueue == IntPtr.Zero)
-                {
-                    ("NoWindowInputQueue Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName).Log();
-                    WinAPI.SendInputApi.SendInputViaKBParams(keyboardInput.Flags, keyboardInput.Time, keyboardInput.Scan, keyboardInput.VK, keyboardInput.CAS);
-                    return;
-                }
+            // no TIQ available
+            IntPtr windowInputQueue = WindowInputQueue;
+            if (windowInputQueue == IntPtr.Zero)
+            {
+                ("NoWindowInputQueue Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName).Log();
+                WinAPI.SendInputApi.SendInputViaKBParams(keyboardInput.Flags, keyboardInput.Time, keyboardInput.Scan, keyboardInput.VK, keyboardInput.CAS);
+                return;
+            }
 
-                // resolve TIQ
-                IntPtr foregroundWindowHandle;
-                IntPtr foregroundInputQueue;
-                if (!TryResolveTIQ(out foregroundInputQueue, out foregroundWindowHandle, DateTime.Now.AddMilliseconds(300).Ticks))
-                {
-                    ("TryResolveTIQ Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName).Log();
-                    WinAPI.SendInputApi.SendInputViaKBParams(keyboardInput.Flags, keyboardInput.Time, keyboardInput.Scan, keyboardInput.VK, keyboardInput.CAS);
-                    return;
-                }
+            // resolve TIQ
+            IntPtr foregroundWindowHandle;
+            IntPtr foregroundInputQueue;
+            if (!TryResolveTIQ(out foregroundInputQueue, out foregroundWindowHandle, DateTime.Now.AddMilliseconds(300).Ticks))
+            {
+                ("TryResolveTIQ Failed OnKeyboardInputReceived, using SendInput for " + this.DisplayName).Log();
+                WinAPI.SendInputApi.SendInputViaKBParams(keyboardInput.Flags, keyboardInput.Time, keyboardInput.Scan, keyboardInput.VK, keyboardInput.CAS);
+                return;
+            }
 
-                // use TIQ
-                Action action = () => OnKeyboardEventViaTIQ(keyboardInput.VK, keyboardInput.Flags, keyboardInput.Scan, keyboardInput.Time, keyboardInput.CAS);
-                ActionViaTIQ(action, foregroundInputQueue, "OnKeyboardInputReceived");
-                 */
+            // use TIQ
+            Action action = () => OnKeyboardEventViaTIQ(keyboardInput.VK, keyboardInput.Flags, keyboardInput.Scan, keyboardInput.Time, keyboardInput.CAS);
+            ActionViaTIQ(action, foregroundInputQueue, "OnKeyboardInputReceived");
+             */
             //}
         }
 
@@ -533,7 +530,6 @@ namespace Mubox.Control.Network
         }
          */
 
-
         /* superceded by InputManager
         private void OnKeyboardEventViaTIQ(uint vk, WinAPI.WindowHook.LLKHF flags, uint scan, uint time, WinAPI.CAS cas)
         {
@@ -620,7 +616,7 @@ namespace Mubox.Control.Network
 
         private static object OnMouseEventLock = new object();
 
-        // NOTE: the following is reference implementation from 2009, which used to be called as a 'VIQ' actionnew UIntPtr(
+        // NOTE: the following is reference implementation from 2009, which used to be called as a 'VIQ' action new UIntPtr(
         /* superceded by InputManager
         private void MouseActionViaPostMessage(int pointX, int pointY, int lPointX, int lPointY, WinAPI.WM wm, uint mouseData, bool isButtonUpEvent)
         {
@@ -648,7 +644,6 @@ namespace Mubox.Control.Network
             }
         }
          */
-
 
         private void OnActivateClient()
         {
@@ -690,17 +685,17 @@ namespace Mubox.Control.Network
                     // use TIQ
                     //Action action = () =>
                     //{
-                        try
-                        {
-                            WinAPI.Windows.SetForegroundWindow(_windowHandle);
-                            WinAPI.Windows.SetWindowPos(_windowHandle, WinAPI.Windows.Position.HWND_TOP, -1, -1, -1, -1, WinAPI.Windows.Options.SWP_NOSIZE | WinAPI.Windows.Options.SWP_NOMOVE | WinAPI.Windows.Options.SWP_SHOWWINDOW);
-                            System.Threading.Thread.Sleep(1);
-                            WinAPI.Windows.SetForegroundWindow(_windowHandle);
-                        }
-                        catch (Exception ex)
-                        {
-                            ex.Log();
-                        }
+                    try
+                    {
+                        WinAPI.Windows.SetForegroundWindow(_windowHandle);
+                        WinAPI.Windows.SetWindowPos(_windowHandle, WinAPI.Windows.Position.HWND_TOP, -1, -1, -1, -1, WinAPI.Windows.Options.SWP_NOSIZE | WinAPI.Windows.Options.SWP_NOMOVE | WinAPI.Windows.Options.SWP_SHOWWINDOW);
+                        System.Threading.Thread.Sleep(1);
+                        WinAPI.Windows.SetForegroundWindow(_windowHandle);
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.Log();
+                    }
                     //};
                     //ActionViaTIQ(action, foregroundInputQueue, "OnActivateClient");
                 } while ((DateTime.Now.Ticks < activationExpiryTime) && (_windowHandle != WinAPI.Windows.GetForegroundWindow()));
@@ -737,27 +732,27 @@ namespace Mubox.Control.Network
                 //}
 
                 // resolve TIQ
-                    /* not necessary?
-                IntPtr foregroundWindowHandle;
-                IntPtr foregroundInputQueue;
-                if (!TryResolveTIQ(out foregroundInputQueue, out foregroundWindowHandle, activationExpiryTime))
-                {
-                    ("TryResolveTIQ Failed OnDeactivateClient for " + this.DisplayName).Log();
-                    return;
-                }
-                     */
+                /* not necessary?
+            IntPtr foregroundWindowHandle;
+            IntPtr foregroundInputQueue;
+            if (!TryResolveTIQ(out foregroundInputQueue, out foregroundWindowHandle, activationExpiryTime))
+            {
+                ("TryResolveTIQ Failed OnDeactivateClient for " + this.DisplayName).Log();
+                return;
+            }
+                 */
 
                 // use TIQ
                 //Action action = () =>
                 //{
-                    try
-                    {
-                        WinAPI.Windows.SetWindowPos(_windowHandle, WinAPI.Windows.Position.HWND_TOP, -1, -1, -1, -1, WinAPI.Windows.Options.SWP_NOSIZE | WinAPI.Windows.Options.SWP_NOMOVE | WinAPI.Windows.Options.SWP_NOACTIVATE);
-                    }
-                    catch (Exception ex)
-                    {
-                        ex.Log();
-                    }
+                try
+                {
+                    WinAPI.Windows.SetWindowPos(_windowHandle, WinAPI.Windows.Position.HWND_TOP, -1, -1, -1, -1, WinAPI.Windows.Options.SWP_NOSIZE | WinAPI.Windows.Options.SWP_NOMOVE | WinAPI.Windows.Options.SWP_NOACTIVATE);
+                }
+                catch (Exception ex)
+                {
+                    ex.Log();
+                }
                 //};
                 //ActionViaTIQ(action, foregroundInputQueue, "OnDeactivateClient");
             }

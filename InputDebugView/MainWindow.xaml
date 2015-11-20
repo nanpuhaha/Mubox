@@ -5,14 +5,14 @@
         Title="Mubox Input Debug Tool" Height="480" Width="640" MouseMove="Window_MouseMove" MouseDown="Window_MouseUpDown" MouseUp="Window_MouseUpDown"
     KeyDown="Window_KeyUpDown" KeyUp="Window_KeyUpDown">
     <Grid>
-        <Controls:VKBoard x:Name="keys" Canvas.Left="218" Canvas.Top="257"/>
+        <Controls:VKBoard x:Name="keys" Canvas.Left="218" Canvas.Top="257" />
         <Canvas x:Name="canvas" HorizontalAlignment="Left" Margin="0,0,0,0" Width="Auto" Height="Auto" Background="Transparent">
-            <Ellipse x:Name="mouse" Fill="SteelBlue" Height="32" Canvas.Left="-48" Stroke="Black" Canvas.Top="0" Width="32"/>
-            <Ellipse x:Name="lmb" Fill="Red" Height="32" Canvas.Left="16" Stroke="Black" Canvas.Top="16" Width="32" Visibility="Hidden"/>
-            <Ellipse x:Name="mmb" Fill="Green" Height="32" Canvas.Left="16" Stroke="Black" Canvas.Top="48" Width="32" Visibility="Hidden"/>
-            <Ellipse x:Name="rmb" Fill="Blue" Height="32" Canvas.Left="16" Stroke="Black" Canvas.Top="80" Width="32" Visibility="Hidden"/>
-            <Ellipse x:Name="xb1" Fill="Orange" Height="32" Canvas.Left="16" Stroke="Black" Canvas.Top="112" Width="32" Visibility="Hidden"/>
-            <Ellipse x:Name="xb2" Fill="Purple" Height="32" Canvas.Left="16" Stroke="Black" Canvas.Top="144" Width="32" Visibility="Hidden"/>
+            <Ellipse x:Name="mouse" Fill="SteelBlue" Height="32" Canvas.Left="-48" Stroke="Black" Canvas.Top="0" Width="32" />
+            <Ellipse x:Name="lmb" Fill="Red" Height="32" Canvas.Left="16" Stroke="Black" Canvas.Top="16" Width="32" Visibility="Hidden" />
+            <Ellipse x:Name="mmb" Fill="Green" Height="32" Canvas.Left="16" Stroke="Black" Canvas.Top="48" Width="32" Visibility="Hidden" />
+            <Ellipse x:Name="rmb" Fill="Blue" Height="32" Canvas.Left="16" Stroke="Black" Canvas.Top="80" Width="32" Visibility="Hidden" />
+            <Ellipse x:Name="xb1" Fill="Orange" Height="32" Canvas.Left="16" Stroke="Black" Canvas.Top="112" Width="32" Visibility="Hidden" />
+            <Ellipse x:Name="xb2" Fill="Purple" Height="32" Canvas.Left="16" Stroke="Black" Canvas.Top="144" Width="32" Visibility="Hidden" />
         </Canvas>
     </Grid>
 </Window>

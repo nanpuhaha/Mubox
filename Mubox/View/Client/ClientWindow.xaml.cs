@@ -34,14 +34,14 @@ namespace Mubox.View.Client
             }
         }
 
-        System.Windows.Threading.DispatcherTimer timerStatusRefresh;
+        private System.Windows.Threading.DispatcherTimer timerStatusRefresh;
 
         public long AutoReconnectLastAttempt { get; set; }
 
         public int AutoReconnectDelay = 9;
         public string ApplicationLaunchPath { get; set; }
 
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors", Justification="expected call to OnPropertyChanged via set_ClientState, it is dispatched and occurs after construction (not during)")]
+        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors", Justification = "expected call to OnPropertyChanged via set_ClientState, it is dispatched and occurs after construction (not during)")]
         public ClientWindow(Mubox.Model.ClientState clientState)
         {
             Mubox.View.Client.ClientWindowCollection.Instance.Add(this);
@@ -294,6 +294,7 @@ namespace Mubox.View.Client
         }
 
         private string clientState_lastStatus = "Not Connected";
+
         private void clientState_SetStatusText(string status)
         {
             bool changed = clientState_lastStatus != status;
@@ -713,7 +714,7 @@ namespace Mubox.View.Client
                         this.ClientState.GameProcess = process;
                         */
 
-                        #endregion
+                        #endregion pre-sandbox launch code
 
                         // new 'sandboxed' process launches
                         if (ClientState.Sandbox == null)
@@ -870,7 +871,7 @@ namespace Mubox.View.Client
             textWindowSizeHeight.Visibility = Visibility.Collapsed;
         }
 
-        #endregion
+        #endregion Migrated App Members
 
         private void textWorkingSetMB_TextChanged(object sender, TextChangedEventArgs e)
         {

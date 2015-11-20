@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -29,6 +28,7 @@ namespace Mubox.View.Server
 
         private static MulticastConfigDialog staticDialogInstance = null;
         private static readonly object staticDialogInstanceLock = new object();
+
         public static void ShowStaticDialog()
         {
             lock (staticDialogInstanceLock)

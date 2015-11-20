@@ -17,7 +17,7 @@
         <TextBox IsEnabled="False" Margin="115,12,11,0" Name="textMachineName" TextChanged="textMachineName_TextChanged" TabIndex="8" Height="23" VerticalAlignment="Top" ToolTip="This will be the name of the Client in the Server UI.">DEFAULT</TextBox>
         <TabControl Name="tabControl1" Margin="12,41,12,73">
             <TabItem Header="Server Connection" Name="tabServerConnection">
-                <Grid >
+                <Grid>
                     <Button HorizontalAlignment="Right" Margin="0,138,77,0" Name="buttonConnect" Width="75" Click="buttonConnect_Click" Content="Connect" IsDefault="True" TabIndex="5" Height="23.08" VerticalAlignment="Top" />
                     <TextBox Margin="167,99,77,0" Name="textPortNumber" Text="" TextChanged="textPortNumber_TextChanged" TabIndex="4" Height="23.08" VerticalAlignment="Top" />
                     <Label  Margin="69,99,0,0" Name="label2" Content="Port Number" TabIndex="3" HorizontalAlignment="Left" Width="92" Height="23.08" VerticalAlignment="Top" />
@@ -26,7 +26,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Game Settings" Name="tabGameSettings">
-                <Grid >
+                <Grid>
                     <Label  Height="24" HorizontalAlignment="Left" Margin="34,59,0,0" Name="label6" TabIndex="7" VerticalAlignment="Top" Width="92">Game EXE</Label>
                     <TextBox Height="23" Margin="132,61,27,0" Name="textApplicationPath" TabIndex="8" ToolTip="Path to EXE" VerticalAlignment="Top" TextChanged="textApplicationPath_TextChanged">D:\Games\Guild Wars 2\gw2.exe</TextBox>
                     <CheckBox  Margin="132,0,112,92" Name="checkIsolateApplication" Checked="checkIsolateApplication_Checked" Unchecked="checkIsolateApplication_Unchecked" Height="16" VerticalAlignment="Bottom">Game Isolation (e.g. SymLinks)</CheckBox>
@@ -55,7 +55,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Process Management" Name="tabProcessManagement">
-                <Grid >
+                <Grid>
                     <TextBox Height="23" Margin="199,74,179,0" Name="textWorkingSetMB" TabIndex="8" ToolTip="Max (and Reserved) Memory for Game, do not set this too low. 348 to 640 is usually a good value depending on your target Zone and loaded Add-Ons." VerticalAlignment="Top" TextChanged="textWorkingSetMB_TextChanged">0</TextBox>
                     <Label  Height="24" HorizontalAlignment="Left" Margin="80,72,0,0" Name="label8" TabIndex="7" VerticalAlignment="Top" Width="113">Memory Limit (MB)</Label>
                     <Label  HorizontalAlignment="Left" Margin="80,101,0,0" Name="label10" TabIndex="7" Width="113" Height="33.08" VerticalAlignment="Top">Processor Affinity</Label>
@@ -64,7 +64,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Game Window" Name="tabWindowSettings">
-                <Grid >
+                <Grid>
                     <CheckBox  Height="16" Margin="78,51,111,0" Name="checkRememberWindowPosition" VerticalAlignment="Top" Checked="checkRememberWindowPosition_Checked" Unchecked="checkRememberWindowPosition_Unchecked">Remember Window Size &amp; Position</CheckBox>
                     <CheckBox  Height="16" Margin="78,149.08,121,0" Name="checkRemoveWindowBorder" VerticalAlignment="Top" Checked="checkRemoveWindowBorder_Checked" Unchecked="checkRemoveWindowBorder_Unchecked">Remove Window Border</CheckBox>
                     <TextBox Height="23" Margin="176,83,202,0" Name="textWindowPositionLeft" TabIndex="8" ToolTip="Max (and Reserved) Memory for Game, do not set this too low. 348 to 640 is usually a good value depending on your target Zone and loaded Add-Ons." VerticalAlignment="Top">0</TextBox>

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Windows;
 using System.Linq;
+using System.Windows;
 
 namespace Mubox.Model
 {
@@ -183,9 +183,10 @@ namespace Mubox.Model
 
         private System.Timers.Timer Timer { get; set; }
 
-        #endregion
+        #endregion State Monitor
 
         private Mubox.Control.Network.Client _networkClient;
+
         public Mubox.Control.Network.Client NetworkClient
         {
             get { return _networkClient; }
@@ -643,6 +644,6 @@ namespace Mubox.Model
             }
         }
 
-        #endregion
+        #endregion IDisposable Members
     }
 }

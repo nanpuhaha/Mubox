@@ -2,11 +2,7 @@
 using Mubox.Extensions.Console.ViewModels;
 using Mubox.Extensions.Console.Views;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -19,15 +15,15 @@ namespace Mubox.Extensions.Console
     public class ConsoleExtension
         : MarshalByRefObject, IExtension, IConsoleService
     {
-        IMubox _mubox;
+        private IMubox _mubox;
 
-        ConsoleViewModel _viewModel;
-        ConsoleView _view;
-        Window _presenter;
-        Application _application;
-        Thread _thread;
-        Dispatcher _dispatcher;
-        bool _exitYet;
+        private ConsoleViewModel _viewModel;
+        private ConsoleView _view;
+        private Window _presenter;
+        private Application _application;
+        private Thread _thread;
+        private Dispatcher _dispatcher;
+        private bool _exitYet;
 
         private ProxyEventHandler<ClientEventArgs> _onActiveClientChanged;
         private ProxyEventHandler<Extensibility.Input.KeyboardEventArgs> _onKeyboardInputReceived;
@@ -63,7 +59,7 @@ namespace Mubox.Extensions.Console
             _mubox.ActiveClientChanged -= _onActiveClientChanged.Proxy;
             _mubox.Keyboard.InputReceived -= _onKeyboardInputReceived.Proxy;
             _mubox.Mouse.InputReceived -= _onMouseInputReceived.Proxy;
-            
+
             _exitYet = true;
             _presenter.Close();
             if (!_thread.Join(2500)) // 2.5 seconds
@@ -145,7 +141,7 @@ namespace Mubox.Extensions.Console
             }
         }
 
-        void OnWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void OnWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             // prevent closing unless OnUnload() has been called
             e.Cancel = !_exitYet;

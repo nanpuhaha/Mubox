@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Mubox.Extensions.Console.ViewModels
 {
@@ -10,6 +7,7 @@ namespace Mubox.Extensions.Console.ViewModels
         public DateTime Timestamp { get; set; }
         public string Category { get; set; }
         public string Text { get; set; }
+
         public override string ToString()
         {
             return string.Format("[{0}] {1}: {2}",

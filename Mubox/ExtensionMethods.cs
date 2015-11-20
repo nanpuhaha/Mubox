@@ -88,5 +88,5 @@ namespace Mubox
         }
     }
 
-    #endregion
+    #endregion INotifyPropertyChanged
 }

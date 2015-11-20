@@ -60,7 +60,7 @@ namespace Mubox.Configuration
 
         #region SandboxKey
 
-        [ConfigurationProperty("SandboxKey", IsRequired = false, DefaultValue="")]
+        [ConfigurationProperty("SandboxKey", IsRequired = false, DefaultValue = "")]
         public string SandboxKey
         {
             get
@@ -80,7 +80,7 @@ namespace Mubox.Configuration
                         buf,
                         new string[] {
                         Name,
-                        Environment.MachineName, 
+                        Environment.MachineName,
                         Environment.UserName,
                     });
                     return Encoding.UTF8.GetString(plain);
@@ -93,7 +93,7 @@ namespace Mubox.Configuration
                     buf,
                     new string[] {
                         Name,
-                        Environment.MachineName, 
+                        Environment.MachineName,
                         Environment.UserName,
                     });
                 var registryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software", true).CreateSubKey("Mubox").CreateSubKey(Name);
@@ -102,7 +102,8 @@ namespace Mubox.Configuration
             }
         }
 
-        #endregion
+        #endregion SandboxKey
+
         #region PerformConnectOnLoad
 
         [ConfigurationProperty("PerformConnectOnLoad", IsRequired = false, DefaultValue = false)]
@@ -112,7 +113,8 @@ namespace Mubox.Configuration
             set { if (!PerformConnectOnLoad.Equals(value)) { base["PerformConnectOnLoad"] = value; this.OnPropertyChanged(o => o.PerformConnectOnLoad); } }
         }
 
-        #endregion
+        #endregion PerformConnectOnLoad
+
         #region ApplicationPath
 
         [ConfigurationProperty("ApplicationPath", IsRequired = false, DefaultValue = @"C:\WoW\wow.exe")]
@@ -122,7 +124,8 @@ namespace Mubox.Configuration
             set { if (!ApplicationPath.Equals(value, StringComparison.InvariantCultureIgnoreCase)) { base["ApplicationPath"] = value; this.OnPropertyChanged(o => o.ApplicationPath); } }
         }
 
-        #endregion
+        #endregion ApplicationPath
+
         #region ApplicationArguments
 
         [ConfigurationProperty("ApplicationArguments", IsRequired = false, DefaultValue = "")]
@@ -132,7 +135,8 @@ namespace Mubox.Configuration
             set { if (!ApplicationArguments.Equals(value, StringComparison.InvariantCultureIgnoreCase)) { base["ApplicationArguments"] = value; this.OnPropertyChanged(o => o.ApplicationArguments); } }
         }
 
-        #endregion
+        #endregion ApplicationArguments
+
         #region IsolationPath
 
         [ConfigurationProperty("IsolationPath", IsRequired = false, DefaultValue = @"C:\MUBOX\")]
@@ -142,7 +146,8 @@ namespace Mubox.Configuration
             set { if (!IsolationPath.Equals(value, StringComparison.InvariantCultureIgnoreCase)) { base["IsolationPath"] = value; this.OnPropertyChanged(o => o.IsolationPath); } }
         }
 
-        #endregion
+        #endregion IsolationPath
+
         #region ProcessorAffinity
 
         [ConfigurationProperty("ProcessorAffinity", IsRequired = false)]
@@ -152,7 +157,8 @@ namespace Mubox.Configuration
             set { if (!ProcessorAffinity.Equals(value)) { base["ProcessorAffinity"] = value; this.OnPropertyChanged(o => o.ProcessorAffinity); } }
         }
 
-        #endregion
+        #endregion ProcessorAffinity
+
         #region RememberWindowPosition
 
         [ConfigurationProperty("RememberWindowPosition", IsRequired = false, DefaultValue = false)]
@@ -162,7 +168,8 @@ namespace Mubox.Configuration
             set { if (!RememberWindowPosition.Equals(value)) { base["RememberWindowPosition"] = value; this.OnPropertyChanged(o => o.RememberWindowPosition); } }
         }
 
-        #endregion
+        #endregion RememberWindowPosition
+
         #region WindowPosition
 
         [ConfigurationProperty("WindowPosition", IsRequired = false)]
@@ -172,7 +179,8 @@ namespace Mubox.Configuration
             set { if (!WindowPosition.Equals(value)) { base["WindowPosition"] = value; this.OnPropertyChanged(o => o.WindowPosition); } }
         }
 
-        #endregion
+        #endregion WindowPosition
+
         #region WindowSize
 
         [ConfigurationProperty("WindowSize", IsRequired = false)]
@@ -182,7 +190,8 @@ namespace Mubox.Configuration
             set { if (!WindowSize.Equals(value)) { base["WindowSize"] = value; this.OnPropertyChanged(o => o.WindowSize); } }
         }
 
-        #endregion
+        #endregion WindowSize
+
         #region RemoveWindowBorderEnabled
 
         [ConfigurationProperty("RemoveWindowBorderEnabled", IsRequired = false, DefaultValue = default(bool))]
@@ -192,7 +201,8 @@ namespace Mubox.Configuration
             set { if (!RemoveWindowBorderEnabled.Equals(value)) { base["RemoveWindowBorderEnabled"] = value; this.OnPropertyChanged(o => o.RemoveWindowBorderEnabled); } }
         }
 
-        #endregion
+        #endregion RemoveWindowBorderEnabled
+
         #region InstallWoWAddOn
 
         [ConfigurationProperty("InstallWoWAddOn", IsRequired = false, DefaultValue = default(bool))]
@@ -202,7 +212,8 @@ namespace Mubox.Configuration
             set { if (!InstallWoWAddOn.Equals(value)) { base["InstallWoWAddOn"] = value; this.OnPropertyChanged(o => o.InstallWoWAddOn); } }
         }
 
-        #endregion
+        #endregion InstallWoWAddOn
+
         #region WindowHandle
 
         [ConfigurationProperty("WindowHandle", IsRequired = false, DefaultValue = default(uint))]
@@ -224,8 +235,10 @@ namespace Mubox.Configuration
             }
         }
 
-        #endregion
+        #endregion WindowHandle
+
         /*
+
         #region XXX
 
         [ConfigurationProperty("XXX", IsRequired = false, DefaultValue = default(YYY))]
@@ -235,8 +248,10 @@ namespace Mubox.Configuration
             set { if (!XXX.Equals(value)) { base["XXX"] = value;this.OnPropertyChanged(o => o.XXX"); } }
         }
 
-        #endregion
+        #endregion XXX
+
          * */
+
         [ConfigurationProperty("Keys")]
         public KeySettingCollection Keys
         {

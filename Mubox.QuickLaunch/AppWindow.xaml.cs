@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Navigation;
 using System.Windows.Threading;
@@ -10,7 +9,7 @@ namespace Mubox.QuickLaunch
     /// <summary>
     /// Interaction logic for Window1.xaml
     /// </summary>
-    public partial class AppWindow 
+    public partial class AppWindow
         : Window, IDisposable
     {
         private DispatcherTimer TitleTimer { get; set; }

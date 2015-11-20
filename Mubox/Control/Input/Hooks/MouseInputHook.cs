@@ -1,7 +1,6 @@
-﻿using System;
-using System.Diagnostics;
+﻿using Mubox.Model.Input;
+using System;
 using System.Runtime.InteropServices;
-using Mubox.Model.Input;
 
 namespace Mubox.Control.Input.Hooks
 {

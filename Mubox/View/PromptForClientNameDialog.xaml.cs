@@ -33,7 +33,7 @@ namespace Mubox.View
             set { SetValue(ClientNameProperty, Mubox.Model.Client.ClientBase.Sanitize(value).ToUpper()); }
         }
 
-        #endregion
+        #endregion ClientName
 
         private void buttonOK_Click(object sender, RoutedEventArgs e)
         {

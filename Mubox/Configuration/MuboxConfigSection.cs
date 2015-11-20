@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Mubox.Model;
+using System;
 using System.ComponentModel;
 using System.Configuration;
-using System.Diagnostics;
-using Mubox.Model;
 
 namespace Mubox.Configuration
 {

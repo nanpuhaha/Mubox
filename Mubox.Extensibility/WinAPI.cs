@@ -5776,7 +5776,7 @@ namespace Mubox
                 All = (HeapList | Process | Thread | Module),
             }
 
-            [StructLayout(LayoutKind.Sequential, Pack=8)]
+            [StructLayout(LayoutKind.Sequential, Pack = 8)]
             public struct PROCESSENTRY32
             {
                 /*

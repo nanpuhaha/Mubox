@@ -32,14 +32,14 @@
         </Grid>
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="False">
-                <Setter TargetName="Content" Property="Background" Value="{StaticResource ToggleButtonBrush}"/>
+                <Setter TargetName="Content" Property="Background" Value="{StaticResource ToggleButtonBrush}" />
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Content" Property="Background" Value="{StaticResource ToggleButtonMouseOverBrush}"/>
+                <Setter TargetName="Content" Property="Background" Value="{StaticResource ToggleButtonMouseOverBrush}" />
                 <Setter TargetName="Border" Property="BorderBrush" Value="Gray" />
             </Trigger>
             <Trigger Property="IsChecked" Value="True">
-                <Setter TargetName="Content" Property="Background" Value="{StaticResource ToggleButtonCheckedBrush}"/>
+                <Setter TargetName="Content" Property="Background" Value="{StaticResource ToggleButtonCheckedBrush}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
                 <Setter TargetName="Border" Property="BorderBrush" Value="Gold" />
@@ -48,7 +48,6 @@
     </ControlTemplate>
 
     <Style TargetType="{x:Type ToggleButton}">
-        <Setter Property="Control.Template" Value="{StaticResource ToggleButtonTemplate}"/>
+        <Setter Property="Control.Template" Value="{StaticResource ToggleButtonTemplate}" />
     </Style>
-
 </ResourceDictionary>  

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Mubox.Extensions
@@ -49,16 +48,18 @@ namespace Mubox.Extensions
                 L_profile.ActiveClientChanged += ActiveClientChanged;
             }
 
-            var extensionsPath = Path.Combine(Environment.CurrentDirectory, "Extensions");
-            var files = System.IO.Directory.EnumerateFiles(extensionsPath, "*.dll");
+            var extensionsPath = Path.Combine(Environment.CurrentDirectory);
+            var files = System.IO.Directory.EnumerateFiles(extensionsPath, "ext.*.dll");
             foreach (var file in files)
             {
+                file.LogInfo();
                 var friendlyName = Path.GetFileNameWithoutExtension(file);
                 var appDomain = AppDomain.CreateDomain(friendlyName);
                 var bridge = new Extensibility.MuboxBridge(this);
                 var loader = (Extensibility.Loader)appDomain
                     .CreateInstanceAndUnwrap("Mubox.Extensibility", "Mubox.Extensibility.Loader");
-                _clients.ToList()
+                _clients
+                    .ToList()
                     .ForEach(bridge.Clients.Add);
                 var extensionState = new ExtensionState()
                 {

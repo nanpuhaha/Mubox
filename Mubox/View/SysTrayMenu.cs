@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Mubox.Model;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
-using Mubox.Model;
 
 namespace Mubox.View
 {
@@ -76,7 +75,6 @@ namespace Mubox.View
                 menuItem.Header = "_Configure New Game Profile...";
                 menuItem.Icon = Resources["imageSettingsIcon"];
                 quickLaunchMenuItems.Add(menuItem);
-
 
                 // Launch Mubox Server
                 quickLaunchMenuItems.Add(new Separator());
@@ -420,7 +418,6 @@ namespace Mubox.View
             menuItem.Header = "_Configure New Client...";
             menuItem.Icon = Resources["imageSettingsIcon"];
             quickLaunchClientShortcuts.Add(menuItem);
-
 
             quickLaunchClientShortcuts.Add(new Separator());
             foreach (var client in clients.Cast<Mubox.Configuration.ClientSettings>())

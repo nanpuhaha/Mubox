@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Runtime.InteropServices;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mubox.Tests
 {
@@ -15,9 +12,9 @@ namespace Mubox.Tests
             var createdNew = default(bool);
             var mutex = new System.Threading.Mutex(false, "AN-Mutex-TEST", out createdNew);
             Assert.IsTrue(createdNew);
-            var mutexWasClosed = WinAPI.SandboxApi.CloseNamedMutexes(process, new string[] 
+            var mutexWasClosed = WinAPI.SandboxApi.CloseNamedMutexes(process, new string[]
                 {
-                    "AN-Mutex", 
+                    "AN-Mutex",
                     "AN-Mutex-Window-Guild Wars 2",
                     "AN-Mutex-Install-101",
                     // TODO: move list to config

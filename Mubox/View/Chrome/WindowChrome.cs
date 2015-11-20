@@ -4,6 +4,7 @@
 
 namespace System.Windows.Extensions
 {
+    using Standard;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -14,8 +15,6 @@ namespace System.Windows.Extensions
     using System.Windows.Controls;
     using System.Windows.Interop;
     using System.Windows.Media;
-    using Standard;
-
     using HANDLE_MESSAGE = System.Collections.Generic.KeyValuePair<Standard.WM, Standard.NativeMethods.MessageHandler>;
 
     public class WindowChrome : DependencyObject
@@ -29,20 +28,23 @@ namespace System.Windows.Extensions
 
         /// <summary>The Window that's chrome is being modified.</summary>
         private Window _window;
+
         /// <summary>Underlying HWND for the _window.</summary>
         private IntPtr _hwnd;
 
         /// <summary>Template for chromeless window.</summary>
         private ControlTemplate _template;
+
         /// <summary>Border for the Window template, obtained when the template is applied.</summary>
         private Border _templatePartBorder;
 
         // Keep track of this so we can detect when we need to apply changes.  Tracking these separately
         // as I've seen using just one cause things to get enough out of sync that occasionally the caption will redraw.
         private WindowState _lastRoundingState;
+
         private WindowState _lastMenuState;
 
-        #endregion
+        #endregion Fields
 
         /// <summary>
         /// Default constructor usable by XAML.
@@ -205,7 +207,7 @@ namespace System.Windows.Extensions
             element.SetValue(HitTestableProperty, hitTestVisible);
         }
 
-        #endregion
+        #endregion Attached Properties and support methods.
 
         #region Dependency Properties and support methods.
 
@@ -371,7 +373,7 @@ namespace System.Windows.Extensions
             set { SetValue(RoundCornersRadiusProperty, value); }
         }
 
-        #endregion
+        #endregion Dependency Properties and support methods.
 
         private void _SetWindow(Window window)
         {
@@ -587,7 +589,7 @@ namespace System.Windows.Extensions
             return IntPtr.Zero;
         }
 
-        #endregion
+        #endregion WindowProc and Message Handlers
 
         private bool _HitTestUIElements(Point mousePosWindow)
         {
@@ -638,6 +640,7 @@ namespace System.Windows.Extensions
             {
                 case SW.SHOWMINIMIZED:
                     return WindowState.Minimized;
+
                 case SW.SHOWMAXIMIZED:
                     return WindowState.Maximized;
             }
@@ -696,6 +699,7 @@ namespace System.Windows.Extensions
                             NativeMethods.EnableMenuItem(hmenu, SC.MINIMIZE, canMinimize ? mfEnabled : mfDisabled);
                             NativeMethods.EnableMenuItem(hmenu, SC.MAXIMIZE, mfDisabled);
                             break;
+
                         case WindowState.Minimized:
                             NativeMethods.EnableMenuItem(hmenu, SC.RESTORE, mfEnabled);
                             NativeMethods.EnableMenuItem(hmenu, SC.MOVE, mfDisabled);
@@ -703,6 +707,7 @@ namespace System.Windows.Extensions
                             NativeMethods.EnableMenuItem(hmenu, SC.MINIMIZE, mfDisabled);
                             NativeMethods.EnableMenuItem(hmenu, SC.MAXIMIZE, canMaximize ? mfEnabled : mfDisabled);
                             break;
+
                         default:
                             NativeMethods.EnableMenuItem(hmenu, SC.RESTORE, mfDisabled);
                             NativeMethods.EnableMenuItem(hmenu, SC.MOVE, mfEnabled);

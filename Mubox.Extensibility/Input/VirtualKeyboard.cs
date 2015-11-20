@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mubox.Extensibility.Input
 {
@@ -10,7 +6,7 @@ namespace Mubox.Extensibility.Input
         : MarshalByRefObject
     {
         public event EventHandler<KeyboardEventArgs> InputReceived;
-        
+
         private MuboxClientBridge _muboxClientBridge;
 
         public VirtualKeyboard(MuboxClientBridge muboxClientBridge)

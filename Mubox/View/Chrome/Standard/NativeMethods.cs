@@ -203,6 +203,7 @@
         /// Logical pixels inch in X
         /// </summary>
         LOGPIXELSX = 88,
+
         /// <summary>
         /// Logical pixels inch in Y
         /// </summary>
@@ -219,6 +220,7 @@
         /// Possible return value for EnableMenuItem
         /// </summary>
         DOES_NOT_EXIST = unchecked((uint)-1),
+
         ENABLED = 0,
         BYCOMMAND = 0,
         GRAYED = 1,
@@ -240,12 +242,16 @@
     {
         /// <summary>Prevents the window caption from being drawn.</summary>
         NODRAWCAPTION = 0x00000001,
+
         /// <summary>Prevents the system icon from being drawn.</summary>
         NODRAWICON = 0x00000002,
+
         /// <summary>Prevents the system icon menu from appearing.</summary>
         NOSYSMENU = 0x00000004,
+
         /// <summary>Prevents mirroring of the question mark, even in right-to-left (RTL) layout.</summary>
         NOMIRRORHELP = 0x00000008,
+
         /// <summary> A mask that contains all the valid bits.</summary>
         VALIDBITS = NODRAWCAPTION | NODRAWICON | NOMIRRORHELP | NOSYSMENU,
     }
@@ -316,15 +322,17 @@
         MONITORPOWER = 0xF170,
         CONTEXTHELP = 0xF180,
         SEPARATOR = 0xF00F,
+
         /// <summary>
         /// SCF_ISSECURE
         /// </summary>
         F_ISSECURE = 0x00000001,
+
         ICON = MINIMIZE,
         ZOOM = MAXIMIZE,
     }
 
-    #endregion
+    #endregion Native Values
 
     #region Native Types
 
@@ -344,6 +352,7 @@
         public byte lfClipPrecision;
         public byte lfQuality;
         public byte lfPitchAndFamily;
+
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
         public string lfFaceName;
     }
@@ -366,6 +375,7 @@
         public LOGFONT lfMenuFont;
         public LOGFONT lfStatusFont;
         public LOGFONT lfMessageFont;
+
         // Vista only
         public int iPaddedBorderWidth;
 
@@ -421,10 +431,13 @@
     {
         /// <summary>Width of left border that retains its size.</summary>
         public int cxLeftWidth;
+
         /// <summary>Width of right border that retains its size.</summary>
         public int cxRightWidth;
+
         /// <summary>Height of top border that retains its size.</summary>
         public int cyTopHeight;
+
         /// <summary>Height of bottom border that retains its size.</summary>
         public int cyBottomHeight;
     };
@@ -485,7 +498,7 @@
         public int flags;
     }
 
-    #endregion
+    #endregion Native Types
 
     // Some native methods are shimmed through public versions that handle converting failures into thrown exceptions.
     [SuppressUnmanagedCodeSecurity]

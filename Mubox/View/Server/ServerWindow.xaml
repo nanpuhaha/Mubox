@@ -16,8 +16,7 @@
     <Window.Resources>
         <CollectionViewSource
             x:Key="ClientListViewSource"
-            Source="{Binding Path=ClientWindowProvider, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}"
-            >
+            Source="{Binding Path=ClientWindowProvider, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}">
             <CollectionViewSource.SortDescriptions>
                 <scm:SortDescription PropertyName="LastActivatedTimestamp" Direction="Descending" />
             </CollectionViewSource.SortDescriptions>
@@ -29,32 +28,31 @@
             ClientBorderThickness="0"
             RoundCorners="True"
             RoundCornersRadius="9"
-            UseGlassFrame="False"
-            >
+            UseGlassFrame="False">
         </ext:WindowChrome>
     </ext:WindowChrome.WindowChrome>
     <Grid>
-        <Rectangle Style="{DynamicResource MuboxServerWindowHeaderStyle}" Name="rectangle1" Stroke="Black" Height="32" VerticalAlignment="Top" Margin="-2,-2,-2,0"/>
+        <Rectangle Style="{DynamicResource MuboxServerWindowHeaderStyle}" Name="rectangle1" Stroke="Black" Height="32" VerticalAlignment="Top" Margin="-2,-2,-2,0" />
         <ComboBox Name="comboThemeSelector" Margin="0,4,7,0" HorizontalAlignment="Right" Width="100" FontSize="10" Height="20" VerticalAlignment="Top" Background="Transparent" />
         <Grid Margin="-1,-1,0,0">
             <Border Style="{DynamicResource MuboxServerWindowBorderStyle}" BorderThickness="2" CornerRadius="9" />
         </Grid>
         <Label Style="{DynamicResource MuboxServerLabelStyle}" FontSize="10" x:Name="label1" Margin="0,0,163,5" Height="25" VerticalAlignment="Bottom" HorizontalContentAlignment="Right" Content="Listen Port" HorizontalAlignment="Right" Width="70" Visibility="Hidden" />
-        <Button Style="{DynamicResource MuboxButtonStyle}" Height="19" HorizontalAlignment="Right" Margin="0,0,63,9" x:Name="buttonStartServer" VerticalAlignment="Bottom" Width="45" Click="buttonStartServer_Click" Content="Start" ToolTip="Click this Button to Start or Stop accepting Client connections" Visibility="Hidden"/>
+        <Button Style="{DynamicResource MuboxButtonStyle}" Height="19" HorizontalAlignment="Right" Margin="0,0,63,9" x:Name="buttonStartServer" VerticalAlignment="Bottom" Width="45" Click="buttonStartServer_Click" Content="Start" ToolTip="Click this Button to Start or Stop accepting Client connections" Visibility="Hidden" />
         <TextBox FontSize="10" Margin="0,0,114,9" x:Name="textListenPort" Text="17520" Height="19" VerticalAlignment="Bottom" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                  ToolTip="This is the Port Number that the Server allows Clients to connect to" TextChanged="textListenPort_TextChanged" HorizontalAlignment="Right" Width="48" Visibility="Hidden" />
         <Canvas Margin="-5,-4,342,171" RenderTransformOrigin="0.5,0.5">
             <Canvas.RenderTransform>
                 <TransformGroup>
-                    <ScaleTransform/>
-                    <SkewTransform/>
-                    <RotateTransform Angle="-9"/>
-                    <TranslateTransform/>
+                    <ScaleTransform />
+                    <SkewTransform />
+                    <RotateTransform Angle="-9" />
+                    <TranslateTransform />
                 </TransformGroup>
             </Canvas.RenderTransform>
-            <TextBlock FontFamily="Trebuchet MS" Foreground="{DynamicResource MuboxPrimaryContrastColorBrush}" FontStyle="Italic" FontSize="42" Padding="0" HorizontalAlignment="Left" Margin="8,0,0,0" x:Name="blockTitleFore1" Width="190" Height="48" VerticalAlignment="Top"><Run Text="Mubox"/></TextBlock>
-            <TextBlock FontFamily="Trebuchet MS" Foreground="{DynamicResource MuboxHiliteContrastColorBrush}" FontStyle="Italic" FontSize="42" Padding="0" HorizontalAlignment="Left" Margin="8,-2,0,0" x:Name="blockTitleFore2" Width="190" Height="48" VerticalAlignment="Top"><Run Text="Mubox"/></TextBlock>
-            <TextBlock FontFamily="Trebuchet MS" Foreground="Black" FontStyle="Italic" FontSize="42" Padding="0" HorizontalAlignment="Left" Margin="8,-1,0,0" x:Name="blockTitleBack" Width="190" Height="48" VerticalAlignment="Top"><Run Text="Mubox"/></TextBlock>
+            <TextBlock FontFamily="Trebuchet MS" Foreground="{DynamicResource MuboxPrimaryContrastColorBrush}" FontStyle="Italic" FontSize="42" Padding="0" HorizontalAlignment="Left" Margin="8,0,0,0" x:Name="blockTitleFore1" Width="190" Height="48" VerticalAlignment="Top"><Run Text="Mubox" /></TextBlock>
+            <TextBlock FontFamily="Trebuchet MS" Foreground="{DynamicResource MuboxHiliteContrastColorBrush}" FontStyle="Italic" FontSize="42" Padding="0" HorizontalAlignment="Left" Margin="8,-2,0,0" x:Name="blockTitleFore2" Width="190" Height="48" VerticalAlignment="Top"><Run Text="Mubox" /></TextBlock>
+            <TextBlock FontFamily="Trebuchet MS" Foreground="Black" FontStyle="Italic" FontSize="42" Padding="0" HorizontalAlignment="Left" Margin="8,-1,0,0" x:Name="blockTitleBack" Width="190" Height="48" VerticalAlignment="Top"><Run Text="Mubox" /></TextBlock>
         </Canvas>
         <Button Style="{DynamicResource MuboxButtonStyle}" Height="19" HorizontalAlignment="Right" Margin="0,0,12,9" Name="buttonExit" VerticalAlignment="Bottom" Width="45" ToolTip="Exit Mubox Server" Click="buttonExit_Click" Visibility="Hidden">Exit</Button>
         <ListView BorderBrush="Transparent" SelectionMode="Single" Background="Transparent" Margin="0,25,0,30" x:Name="listBox1" Focusable="False" IsTabStop="False" FocusVisualStyle="{DynamicResource ClientListViewItemContainerStyle}" SelectionChanged="listBox1_SelectionChanged">
@@ -149,7 +147,7 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Button Style="{DynamicResource MuboxButtonStyle}" Height="21" HorizontalAlignment="Left" Margin="10,0,0,9" x:Name="buttonConfigureMulticast" VerticalAlignment="Bottom" Width="188" Click="buttonConfigureMulticast_Click" ToolTip="Open a Dialog where you can Configure the Keyboard" Content="Configure Keyboard" FontSize="12" FontWeight="Bold"/>
+        <Button Style="{DynamicResource MuboxButtonStyle}" Height="21" HorizontalAlignment="Left" Margin="10,0,0,9" x:Name="buttonConfigureMulticast" VerticalAlignment="Bottom" Width="188" Click="buttonConfigureMulticast_Click" ToolTip="Open a Dialog where you can Configure the Keyboard" Content="Configure Keyboard" FontSize="12" FontWeight="Bold" />
         <TextBlock Margin="267,184,0,0" Foreground="Silver">Press <Run TextBlock.FontWeight="Bold">PAUSE/BREAK</Run> Key to Toggle</TextBlock>
     </Grid>
 </Window>

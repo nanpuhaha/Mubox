@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Markup;
-using System.Linq;
-using Mubox.Extensibility;
 
 namespace Mubox.QuickLaunch
 {

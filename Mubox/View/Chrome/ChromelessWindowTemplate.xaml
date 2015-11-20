@@ -15,12 +15,12 @@
             BorderBrush="{TemplateBinding BorderBrush}"
             BorderThickness="{TemplateBinding BorderThickness}"
             Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Canvas}}, Path=Height}"
-            Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Canvas}}, Path=Width}"/>
+            Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Canvas}}, Path=Width}" />
         <AdornerDecorator x:Name="PART_Adorner"
             Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Canvas}}, Path=Height}"
             Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Canvas}}, Path=Width}">
-            <ContentPresenter/>
+            <ContentPresenter />
         </AdornerDecorator>
-        <ResizeGrip HorizontalAlignment="Right" VerticalAlignment="Bottom" Visibility="Collapsed" IsTabStop="False"/>
+        <ResizeGrip HorizontalAlignment="Right" VerticalAlignment="Bottom" Visibility="Collapsed" IsTabStop="False" />
     </Canvas>
 </ControlTemplate>

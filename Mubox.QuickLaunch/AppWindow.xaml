@@ -1,7 +1,9 @@
 ﻿<Window x:Class="Mubox.QuickLaunch.AppWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="Mubox" Height="480" Width="900" HorizontalContentAlignment="Left" VerticalContentAlignment="Stretch" Icon="/Mubox.QuickLaunch;component/Mubox2013.ico"
+    Title="Mubox" 
+        Height="480" Width="900" 
+        HorizontalContentAlignment="Left" VerticalContentAlignment="Stretch" Icon="/Mubox.QuickLaunch;component/Mubox2013.ico"
         Loaded="OnLoaded"
         Top="8" Left="128" WindowStartupLocation="Manual" Topmost="False" ShowInTaskbar="False" WindowState="Minimized">
     <Window.Resources>
@@ -17,8 +19,7 @@
                NavigationUIVisibility="Hidden"
                Navigated="frameContentPage_Navigated"
                NavigationFailed="frameContentPage_NavigationFailed"
-               NavigationStopped="frameContentPage_Navigated"
-               >
+               NavigationStopped="frameContentPage_Navigated">
         </Frame>
     </Grid>
 </Window>

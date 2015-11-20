@@ -76,6 +76,6 @@ namespace Mubox.Configuration
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-        #endregion
+        #endregion INotifyCollectionChanged Members
     }
 }

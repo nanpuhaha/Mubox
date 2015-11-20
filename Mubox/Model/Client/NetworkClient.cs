@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net.Sockets;
-using Mubox.Control;
+﻿using Mubox.Control;
 using Mubox.Model.Input;
+using System;
+using System.Collections.Generic;
 using System.Linq;
-using Mubox.Extensibility;
+using System.Net.Sockets;
 
 namespace Mubox.Model.Client
 {
@@ -107,22 +105,28 @@ namespace Mubox.Model.Client
                     case "NAME":
                         OnNameReceived(parameters);
                         break;
+
                     case "PONG":
                         OnPongReceived();
                         break;
+
                     case "STAT":
                         // ping client from non-ui thread
                         OnPerformanceInfoReceived(parameters);
                         break;
+
                     case "CACT":
                         OnCoerceActivationReceived();
                         break;
+
                     case "DC":
                         OnDetachReceived();
                         break;
+
                     case "ACTV":
                         OnClientActivated();
                         break;
+
                     default:
                         // TODO log unknown command
                         break;
@@ -345,7 +349,7 @@ namespace Mubox.Model.Client
             }
         }
 
-        #endregion
+        #endregion Networking Code
 
         public NetworkClient(Socket socket, string profileName)
             : base(profileName)

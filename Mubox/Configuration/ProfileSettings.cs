@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Mubox.Extensibility;
 
 namespace Mubox.Configuration
 {
@@ -30,6 +24,7 @@ namespace Mubox.Configuration
         }
 
         private ClientSettings _activeClient;
+
         public ClientSettings ActiveClient
         {
             get
@@ -56,7 +51,7 @@ namespace Mubox.Configuration
             }
         }
 
-        #endregion
+        #endregion Clients
 
         [ConfigurationProperty("EnableMulticast", IsRequired = false, DefaultValue = false)]
         public bool EnableMulticast
@@ -83,8 +78,8 @@ namespace Mubox.Configuration
 
         /// <summary>
         /// <para>
-        /// Some games reset/alter the mouse position when panning with the mouse in a way that 
-        /// is not compatible with Mubox (and similar applications), this results in erratic 
+        /// Some games reset/alter the mouse position when panning with the mouse in a way that
+        /// is not compatible with Mubox (and similar applications), this results in erratic
         /// 'spinning' of the camera because the game continues to read an incorrect position.
         ///
         /// This option attemps to provide a 'fix' for some of these games.
@@ -100,11 +95,11 @@ namespace Mubox.Configuration
         /// <summary>
         /// <para>
         /// Some games don't appear to respond to LeftControl, LeftMenu nor LeftShift key messages.
-        /// 
+        ///
         /// This option performs a translation from Left/Right to less-specific messages (e.g. for LeftShift we translate to Shift, for RightMenu we translate to Menu, etc.)
-        /// 
+        ///
         /// If necessary we will re-work this to be more specific about which keys to translate, but currently this applies to all three.
-        /// 
+        ///
         /// By default this option is enabled because so far most games (but NOT all) appear to need this translation.
         /// </para>
         /// </summary>

@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Mubox.Extensibility;
 using System.Collections.Concurrent;
+using System.IO;
+using System.Reflection;
+using System.Threading;
 
 namespace Mubox.Extensibility
 {
@@ -71,7 +66,6 @@ namespace Mubox.Extensibility
             return false;
         }
 
-
         private void InitializeDispatchRuntime(IMubox mubox, string name)
         {
             _dispatchQueue = new ConcurrentQueue<dynamic>();
@@ -105,6 +99,7 @@ namespace Mubox.Extensibility
                                 case "STOP":
                                     _exitYet.Set();
                                     break;
+
                                 default:
                                     break;
                             }
@@ -150,7 +145,7 @@ namespace Mubox.Extensibility
             _assembly = Assembly.Load(dll, pdb);
         }
 
-        #endregion
+        #endregion Initialization
 
         public void ExtensionStop()
         {

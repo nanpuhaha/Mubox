@@ -1,13 +1,11 @@
 ﻿using Mubox.Configuration;
 using Mubox.Control.Input.Hooks;
-using Mubox.Extensibility;
 using Mubox.Model;
 using Mubox.Model.Client;
 using Mubox.Model.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -140,6 +138,7 @@ namespace Mubox.View.Server
                             return;
                         }
                         break;
+
                     case WinAPI.WM.LBUTTONDOWN:
                     case WinAPI.WM.RBUTTONDOWN:
                     case WinAPI.WM.MBUTTONDOWN:
@@ -214,7 +213,7 @@ namespace Mubox.View.Server
                 e.IsDoubleClickEvent = mouseButtonInfo.IsDoubleClick;
             }
 
-            #endregion 'Mouse Buffering' Option
+            #endregion Mouse 'Button State' Tracking
 
             if (!Mubox.Configuration.MuboxConfigSection.Default.EnableMouseCapture)
             {
@@ -245,7 +244,6 @@ namespace Mubox.View.Server
                     return;
                 }
             }
-
 
             var shouldMulticastMouse = ShouldMulticastMouse(e);
 
@@ -349,7 +347,7 @@ namespace Mubox.View.Server
             {
                 // track client-relative position
                 this.L_e_Point = new Point(
-                    Math.Ceiling((double)(e.Point.X - clientForCoordinateNormalization.CachedScreenFromClientRect.Left) * (65536.0 / (double)clientForCoordinateNormalization.CachedScreenFromClientRect.Width)), 
+                    Math.Ceiling((double)(e.Point.X - clientForCoordinateNormalization.CachedScreenFromClientRect.Left) * (65536.0 / (double)clientForCoordinateNormalization.CachedScreenFromClientRect.Width)),
                     Math.Ceiling((double)(e.Point.Y - clientForCoordinateNormalization.CachedScreenFromClientRect.Top) * (65536.0 / (double)clientForCoordinateNormalization.CachedScreenFromClientRect.Height)));
             }
         }

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Threading;
 
 namespace Mubox.Extensions.Console.ViewModels
@@ -12,7 +8,7 @@ namespace Mubox.Extensions.Console.ViewModels
     public class ConsoleViewModel
         : INotifyPropertyChanged
     {
-        Dispatcher _dispatcher;
+        private Dispatcher _dispatcher;
 
         public ObservableCollection<ConsoleMessage> Messages { get; private set; }
 

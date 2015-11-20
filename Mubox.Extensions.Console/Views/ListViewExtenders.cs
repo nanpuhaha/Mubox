@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -39,7 +35,7 @@ namespace Mubox.Extensions.Console.Views
             obj.SetValue(AutoScrollToCurrentItemProperty, value);
         }
 
-        #endregion
+        #endregion Properties
 
         #region Events
 
@@ -80,6 +76,6 @@ namespace Mubox.Extensions.Console.Views
             listView.ScrollIntoView(listView.Items.CurrentItem);
         }
 
-        #endregion
+        #endregion Events
     }
 }

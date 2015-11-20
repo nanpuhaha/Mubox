@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace Mubox.Model.Input
 {
@@ -47,34 +45,44 @@ namespace Mubox.Model.Input
                     case WinAPI.WM.MOUSEMOVE:
                         flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_MOVE;
                         break;
+
                     case WinAPI.WM.LBUTTONDOWN:
                         flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_LEFTDOWN;
                         break;
+
                     case WinAPI.WM.LBUTTONUP:
                         flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_LEFTUP;
                         break;
+
                     case WinAPI.WM.RBUTTONDOWN:
                         flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_RIGHTDOWN;
                         break;
+
                     case WinAPI.WM.RBUTTONUP:
                         flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_RIGHTUP;
                         break;
+
                     case WinAPI.WM.MBUTTONDOWN:
                         flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_MIDDLEDOWN;
                         break;
+
                     case WinAPI.WM.MBUTTONUP:
                         flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_MIDDLEUP;
                         break;
+
                     case WinAPI.WM.XBUTTONDOWN:
                         flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_XDOWN;
                         break;
+
                     case WinAPI.WM.XBUTTONUP:
                         flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_XUP;
                         break;
+
                     case WinAPI.WM.MOUSEWHEEL:
                     case WinAPI.WM.MOUSEHWHEEL:
                         flags |= WinAPI.SendInputApi.MouseEventFlags.MOUSEEVENTF_WHEEL;
                         break;
+
                     case WinAPI.WM.LBUTTONDBLCLK:
                     case WinAPI.WM.MBUTTONDBLCLK:
                     case WinAPI.WM.RBUTTONDBLCLK:

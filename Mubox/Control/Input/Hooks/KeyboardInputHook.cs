@@ -1,9 +1,7 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
+﻿using Mubox.Configuration;
 using Mubox.Model.Input;
-using Mubox.Configuration;
+using System;
+using System.Runtime.InteropServices;
 
 namespace Mubox.Control.Input.Hooks
 {
@@ -53,6 +51,7 @@ namespace Mubox.Control.Input.Hooks
         private static System.Threading.Thread keyboardHookCheckThread = null;
 
         private static object StartLock = new object();
+
         public static void Start()
         {
             lock (StartLock)
@@ -138,6 +137,7 @@ namespace Mubox.Control.Input.Hooks
 
         // TODO: initialize this to current key state on init to deal with rare/theoretical key state desync
         private static System.Collections.BitArray pressedKeys = new System.Collections.BitArray(256);
+
         private static object pressedKeysLock = new object();
 
         private static Performance KeyboardInputPerformance = Performance.CreatePerformance("_KeyboardInput");
