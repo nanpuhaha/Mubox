@@ -99,45 +99,54 @@ function X4D_Inventory:Sort(resumeBagId, resumeSlotId)
 		local leftBagNumSlots = GetContainerNumSlots(leftBag)
 		for leftSlot = resumeSlotId, leftBagNumSlots do
 			-- resolve left and right targets
-			local rightBag = leftBag
-			local rightSlot = leftSlot + 1
-			if (rightSlot > leftBagNumSlots) then
-				rightBag = leftBag - 1
-				if (rightBag > -1) then
-					rightSlot = 1--GetContainerNumSlots(rightBag)
+			for rightBag = leftBag, 0, -1 do
+				local L_rightSlot = leftSlot
+				if (not rightBag == leftBag) then
+					L_rightSlot = 1
 				end
-			end
-			local rightBagNumSlots = GetContainerNumSlots(rightBag)
-			-- compare targets and swap if possible
-			if (rightBag > -1) then
-				local _, leftSlotCount, leftLocked, _, _, _, leftLink = GetContainerItemInfo(leftBag, leftSlot)
-				if (not leftLocked and leftLink ~= nil) then
-					local _, rightSlotCount, rightLocked, _, _, _, rightLink = GetContainerItemInfo(rightBag, rightSlot)
-					if (rightLocked) then
-						leftSlot = leftSlot + 1
-						X4D_Inventory.ShouldSort = true
-					else
-						-- derive scores
-						if (leftSlotCount == nil) then
-							leftSlotCount = 0
+				local rightBagNumSlots = GetContainerNumSlots(rightBag)
+				for rightSlot = L_rightSlot, rightBagNumSlots do
+					if (rightSlot > rightBagNumSlots) then
+						rightBag = rightBag - 1
+						rightBagNumSlots = GetContainerNumSlots(rightBag)
+						if (rightBag > -1) then
+							rightSlot = 1--GetContainerNumSlots(rightBag)
 						end
-						local leftScore = X4D.Equipment:GetItemSortKey(leftLink, nil, false) .. leftSlotCount
-						if (rightSlotCount == nil) then
-							rightSlotCount = 0
-						end
-						local rightScore = X4D.Equipment:GetItemSortKey(rightLink, nil, false) .. rightSlotCount
+					end
+					-- compare targets and swap if possible
+					if (rightBag > -1) then
+						local _, leftSlotCount, leftLocked, _, _, _, leftLink = GetContainerItemInfo(leftBag, leftSlot)
+						if (not leftLocked and leftLink ~= nil) then
+							local _, rightSlotCount, rightLocked, _, _, _, rightLink = GetContainerItemInfo(rightBag, rightSlot)
+							if (rightLocked or rightLink == nil) then
+								--PickupContainerItem(leftBag, leftSlot)
+								--PickupContainerItem(rightBag, rightSlot)
+								rightSlot = rightSlot + 1
+								X4D_Inventory.ShouldSort = true
+							else
+								-- derive scores
+								if (leftSlotCount == nil) then
+									leftSlotCount = 0
+								end
+								local leftScore = X4D.Equipment:GetItemSortKey(leftLink, nil, false) .. leftSlotCount
+								if (rightSlotCount == nil) then
+									rightSlotCount = 0
+								end
+								local rightScore = X4D.Equipment:GetItemSortKey(rightLink, nil, false) .. rightSlotCount
 						
-						-- apply derived scores
-						if (leftScore < rightScore) then
-							PickupContainerItem(leftBag, leftSlot)
-							PickupContainerItem(rightBag, rightSlot)
-							X4D_Inventory.ShouldSort = true
-						elseif (rightScore > leftScore) then
-							PickupContainerItem(rightBag, rightSlot)
-							PickupContainerItem(leftBag, leftSlot)
-							X4D_Inventory.ShouldSort = true
-						else
-							-- TODO: sort by?
+								-- apply derived scores
+								if (leftScore < rightScore) then
+									PickupContainerItem(leftBag, leftSlot)
+									PickupContainerItem(rightBag, rightSlot)
+									X4D_Inventory.ShouldSort = true
+								elseif (rightScore > leftScore) then
+									PickupContainerItem(rightBag, rightSlot)
+									PickupContainerItem(leftBag, leftSlot)
+									X4D_Inventory.ShouldSort = true
+								else
+									-- TODO: sort by?
+								end
+							end
 						end
 					end
 				end
