@@ -1,4 +1,5 @@
-﻿using Mubox.Model;
+﻿using Mubox.Extensibility;
+using Mubox.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,74 @@ using System.Windows.Media;
 
 namespace Mubox.View
 {
+	/// <summary>
+	/// <para>Allow extensions to (indirectly) interact with SysTrayMenu</para>
+	/// </summary>
+	public class SysTrayMenuProxy : MarshalByRefObject, ISysTrayMenu
+	{
+		public string AddMenuItem(string header, Extensibility.ProxyEventHandler<EventArgs> proxyEventHandler)
+		{
+			var onClick = default(RoutedEventHandler);
+			if (proxyEventHandler != null)
+			{
+				onClick = (s, e) =>
+				{
+					try
+					{
+						proxyEventHandler.Proxy(s, new EventArgs());
+					}
+					catch (Exception ex)
+					{
+						ex.Log();
+					}
+				};
+			}
+			SysTrayMenu.Current.AddMenuItem(header, onClick);
+			return header;
+		}
+
+		public string InsertMenuItem(int index, string header, Extensibility.ProxyEventHandler<EventArgs> proxyEventHandler)
+		{
+			var onClick = default(RoutedEventHandler);
+			if (proxyEventHandler != null)
+			{
+				onClick = (s, e) =>
+				{
+					try
+					{
+						proxyEventHandler.Proxy(s, new EventArgs());
+					}
+					catch (Exception ex)
+					{
+						ex.Log();
+					}
+				};
+			}
+			SysTrayMenu.Current.AddMenuItem(header, onClick, index);
+			return header;
+		}
+
+		public void DestroyMenuItem(string token)
+		{
+			SysTrayMenu.Current.DestroyMenuItem(token);
+		}
+	}
+
 	public class SysTrayMenu
 		: ContextMenu
 	{
+		public static SysTrayMenu Current { get; private set; }
+
+		private static SysTrayMenuProxy _proxy;
+
 		public SysTrayMenu(Action helpCallback, Action exitApplicationCallback)
 		{
+			Current = this;
+			if (_proxy == null)
+			{
+				_proxy = new SysTrayMenuProxy();
+				Mubox.Extensions.ExtensionManager.Instance.RegisterInstance(typeof(ISysTrayMenu), _proxy);
+			}
 			try
 			{
 				Resources["imageShortcutIcon"] = new Image
@@ -560,5 +624,77 @@ namespace Mubox.View
 
 			return clientMenuItem;
 		}
+
+		#region Extensibility
+
+		private Dictionary<string, MenuItem> _extensionMenuItems = new Dictionary<string, MenuItem>();
+
+		public string AddMenuItem(string header, RoutedEventHandler onClick = null, int index = -1)
+		{
+			return Current.Dispatcher.Invoke<string>(() =>
+				{
+					try
+					{
+						var menuItems = ItemsSource as List<object>;
+						if (menuItems == null)
+						{
+							return null;
+						}
+						var obj = menuItems.FirstOrDefault(e =>
+							((e as MenuItem) != null && ((e as MenuItem).Header as string) == header)
+							|| ((e as Separator) != null && ((e as Separator).Tag as string) == header));
+						if (obj == null)
+						{
+							if (header.StartsWith("separator"))
+							{
+								var separator = new Separator();
+								separator.Tag = header;
+								obj = separator;
+							}
+							else
+							{
+								var menuItem = new MenuItem();
+								menuItem.Tag = header;
+								menuItem.Header = header;
+								if (onClick != null)
+								{
+									menuItem.Click += (s, e) =>
+										{
+											try
+											{
+												onClick(s, e);
+											}
+											catch (Exception L_ex)
+											{
+												L_ex.Log();
+											}
+										};
+								}
+								obj = menuItem;
+							}
+							if (index == -1)
+							{
+								menuItems.Add(obj);
+							}
+							else
+							{
+								menuItems.Insert(index, obj);
+							}
+						}
+					}
+					catch (Exception ex)
+					{
+						ex.Log();
+					}
+					return header;
+				});
+		}
+
+		public void DestroyMenuItem(string token)
+		{
+
+		}
+
+		#endregion Extensibility
 	}
 }

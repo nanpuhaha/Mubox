@@ -44,6 +44,7 @@
     <Compile Include="IConsoleService.cs" />
     <Compile Include="Input\VirtualKeyboard.cs" />
     <Compile Include="Input\VirtualMouse.cs" />
+    <Compile Include="ISysTrayMenu.cs" />
     <Compile Include="LeaseExtensions.cs" />
     <Compile Include="Loader.cs" />
     <Compile Include="IExtension.cs" />
