@@ -353,8 +353,16 @@ namespace Mubox.Extensions
             }, TaskCreationOptions.PreferFairness);
         }
 
+		private Dictionary<string, MarshalByRefObject> _registeredInstances = new Dictionary<string, MarshalByRefObject>();
+
         public object GetService(Type serviceType)
         {
+			// try to get the service from list of registered instances
+			var exist = default(MarshalByRefObject);
+			if (_registeredInstances.TryGetValue(serviceType.Name, out exist) && exist != null)
+			{
+				return exist;
+			}
             // try to get the service from an extension, for example "IConsoleService" is provided by the Console Extension
             try
             {
@@ -375,5 +383,10 @@ namespace Mubox.Extensions
             catch { }
             return null;
         }
+
+		public void RegisterInstance(Type type, MarshalByRefObject instance)
+		{
+			_registeredInstances[type.Name] = instance;
+		}
     }
 }
