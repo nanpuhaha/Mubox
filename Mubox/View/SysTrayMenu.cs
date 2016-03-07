@@ -642,7 +642,7 @@ namespace Mubox.View
 						}
 						var obj = menuItems.FirstOrDefault(e =>
 							((e as MenuItem) != null && ((e as MenuItem).Header as string) == header)
-							|| ((e as Separator) != null && ((e as Separator).Tag as string) == header));
+							|| ((e as FrameworkElement) != null && ((e as FrameworkElement).Tag as string) == header));
 						if (obj == null)
 						{
 							if (header.StartsWith("separator"))
@@ -692,7 +692,17 @@ namespace Mubox.View
 
 		public void DestroyMenuItem(string token)
 		{
-
+			var menuItems = ItemsSource as List<object>;
+			if (menuItems != null)
+			{
+				var obj = menuItems.FirstOrDefault(e =>
+					((e as MenuItem) != null && ((e as MenuItem).Header as string) == token)
+					|| ((e as FrameworkElement) != null && ((e as FrameworkElement).Tag as string) == token));
+				if (obj != null)
+				{
+					menuItems.Remove(obj);
+				}
+			}
 		}
 
 		#endregion Extensibility
