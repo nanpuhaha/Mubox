@@ -172,9 +172,19 @@ function X4D:UnregisterEvent(scope, eventName, eventHandler)
 	end
 end
 
+local _playerInfoEvictionTime = 0
+local _playerInfo = nil
+
 function X4D:OnEvent(...)
+	-- throttle api calls
+	local startTime = debugprofilestop()
+	if (_playerInfoEvictionTime <= startTime) then
+		_playerInfoEvictionTime = startTime + 1000
+		_playerInfo = { CastingInfo = { UnitCastingInfo("player"), nil }, IsAffectingCombat = UnitAffectingCombat("player") }
+	end
 	--X4D.Log:Debug({...})
-	if (IsShiftKeyDown() or (X4D.Persistence ~= nil and (not X4D.Persistence.IsEnabled))) then
+
+	if (IsShiftKeyDown() or (X4D.Persistence ~= nil and (not X4D.Persistence.IsEnabled)) or (_playerInfo.IsAffectingCombat or _playerInfo.CastingInfo[0] ~= nil)) then
 		-- user can press and hold shift key to bypass some of X4D's behaviors, such as not talking to quest NPCs.. 
 		-- this is meant to work in conjunction with pressing shift to not auto-loot
 		return false
