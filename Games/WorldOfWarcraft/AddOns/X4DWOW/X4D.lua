@@ -5,7 +5,9 @@ if (not X4D) then
 end
 
 X4D.Name = "X4D"
-X4D.Version = "2.0"
+X4D.Version = "2.1"
+
+-- TODO: localize names
 
 X4D.StaticConfig = 
 	{
@@ -32,6 +34,16 @@ X4D.StaticConfig =
 			},
 			MAGE = 
 			{ 
+				"Mail",
+				"Leather",
+				"Shields",
+				"Plate", 
+				"One-Handed Axes",
+				"Two-Handed Axes",
+				"Bows",
+				"Guns",
+				"Polearms",
+				"Crossbows",
 			},
 			PALADIN = 
 			{ 
@@ -91,6 +103,13 @@ X4D.StaticConfig =
 			},
 			MAGE = 
 			{ 
+				ITEM_MOD_SPELL_PENETRATION_SHORT = 1.75,
+				ITEM_MOD_SPELL_POWER_SHORT = 1,
+				ITEM_MOD_POWER_REGEN0_SHORT = 33,
+				ITEM_MOD_INTELLECT_SHORT = 3,
+				ITEM_MOD_STAMINA_SHORT = 1.5,
+				ITEM_MOD_SPIRIT_SHORT  = 1,
+				ITEM_MOD_MANA_SHORT = 1
 			},
 			PALADIN = 
 			{ 
