@@ -117,9 +117,10 @@ X4D_Colors.ItemQualityNames = {
 	[5] = "Legendary",
 	[6] = "Artifact",
 	[7] = "Heirloom",
-	[8] = "Token"
+	[8] = "Token"   
 }
-for i = 0, NUM_ITEM_QUALITIES do
+X4D_Colors.NUM_ITEM_QUALITIES = 8 -- this constant was found missing, we have our own version now
+for i = 0, X4D_Colors.NUM_ITEM_QUALITIES do
 	local r, g, b, hex = GetItemQualityColor(i)
 	X4D_Colors.ItemQuality[X4D_Colors.ItemQualityNames[i]] = X4D_Colors:Create(r, g, b, 1)
 end

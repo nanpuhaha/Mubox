@@ -48,7 +48,7 @@ function X4D_Player:WriteHelpText()
 	X4D.Player:Write("       a peer can only belong to one group")
 	X4D.Player:Write("  Usage: /x4d vendor [quality]")
 	X4D.Player:Write("       where 'quality' is numeric, one of:")
-	for i = 0, NUM_ITEM_QUALITIES do
+	for i = 0, X4D.Colors.NUM_ITEM_QUALITIES do
 		local r, g, b, hex = GetItemQualityColor(i)
 		local itemQualityColor = X4D.Colors:Create(r, g, b)
 		local itemQualityName = X4D.Colors.ItemQualityNames[i]
@@ -58,13 +58,15 @@ function X4D_Player:WriteHelpText()
 	X4D.Player:Write("       where 'command' is one of:")
 	X4D.Player:Write("       'on' - Turns X4D WoW Add-on features 'ON'")
 	X4D.Player:Write("       'off' - Turns X4D WoW Add-on features 'OFF'")
-	if (not X4D.Persistence.IsEnabled) then
-		X4D.Player:X4DCommandHandler("")
-		X4D.HUD:Write(X4D.Name.." "..X4D.Version.." is Currently Disabled.")
-		X4D.Player:Write(X4D.Name.." "..X4D.Version.." is Currently Disabled.")
+	local enablementMessage = X4D.Colors.Text..X4D.Name.." Add-on ("..X4D.Version..")"
+	if (X4D.Persistence.IsEnabled) then
+		enablementMessage = enablementMessage.." is ENABLED, using Group \""..X4D.Colors.TextHighlight..X4D.Persistence.Group.Name..X4D.Colors.Text.."\""
 	else
-		X4D.HUD:Write(X4D.Colors.Text..X4D.Name.." "..X4D.Version.." is using Group \""..X4D.Colors.TextHighlight..X4D.Persistence.Group.Name..X4D.Colors.Text.."\"")
+		enablementMessage = enablementMessage.." is DISABLED."
 	end
+	X4D.HUD:Write(enablementMessage)
+	X4D.Player:Write("")
+	X4D.Player:Write(enablementMessage)
 end
 
 function X4D_Player:X4DCommandHandler(parm)
@@ -101,7 +103,7 @@ function X4D_Player:X4DCommandHandler(parm)
 		end
 		X4D.Player:Write("  Usage: /x4d vendor [quality]")
 		X4D.Player:Write("       where 'quality' is numeric, one of:")
-		for i = 0, NUM_ITEM_QUALITIES do
+		for i = 0, X4D.Colors.NUM_ITEM_QUALITIES do
 			local r, g, b, hex = GetItemQualityColor(i)
 			local itemQualityColor = X4D.Colors:Create(r, g, b)
 			local itemQualityName = X4D.Colors.ItemQualityNames[i]
@@ -115,5 +117,9 @@ function X4D_Player:X4DCommandHandler(parm)
 		ReloadUI()
 	elseif (cmd_text == "sort") then
 		X4D.Inventory:Sort()
+	elseif (cmd_text == "test") or (cmd_text == "debug") then
+		X4D.Log:SetTraceLevel(X4D.Log.TRACE_LEVELS.DEBUG)
+		X4D.Log:Debug("Debug Logging Enabled", "X4D");
+		-- TODO: implement some tests
 	end
 end
