@@ -5,25 +5,56 @@ end
 local X4D = LibStub("X4D")
 X4D.Equipment = X4D_Equipment
 
+X4D.Equipment.SlotNames =
+{
+	-- TODO: these need to be verified
+	"AmmoSlot",
+	"BackSlot",
+	"Bag0Slot",
+	"Bag1Slot",
+	"Bag2Slot",
+	"Bag3Slot",
+	"ChestSlot",
+	"FeetSlot",
+	"Finger0Slot",
+	"Finger1Slot",
+	"HandsSlot",
+	"HeadSlot",
+	"LegsSlot",
+	"MainHandSlot",
+	"NeckSlot",
+--	"RangedSlot",
+	"SecondaryHandSlot",
+	"ShirtSlot",
+	"ShoulderSlot",
+	"TabardSlot",
+	"Trinket0Slot",
+	"Trinket1Slot",
+	"WaistSlot",
+	"WristSlot"
+};
+
 function X4D_Equipment:Repair()
 	local noRepairNecessary = true
 	-- custom repair of equipment, and not inventory, inventory slots are ordered by repair priority (e.g. chest before feet)
 	local playerMoney = GetMoney()
 	local shouldResetCursor = false
 	if (CanMerchantRepair()) then
-		if (InRepairMode() == nil) then
+		if (not InRepairMode()) then
 			ShowRepairCursor()
 			shouldResetCursor = true
 		end
 		if (InRepairMode()) then
 			for _,v in pairs(X4D.Equipment.SlotNames) do
+				--X4D.Log:Debug(v)
 				local inventoryId = GetInventorySlotInfo(v)
 				local itemId = GetInventoryItemID("player", inventoryId)
 				if (itemId ~= nil) then
 					local name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice = GetItemInfo(itemId)
-					X4D.Log:Debug({name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice})
+					--X4D.Log:Debug({name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice})
 					if (link ~= nil) then
 						local durability,max  = GetInventoryItemDurability(inventoryId)
+						--X4D.Log:Debug({playerMoney,quality,durability,max})
 						if (durability ~= max) then
 							local estimatedRepairCost = 0.010
 							if (quality <= 1) then -- common
@@ -39,8 +70,12 @@ function X4D_Equipment:Repair()
 							-- TODO determine/implement legendary and trash repair costs
 							-- TODO verify repair costs for weapons, armor, and shields/etc
 							-- TODO implement the above as a table, instead of hard-coded values
-
-							estimatedRepairCost = (estimatedRepairCost * (max - durability) * (iLevel - 32.5)) * 100
+							local iLevelAdjusted = (iLevel - 32.5)
+							if (iLevelAdjusted <= 1) then
+								iLevelAdjusted = 1
+							end
+							estimatedRepairCost = (estimatedRepairCost * (max - durability) * iLevelAdjusted) * 100
+--X4D.Log:Debug({playerMoney,quality,durability,max,estimatedRepairCost, iLevel})
 							
 							-- TODO determine/implement faction discount
 							
@@ -61,8 +96,10 @@ function X4D_Equipment:Repair()
 			HideRepairCursor()
 		end
 		if (noRepairNecessary) then
-			--X4D.Player:Write("No repairs were necessary. (this message was broken in patch 401 and may be incorrect)")
+			X4D.Player:Write("No repairs were necessary.")
 		end
+--	else
+--		X4D.Log:Debug("NPC Cannot Repair")
 	end
 	X4D.Persistence.Player.Money = GetMoney()
 end
