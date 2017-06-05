@@ -1,9 +1,9 @@
 ## Title: X4D|cfffff56c (2.1)
 ## Version: 2.1
-## Author: Shaun Wilson <mrshaunwilson@msn.com>
+## Author: Shaun Wilson <mubox@mrshaunwilson.com>
 ## Interface: 70200
 ## SavedVariablesPerCharacter: X4DPersistence
-## Notes: Macros, Commands and Behaviors useful for multiboxers. Author: Shaun Wilson <mrshaunwilson@msn.com> 
+## Notes: Macros, Commands and Behaviors useful for multiboxers. Author: Shaun Wilson <mubox@mrshaunwilson.com> 
 ## X-Website: https://github.com/wilson0x4d/Mubox
 ## X-License: MS-RL
 

@@ -110,19 +110,25 @@ end
 
 function X4D_Equipment:GetItemSortKey(item)
 	if (item == nil) then
-		return ""
+		return "!!!!"
 	end
-	local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = 
-		GetItemInfo(item)
+	local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(item)
+	-- sort hearthstone to edge of inventory
+	if (itemName ~= nil and itemName:find("Hearthstone") ~= nil) then
+		return "Z"
+	end
+
+	-- sort by quality, type, subtype, level, name
 	local key = ""
-	if (itemName == nil) then
-		key = key.."!!!"
-	elseif (itemName:find(" Hearthstone") ~= nil) then
-		return "000"
-	elseif (itemName:find("Hearthstone") ~= nil) then
-		return "001"
+	if (itemEquipLoc == nil) then
+		key = key.."ZZZ"
 	else
-		key = key..strsub(itemName, 1, 3)
+		key = key..strsub(itemEquipLoc, 1, 3)
+	end
+	if (itemQuality == nil) then
+		key = key.."!"
+	else
+		key = key..tostring(itemQuality)
 	end
 	if (itemType == nil) then
 		key = key.."!!!"
@@ -134,10 +140,10 @@ function X4D_Equipment:GetItemSortKey(item)
 	else
 		key = key..strsub(itemSubType, 1, 3)
 	end
-	if (itemQuality == nil) then
-		key = key.."0"
+	if (itemName == nil) then
+		key = key.."!!!"
 	else
-		key = key..tostring(itemQuality)
+		key = key..strsub(itemName, 1, 3)
 	end
 	return key
 end

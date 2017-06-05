@@ -1,6 +1,6 @@
 local X4D = LibStub:NewLibrary("X4D", 2000)
 if (not X4D) then
-	print("X4D Add-on has failed to load")
+	print("X4D AddOn has failed to load")
     return
 end
 
@@ -245,7 +245,7 @@ function X4D:OnUpdate(elapsed)
 
 	-- note: we only begin one process per tick, e.g. sorting bags, or queuing for a bg, etc. these are in priority. thus, bag sorts will suppress queuing for a bg.
 	if (X4D.Inventory.ShouldSort) then
-		X4D.Inventory:Sort(4, 1)
+		X4D.Inventory:Sort()
 	else
 		X4D.PvP:TryQueuePvP()
 	end
@@ -306,25 +306,27 @@ X4D:RegisterForEvent(X4D.Name, "ADDON_LOADED", function (...)
 				}
 			},
 			MaxQualityAutoVendor = 0,
-			InviteList = nil
+			InviteList = nil,
+			ShouldCompressInventory = true,
 		}
 	end
 	X4D.Persistence.Player.Class = UnitClass("player")
 	X4D.Persistence.Player.Level = UnitLevel("player")
+	X4D.Persistence.ShouldCompressInventory = true
 end)
 
 X4D:RegisterForEvent(X4D.Name, "BAG_UPDATE", function (self, event, ...)
-	X4D.Inventory:Sort(4, 1)
+	X4D.Inventory:Sort()
 end)
 
 X4D:RegisterForEvent(X4D.Name, "ITEM_LOCK_CHANGED", function (self, event, ...)
-	local arg1, arg2, arg3, arg4, arg5 = ...
-	local ok, _, _, leftLocked = pcall(GetContainerItemInfo, arg1, arg2)
+	local bagId, slotId, arg3, arg4, arg5 = ...
+	local ok, _, _, leftLocked = pcall(GetContainerItemInfo, bagId, slotId)
 	if (ok) then
 		if (not leftLocked) then
-			X4D.Inventory:Sort(arg1, arg2)
+			X4D.Inventory:Sort(bagId, slotId)
 		else
-			X4D.Inventory:Sort(4, 1)
+			X4D.Inventory:Sort()
 		end
 	end
 end)

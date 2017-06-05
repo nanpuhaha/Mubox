@@ -56,9 +56,9 @@ function X4D_Player:WriteHelpText()
 	end
 	X4D.Player:Write("  Usage: /x4d [command]")
 	X4D.Player:Write("       where 'command' is one of:")
-	X4D.Player:Write("       'on' - Turns X4D WoW Add-on features 'ON'")
-	X4D.Player:Write("       'off' - Turns X4D WoW Add-on features 'OFF'")
-	local enablementMessage = X4D.Colors.Text..X4D.Name.." Add-on ("..X4D.Version..")"
+	X4D.Player:Write("       'on' - Turns X4D WoW AddOn features 'ON'")
+	X4D.Player:Write("       'off' - Turns X4D WoW AddOn features 'OFF'")
+	local enablementMessage = X4D.Colors.Text..X4D.Name.." AddOn ("..X4D.Version..")"
 	if (X4D.Persistence.IsEnabled) then
 		enablementMessage = enablementMessage.." is ENABLED, using Group \""..X4D.Colors.TextHighlight..X4D.Persistence.Group.Name..X4D.Colors.Text.."\""
 	else

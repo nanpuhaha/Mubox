@@ -1,8 +1,8 @@
-All **X4D WoW Add-On Modules** are licensed under the **MS-RL (Microsoft Reciprocal License)**, a copy of this license appears below.
+All **X4D WoW AddOn Modules** are licensed under the **MS-RL (Microsoft Reciprocal License)**, a copy of this license appears below.
 
 **Copyright © Shaun Wilson, all rights reserved.**
 
-# Reciprocal License (Ms-RL)
+# Reciprocal License (MS-RL)
 
 This license governs use of the accompanying software.
 If you use the software, you accept this license.
