@@ -29,9 +29,9 @@ end)
 
 
 
-function X4D_Player:Write(message)
+function X4D_Player:Write(message, from)
 	if (message ~= nil) then
-		X4D.Log:Information(message)
+		X4D.Log:Information(message, from)
 	end
 end
 

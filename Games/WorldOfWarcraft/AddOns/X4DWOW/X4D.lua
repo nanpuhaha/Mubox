@@ -451,7 +451,7 @@ end)
 X4D:RegisterForEvent(X4D.Name, "QUEST_GREETING", function (...)
 	OnQuestGreeting()
 end)
-X4D:RegisterForEvent(X4D.Name, "QUEST_DETAIL", function (...)
+X4D:RegisterForEvent(X4D.Name, "QUEST_DETAIL", function (...)	
 	OnQuestDetail()
 end)
 X4D:RegisterForEvent(X4D.Name, "QUEST_ACCEPT_CONFIRM", function (...)
@@ -546,7 +546,7 @@ end
 
 function OnQuestCompleteAsync(timer, state)
 	--X4D.Log:Debug("OnQuestCompleteAsync")
-    timer:Stop()
+    timer:Stop()	
 	local num_choices = GetNumQuestChoices()
 	if (num_choices == nil) then
 		--X4D.Log:Debug("nil choices")
@@ -590,6 +590,10 @@ end
 
 function OnQuestDetail()
 	--X4D.Log:Debug("OnQuestDetail")
+	local text = GetObjectiveText()
+	if (text ~= nil) then
+		X4D.Player:Write(text, UnitName("target"))
+	end	
 	AcceptQuest()
 end
 
