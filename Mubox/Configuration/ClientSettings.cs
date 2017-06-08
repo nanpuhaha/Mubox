@@ -216,10 +216,10 @@ namespace Mubox.Configuration
 
         #region WindowHandle
 
-        [ConfigurationProperty("WindowHandle", IsRequired = false, DefaultValue = default(uint))]
-        public uint WindowHandleInternal
+        [ConfigurationProperty("WindowHandle", IsRequired = false, DefaultValue = default(int))]
+        public int WindowHandleInternal
         {
-            get { return (uint)base["WindowHandle"]; }
+            get { return (int)base["WindowHandle"]; }
             set { if (!WindowHandleInternal.Equals(value)) { base["WindowHandle"] = value; this.OnPropertyChanged(o => o.WindowHandleInternal); this.OnPropertyChanged(o => o.WindowHandle); } }
         }
 
@@ -231,7 +231,7 @@ namespace Mubox.Configuration
             }
             set
             {
-                WindowHandleInternal = (uint)value;
+                WindowHandleInternal = (int)value;
             }
         }
 
@@ -250,7 +250,7 @@ namespace Mubox.Configuration
 
         #endregion XXX
 
-         * */
+        n*/
 
         [ConfigurationProperty("Keys")]
         public KeySettingCollection Keys
