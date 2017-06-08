@@ -768,11 +768,8 @@ namespace Mubox.Control.Network
         private void OnConnected()
         {
             SendClientConfig();
-            if (this.Connected != null)
-            {
-                Connected(this, new EventArgs());
-            }
-        }
+			Connected?.Invoke(this, new EventArgs());
+		}
 
         public void SendClientConfig()
         {
@@ -993,11 +990,8 @@ namespace Mubox.Control.Network
 
         private void OnDisconnected()
         {
-            if (this.Disconnected != null)
-            {
-                Disconnected(this, new EventArgs());
-            }
-        }
+			Disconnected?.Invoke(this, new EventArgs());
+		}
 
         public void CoerceActivation()
         {
@@ -1010,24 +1004,40 @@ namespace Mubox.Control.Network
 
         public event EventHandler<EventArgs> ClientActivated;
 
-        public void NotifyClientActivated()
-        {
-            try
-            {
-                if (ClientActivated != null)
-                {
-                    ClientActivated(this, EventArgs.Empty);
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.Log();
-            }
-            SendCommand("ACTV",
-                (sender, e) =>
-                {
-                    // NOP
-                });
-        }
-    }
+		public void NotifyClientActivated()
+		{
+			try
+			{
+				ClientActivated?.Invoke(this, EventArgs.Empty);
+			}
+			catch (Exception ex)
+			{
+				ex.Log();
+			}
+			SendCommand("ACTV",
+				(sender, e) =>
+				{
+					// NOP
+				});
+		}
+
+		public event EventHandler<EventArgs> GameProcessExited;
+
+		public void NotifyGameProcessExited()
+		{
+			try
+			{
+				GameProcessExited?.Invoke(this, EventArgs.Empty);
+			}
+			catch (Exception ex)
+			{
+				ex.Log();
+			}
+			SendCommand("GPE",
+				(sender, e) =>
+				{
+					// NOP
+				});
+		}
+	}
 }

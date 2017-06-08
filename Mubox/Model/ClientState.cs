@@ -389,11 +389,8 @@ namespace Mubox.Model
                         {
                             NetworkClient.WindowHandle = Settings.WindowHandle;
                         }
-                        if (GameProcessExited != null)
-                        {
-                            GameProcessExited(this, new EventArgs());
-                        }
-                    }
+						GameProcessExited?.Invoke(this, new EventArgs());
+					}
                 }
                 else
                 {
@@ -411,11 +408,8 @@ namespace Mubox.Model
                             ("NewGameProcess for " + this.Settings.Name).Log();
                             WinAPI.SandboxApi.TryFixMultilaunch(gameProcess);
                             Settings.WindowHandle = newWindowHandle;
-                            if (GameProcessFound != null)
-                            {
-                                GameProcessFound(this, new EventArgs());
-                            }
-                        }
+							GameProcessFound?.Invoke(this, new EventArgs());
+						}
                         if (gameProcess.PriorityClass != ProcessPriorityClass.Idle)
                         {
                             gameProcess.PriorityClass = ProcessPriorityClass.Idle;

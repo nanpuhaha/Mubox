@@ -86,8 +86,9 @@ namespace Mubox.View.Client
                                 buttonLaunchApplication.IsEnabled = true;
                                 this.Show();
                                 ToggleApplicationLaunchButton();
-                            }
-                            catch
+								this.ClientState.NetworkClient.NotifyGameProcessExited();
+							}
+							catch
                             {
                                 // NOP - known issue during shutdown where client window is in a closing state before game process has exited, resulting in exception.
                             }
