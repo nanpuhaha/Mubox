@@ -243,12 +243,7 @@ function X4D:OnUpdate(elapsed)
 	end
 	X4D.TimeOfNextUpdate = time() + 5 -- NOTE: we only allow updates once every 5 seconds
 
-	-- note: we only begin one process per tick, e.g. sorting bags, or queuing for a bg, etc. these are in priority. thus, bag sorts will suppress queuing for a bg.
-	if (X4D.Inventory.ShouldSort) then
-		X4D.Inventory:Sort()
-	else
-		X4D.PvP:TryQueuePvP()
-	end
+	X4D.PvP:TryQueuePvP()
 end
 
 X4D:RegisterForEvent(X4D.Name, "ADDON_LOADED", function (...)
@@ -316,19 +311,20 @@ X4D:RegisterForEvent(X4D.Name, "ADDON_LOADED", function (...)
 end)
 
 X4D:RegisterForEvent(X4D.Name, "BAG_UPDATE", function (self, event, ...)
-	X4D.Inventory:Sort()
+	--if (X4D.Inventory.ShouldSort) then
+	--local bagId, arg2, arg3 = ...
+	--X4D.Inventory:Sort(bagId)
+	--end
 end)
 
 X4D:RegisterForEvent(X4D.Name, "ITEM_LOCK_CHANGED", function (self, event, ...)
-	local bagId, slotId, arg3, arg4, arg5 = ...
-	local ok, _, _, leftLocked = pcall(GetContainerItemInfo, bagId, slotId)
-	if (ok) then
-		if (not leftLocked) then
-			X4D.Inventory:Sort(bagId, slotId)
-		else
-			X4D.Inventory:Sort()
-		end
-	end
+	--local bagId, slotId, arg3, arg4, arg5 = ...
+	--local ok, _, _, isLocked = pcall(GetContainerItemInfo, bagId, slotId)
+	--if (ok) then
+	--	if (not isLocked) then
+	--		X4D.Inventory:Sort(bagId, slotId)
+	--	end
+	--end
 end)
 
 X4D:RegisterForEvent(X4D.Name, "PARTY_LOOT_METHOD_CHANGED", function (self, event, ...)
