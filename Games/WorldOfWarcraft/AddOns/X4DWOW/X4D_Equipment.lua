@@ -49,11 +49,11 @@ function X4D_Equipment:Repair()
 				--X4D.Log:Debug(v)
 				local inventoryId = GetInventorySlotInfo(v)
 				local itemId = GetInventoryItemID("player", inventoryId)
-				if (itemId ~= nil) then
-					local name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice = GetItemInfo(itemId)
+				if (itemId ~= nil) then					
+					local name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice, itemClassId, itemSubClassId = GetItemInfo(itemId)
 					--X4D.Log:Debug({name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice})
 					if (link ~= nil) then
-						local durability,max  = GetInventoryItemDurability(inventoryId)
+						local durability,max = GetInventoryItemDurability(inventoryId)
 						--X4D.Log:Debug({playerMoney,quality,durability,max})
 						if (durability ~= max) then
 							local estimatedRepairCost = 0.010
@@ -108,42 +108,61 @@ function X4D_Equipment:CompareItemScore(item1, item2, class, log)
 	return X4D.Equipment:GetItemScore(item1, class, log) > X4D.Equipment:GetItemScore(item2, class, log)
 end
 
-function X4D_Equipment:GetItemSortKey(item)
-	if (item == nil) then
-		return "!!!!"
+local _auctionItemClassSortKey = nil
+function GetItemClassSortKey(itemClassId, itemSubClassId)
+	if (_auctionItemClassSortKey == nil) then
+		_auctionItemClassSortKey = {
+			LE_ITEM_CLASS_RECIPE = "A",
+			LE_ITEM_CLASS_MISCELLANEOUS = "B",
+			LE_ITEM_CLASS_CONSUMABLE = "C",
+			LE_ITEM_CLASS_CONTAINER = "D",
+			LE_ITEM_CLASS_ITEM_ENHANCEMENT = "E",
+			LE_ITEM_CLASS_GLYPH = "F",
+			LE_ITEM_CLASS_GEM = "G",
+			LE_ITEM_CLASS_TRADEGOODS = "H",
+			LE_ITEM_CLASS_WEAPON = "I",
+			LE_ITEM_CLASS_ARMOR = "J",
+			LE_ITEM_CLASS_BATTLEPET = "K",
+			LE_ITEM_CLASS_QUESTITEM = "L",
+		}
 	end
-	local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(item)
-	-- sort hearthstone to edge of inventory
-	if (itemName ~= nil and itemName:find("Hearthstone") ~= nil) then
-		return "Z"
+	local lval = _auctionItemClassSortKey[itemClassId]
+	if (lval == nil) then
+		lval = "!"
 	end
+	if (itemSubClassId == nil) then
+		itemSubClassId = "!"
+	end
+	return lval..itemSubClassId
+end
 
-	-- sort by quality, type, subtype, level, name
+function X4D_Equipment:GetItemSortKey(item)
 	local key = ""
-	if (itemEquipLoc == nil) then
-		key = key.."ZZZ"
-	else
-		key = key..strsub(itemEquipLoc, 1, 3)
-	end
-	if (itemQuality == nil) then
-		key = key.."!"
-	else
-		key = key..tostring(itemQuality)
-	end
-	if (itemType == nil) then
-		key = key.."!!!"
-	else
-		key = key..strsub(itemType, 1, 3)
-	end
-	if (itemSubType == nil) then
-		key = key.."!!!"
-	else
-		key = key..strsub(itemSubType, 1, 3)
-	end
-	if (itemName == nil) then
-		key = key.."!!!"
-	else
-		key = key..strsub(itemName, 1, 3)
+	if (item ~= nil) then
+		local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice, itemClassId, itemSubClassId = GetItemInfo(item)
+		-- sort hearthstone to edge of inventory
+		-- sort by quality (move trash to top), type, subtype, quality level, name
+		local isTrash = (itemQuality == nil or tostring(itemQuality) == "0")
+		if (isTrash) then
+			key = key.."!"
+		else
+			if (itemName ~= nil) then
+				if (itemName:find(" Hearthstone") ~= nil) then
+					return "Y"..itemName
+				elseif (itemName:find("Hearthstone") ~= nil) then
+					return "Z"..itemName
+				end
+			end
+		end
+		key = key..GetItemClassSortKey(itemClassId, itemSubClassId)
+		if (not isTrash) then
+			key = key..tostring(itemQuality)
+		end
+		if (itemName == nil) then
+			key = key.."!"
+		else
+			key = key..strsub(itemName, 1, 3)
+		end
 	end
 	return key
 end
